@@ -1,0 +1,21 @@
+{
+  "name": "CyberArm PCA9685 Servo",
+  "version": "1.0.0",
+  "description": "Safe and convenient PCA9685 servo control for ESP32-S3 Arduino projects.",
+  "keywords": [
+    "pca9685",
+    "servo",
+    "esp32-s3",
+    "i2c"
+  ],
+  "authors": [
+    {
+      "name": "CyberArm"
+    }
+  ],
+  "frameworks": "arduino",
+  "platforms": "espressif32",
+  "dependencies": {
+    "adafruit/Adafruit PWM Servo Driver Library": "^3.0.3"
+  }
+}
