@@ -1,0 +1,9 @@
+{
+  "mesh_components": 2,
+  "main_vertices": 10665,
+  "hook_vertices": 245,
+  "triangle_intersections": 96,
+  "hook_vertex_to_main_surface_min_mm": 0.0004414646828081459,
+  "hook_vertex_to_main_surface_max_mm": 10.14647102355957,
+  "note": "Vertex-to-surface minimum plus triangle intersections, not an exact CAD solid distance nor print bonding certification."
+}

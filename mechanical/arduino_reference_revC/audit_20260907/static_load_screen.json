@@ -1,0 +1,686 @@
+{
+  "scope": "STATIC SCREEN ONLY. All-solid PLA upper mass proxy and illustrative mass multipliers, not infill percentages. No certified operating envelope. Tips are proxy COM locations. Support assumes all feet are rigidly attached, coplanar and nonslip. No springs, electronics, payload offset, servo torque derating by lot, thermal rating, contact/friction, dynamics or FEA.",
+  "saved_pose": [
+    {
+      "q_deg": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "print_solid_mass_multiplier": 1.0,
+      "base_print_multiplier": null,
+      "total_mass_g": 715.9691741580747,
+      "com_world_mm": [
+        52.253483644085904,
+        -5.339379772317604,
+        83.0708773702169
+      ],
+      "tip_world_mm": [
+        264.9225563028315,
+        13.024977691872234,
+        57.97372851331024
+      ],
+      "reach_from_base_axis_mm": 265.24255103942255,
+      "joints": [
+        {
+          "joint": "J02_Shoulder_pitch",
+          "empty_Nm": 0.41658837470621085,
+          "signed_Nm": 0.41658837470621085,
+          "payload_Nm_per_g": 0.0027345015230957497,
+          "with_50g_Nm": 0.5533134508609984,
+          "with_100g_Nm": 0.6900385270157858,
+          "fraction_of_stall_empty": 0.45191693598515686,
+          "stall_4p8V_Nm": 0.9218251000000001,
+          "screen_cap_g": {
+            "0.3": 0.0,
+            "0.5": 16.209234085051616,
+            "1.0": 184.76373884839055
+          }
+        },
+        {
+          "joint": "J03_Elbow_pitch",
+          "empty_Nm": 0.17164123039484291,
+          "signed_Nm": 0.17164123039484291,
+          "payload_Nm_per_g": 0.0018738459467775252,
+          "with_50g_Nm": 0.26533352773371915,
+          "with_100g_Nm": 0.3590258250725954,
+          "fraction_of_stall_empty": 0.18619717600968222,
+          "stall_4p8V_Nm": 0.9218251000000001,
+          "screen_cap_g": {
+            "0.3": 55.98448462936116,
+            "0.5": 154.3730529730154,
+            "1.0": 400.344473832151
+          }
+        },
+        {
+          "joint": "J04_Wrist_roll",
+          "empty_Nm": 0.01658047176402145,
+          "signed_Nm": -0.01658047176402145,
+          "payload_Nm_per_g": 0.00020497830220698218,
+          "with_50g_Nm": 0.02682938687437056,
+          "with_100g_Nm": 0.03707830198471967,
+          "fraction_of_stall_empty": 0.09392986598108567,
+          "stall_4p8V_Nm": 0.1765197,
+          "screen_cap_g": {
+            "0.3": 177.4599450006543,
+            "0.5": 349.69251605761883,
+            "1.0": 780.27394370003
+          }
+        },
+        {
+          "joint": "J05_Wrist_pitch",
+          "empty_Nm": 0.038299540946546,
+          "signed_Nm": 0.038299540946546,
+          "payload_Nm_per_g": 0.0009344659657639546,
+          "with_50g_Nm": 0.08502283923474373,
+          "with_100g_Nm": 0.13174613752294145,
+          "fraction_of_stall_empty": 0.21697034918224992,
+          "stall_4p8V_Nm": 0.1765197,
+          "screen_cap_g": {
+            "0.3": 15.684219212277004,
+            "0.5": 53.464022108723796,
+            "1.0": 147.9135293498408
+          }
+        }
+      ],
+      "all_feet": {
+        "margin_mm": 44.8484352187195,
+        "minimum_empty_restoring_Nm": 0.31489248397900604,
+        "static_tip_threshold_g": 191.38785088216926,
+        "tip_threshold_1p5_moment_margin_g": 102.28489278546907
+      },
+      "base_only": {
+        "margin_mm": 12.467160862079133,
+        "minimum_empty_restoring_Nm": 0.0875351666759453,
+        "static_tip_threshold_g": 45.08852506021177,
+        "tip_threshold_1p5_moment_margin_g": -3.1580852834587527
+      }
+    },
+    {
+      "q_deg": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "print_solid_mass_multiplier": 0.75,
+      "base_print_multiplier": null,
+      "total_mass_g": 600.8522845065529,
+      "com_world_mm": [
+        53.39956051414286,
+        -6.168597497542122,
+        84.74358991316306
+      ],
+      "tip_world_mm": [
+        264.9225563028315,
+        13.024977691872234,
+        57.97372851331024
+      ],
+      "reach_from_base_axis_mm": 265.24255103942255,
+      "joints": [
+        {
+          "joint": "J02_Shoulder_pitch",
+          "empty_Nm": 0.357392013766095,
+          "signed_Nm": 0.357392013766095,
+          "payload_Nm_per_g": 0.0027345015230957497,
+          "with_50g_Nm": 0.49411708992088244,
+          "with_100g_Nm": 0.63084216607567,
+          "fraction_of_stall_empty": 0.38770045832565736,
+          "stall_4p8V_Nm": 0.9218251000000001,
+          "screen_cap_g": {
+            "0.3": 0.0,
+            "0.5": 37.857187264137515,
+            "1.0": 206.41169202747642
+          }
+        },
+        {
+          "joint": "J03_Elbow_pitch",
+          "empty_Nm": 0.1467341359842384,
+          "signed_Nm": 0.1467341359842384,
+          "payload_Nm_per_g": 0.0018738459467775252,
+          "with_50g_Nm": 0.24042643332311464,
+          "with_100g_Nm": 0.33411873066199094,
+          "fraction_of_stall_empty": 0.15917784836216586,
+          "stall_4p8V_Nm": 0.9218251000000001,
+          "screen_cap_g": {
+            "0.3": 69.2764494535974,
+            "0.5": 167.66501779725166,
+            "1.0": 413.63643865638727
+          }
+        },
+        {
+          "joint": "J04_Wrist_roll",
+          "empty_Nm": 0.014200964820410042,
+          "signed_Nm": -0.014200964820410042,
+          "payload_Nm_per_g": 0.00020497830220698218,
+          "with_50g_Nm": 0.02444987993075915,
+          "with_100g_Nm": 0.03469879504110826,
+          "fraction_of_stall_empty": 0.08044974481834062,
+          "stall_4p8V_Nm": 0.1765197,
+          "screen_cap_g": {
+            "0.3": 189.06852463074918,
+            "0.5": 361.30109568771366,
+            "1.0": 791.8825233301249
+          }
+        },
+        {
+          "joint": "J05_Wrist_pitch",
+          "empty_Nm": 0.03276962707466699,
+          "signed_Nm": 0.03276962707466699,
+          "payload_Nm_per_g": 0.0009344659657639546,
+          "with_50g_Nm": 0.07949292536286472,
+          "with_100g_Nm": 0.12621622365106244,
+          "fraction_of_stall_empty": 0.18564288900710227,
+          "stall_4p8V_Nm": 0.1765197,
+          "screen_cap_g": {
+            "0.3": 21.601945565593827,
+            "0.5": 59.38174846204062,
+            "1.0": 153.8312557031576
+          }
+        }
+      ],
+      "all_feet": {
+        "margin_mm": 43.700330022430656,
+        "minimum_empty_restoring_Nm": 0.2574975546479432,
+        "static_tip_threshold_g": 156.5039056148746,
+        "tip_threshold_1p5_moment_margin_g": 82.63976930633878
+      },
+      "base_only": {
+        "margin_mm": 11.238489121965827,
+        "minimum_empty_restoring_Nm": 0.0662210895285765,
+        "static_tip_threshold_g": 34.20316252301342,
+        "tip_threshold_1p5_moment_margin_g": -5.73567348246368
+      }
+    },
+    {
+      "q_deg": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "print_solid_mass_multiplier": 0.5,
+      "base_print_multiplier": null,
+      "total_mass_g": 485.73539485503125,
+      "com_world_mm": [
+        55.088866500216255,
+        -7.390856233913238,
+        87.20915167922382
+      ],
+      "tip_world_mm": [
+        264.9225563028315,
+        13.024977691872234,
+        57.97372851331024
+      ],
+      "reach_from_base_axis_mm": 265.24255103942255,
+      "joints": [
+        {
+          "joint": "J02_Shoulder_pitch",
+          "empty_Nm": 0.2981956528259792,
+          "signed_Nm": 0.2981956528259792,
+          "payload_Nm_per_g": 0.0027345015230957497,
+          "with_50g_Nm": 0.4349207289807667,
+          "with_100g_Nm": 0.5716458051355542,
+          "fraction_of_stall_empty": 0.323483980666158,
+          "stall_4p8V_Nm": 0.9218251000000001,
+          "screen_cap_g": {
+            "0.3": 0.0,
+            "0.5": 59.505140443223375,
+            "1.0": 228.0596452065623
+          }
+        },
+        {
+          "joint": "J03_Elbow_pitch",
+          "empty_Nm": 0.12182704157363392,
+          "signed_Nm": 0.12182704157363392,
+          "payload_Nm_per_g": 0.0018738459467775252,
+          "with_50g_Nm": 0.21551933891251018,
+          "with_100g_Nm": 0.3092116362513864,
+          "fraction_of_stall_empty": 0.13215852071464956,
+          "stall_4p8V_Nm": 0.9218251000000001,
+          "screen_cap_g": {
+            "0.3": 82.56841427783363,
+            "0.5": 180.95698262148787,
+            "1.0": 426.9284034806235
+          }
+        },
+        {
+          "joint": "J04_Wrist_roll",
+          "empty_Nm": 0.011821457876798641,
+          "signed_Nm": -0.011821457876798641,
+          "payload_Nm_per_g": 0.00020497830220698218,
+          "with_50g_Nm": 0.02207037298714775,
+          "with_100g_Nm": 0.03231928809749686,
+          "fraction_of_stall_empty": 0.06696962365559561,
+          "stall_4p8V_Nm": 0.1765197,
+          "screen_cap_g": {
+            "0.3": 200.67710426084403,
+            "0.5": 372.90967531780854,
+            "1.0": 803.4911029602198
+          }
+        },
+        {
+          "joint": "J05_Wrist_pitch",
+          "empty_Nm": 0.02723971320278799,
+          "signed_Nm": 0.02723971320278799,
+          "payload_Nm_per_g": 0.0009344659657639546,
+          "with_50g_Nm": 0.07396301149098572,
+          "with_100g_Nm": 0.12068630977918345,
+          "fraction_of_stall_empty": 0.15431542883195468,
+          "stall_4p8V_Nm": 0.1765197,
+          "screen_cap_g": {
+            "0.3": 27.51967191891064,
+            "0.5": 65.29947481535743,
+            "1.0": 159.74898205647443
+          }
+        }
+      ],
+      "all_feet": {
+        "margin_mm": 42.0080343035263,
+        "minimum_empty_restoring_Nm": 0.20010262531688036,
+        "static_tip_threshold_g": 121.61996034757998,
+        "tip_threshold_1p5_moment_margin_g": 62.994645827208444
+      },
+      "base_only": {
+        "margin_mm": 9.409060369011897,
+        "minimum_empty_restoring_Nm": 0.04481946639065316,
+        "static_tip_threshold_g": 23.240944472795565,
+        "tip_threshold_1p5_moment_margin_g": -8.376331274263636
+      }
+    }
+  ],
+  "max_extension_reference": [
+    {
+      "q_deg": [
+        0,
+        43.0,
+        -80.8,
+        0,
+        11.6
+      ],
+      "print_solid_mass_multiplier": 1.0,
+      "base_print_multiplier": null,
+      "total_mass_g": 715.9691741580747,
+      "com_world_mm": [
+        70.5784556714209,
+        -5.339381396055479,
+        67.92799002025295
+      ],
+      "tip_world_mm": [
+        333.56029086146214,
+        13.024964355307944,
+        97.3463958904406
+      ],
+      "reach_from_base_axis_mm": 333.8144953953322,
+      "joints": [
+        {
+          "joint": "J02_Shoulder_pitch",
+          "empty_Nm": 0.5452527513425862,
+          "signed_Nm": 0.5452527513425862,
+          "payload_Nm_per_g": 0.0034076077627051646,
+          "with_50g_Nm": 0.7156331394778445,
+          "with_100g_Nm": 0.8860135276131027,
+          "fraction_of_stall_empty": 0.5914926284200617,
+          "stall_4p8V_Nm": 0.9218251000000001,
+          "screen_cap_g": {
+            "0.3": 0.0,
+            "0.5": 0.0,
+            "1.0": 110.50930003706412
+          }
+        },
+        {
+          "joint": "J03_Elbow_pitch",
+          "empty_Nm": 0.2104249842233572,
+          "signed_Nm": 0.2104249842233572,
+          "payload_Nm_per_g": 0.00223080974451864,
+          "with_50g_Nm": 0.3219654714492892,
+          "with_100g_Nm": 0.43350595867522124,
+          "fraction_of_stall_empty": 0.22826996598742774,
+          "stall_4p8V_Nm": 0.9218251000000001,
+          "screen_cap_g": {
+            "0.3": 29.640602897272434,
+            "0.5": 112.28549023157174,
+            "1.0": 318.89770856731997
+          }
+        },
+        {
+          "joint": "J04_Wrist_roll",
+          "empty_Nm": 0.021040792952746582,
+          "signed_Nm": -0.021040792952746582,
+          "payload_Nm_per_g": 0.00026011963942662613,
+          "with_50g_Nm": 0.034046774924077886,
+          "with_100g_Nm": 0.04705275689540919,
+          "fraction_of_stall_empty": 0.11919798726570792,
+          "stall_4p8V_Nm": 0.1765197,
+          "screen_cap_g": {
+            "0.3": 122.69399233984387,
+            "0.5": 258.4159242855417,
+            "1.0": 597.7207541497862
+          }
+        },
+        {
+          "joint": "J05_Wrist_pitch",
+          "empty_Nm": 0.04151525476317314,
+          "signed_Nm": 0.04151525476317314,
+          "payload_Nm_per_g": 0.0010410148478884576,
+          "with_50g_Nm": 0.09356599715759602,
+          "with_100g_Nm": 0.1456167395520189,
+          "fraction_of_stall_empty": 0.23518765759953783,
+          "stall_4p8V_Nm": 0.1765197,
+          "screen_cap_g": {
+            "0.3": 10.989905917319543,
+            "0.5": 44.90290924441785,
+            "1.0": 129.68541756216362
+          }
+        }
+      ],
+      "all_feet": {
+        "margin_mm": 26.523518195224497,
+        "minimum_empty_restoring_Nm": 0.18622849353884502,
+        "static_tip_threshold_g": 80.32578200362369,
+        "tip_threshold_1p5_moment_margin_g": 20.136787047804173
+      },
+      "base_only": {
+        "margin_mm": -5.781031774345863,
+        "minimum_empty_restoring_Nm": -0.040590121963173895,
+        "static_tip_threshold_g": -15.561374976209155,
+        "tip_threshold_1p5_moment_margin_g": -50.09080683026681
+      }
+    },
+    {
+      "q_deg": [
+        0,
+        43.0,
+        -80.8,
+        0,
+        11.6
+      ],
+      "print_solid_mass_multiplier": 0.75,
+      "base_print_multiplier": null,
+      "total_mass_g": 600.8522845065529,
+      "com_world_mm": [
+        72.17775518315854,
+        -6.16859915374863,
+        69.12431726732993
+      ],
+      "tip_world_mm": [
+        333.56029086146214,
+        13.024964355307944,
+        97.3463958904406
+      ],
+      "reach_from_base_axis_mm": 333.8144953953322,
+      "joints": [
+        {
+          "joint": "J02_Shoulder_pitch",
+          "empty_Nm": 0.46803967261656015,
+          "signed_Nm": 0.46803967261656015,
+          "payload_Nm_per_g": 0.0034076077627051646,
+          "with_50g_Nm": 0.6384200607518185,
+          "with_100g_Nm": 0.8088004488870766,
+          "fraction_of_stall_empty": 0.507731534557434,
+          "stall_4p8V_Nm": 0.9218251000000001,
+          "screen_cap_g": {
+            "0.3": 0.0,
+            "0.5": 0.0,
+            "1.0": 133.16832774884796
+          }
+        },
+        {
+          "joint": "J03_Elbow_pitch",
+          "empty_Nm": 0.18007276182974125,
+          "signed_Nm": 0.18007276182974125,
+          "payload_Nm_per_g": 0.00223080974451864,
+          "with_50g_Nm": 0.29161324905567326,
+          "with_100g_Nm": 0.4031537362816052,
+          "fraction_of_stall_empty": 0.19534373909946826,
+          "stall_4p8V_Nm": 0.9218251000000001,
+          "screen_cap_g": {
+            "0.3": 43.24652445476738,
+            "0.5": 125.8914117890667,
+            "1.0": 332.50363012481495
+          }
+        },
+        {
+          "joint": "J04_Wrist_roll",
+          "empty_Nm": 0.01802117359936251,
+          "signed_Nm": -0.01802117359936251,
+          "payload_Nm_per_g": 0.00026011963942662613,
+          "with_50g_Nm": 0.031027155570693816,
+          "with_100g_Nm": 0.04403313754202512,
+          "fraction_of_stall_empty": 0.10209157164533199,
+          "stall_4p8V_Nm": 0.1765197,
+          "screen_cap_g": {
+            "0.3": 134.3025712231613,
+            "0.5": 270.0245031688591,
+            "1.0": 609.3293330331036
+          }
+        },
+        {
+          "joint": "J05_Wrist_pitch",
+          "empty_Nm": 0.03572427066594169,
+          "signed_Nm": 0.03572427066594169,
+          "payload_Nm_per_g": 0.0010410148478884576,
+          "with_50g_Nm": 0.08777501306036457,
+          "with_100g_Nm": 0.13982575545478745,
+          "fraction_of_stall_empty": 0.2023812110826253,
+          "stall_4p8V_Nm": 0.1765197,
+          "screen_cap_g": {
+            "0.3": 16.552731566711177,
+            "0.5": 50.46573489380948,
+            "1.0": 135.24824321155526
+          }
+        }
+      ],
+      "all_feet": {
+        "margin_mm": 24.9221917176571,
+        "minimum_empty_restoring_Nm": 0.14685022791521218,
+        "static_tip_threshold_g": 63.34078727989772,
+        "tip_threshold_1p5_moment_margin_g": 13.570322313178758
+      },
+      "base_only": {
+        "margin_mm": -7.449458350251518,
+        "minimum_empty_restoring_Nm": -0.04389480142728611,
+        "static_tip_threshold_g": -16.828317617176943,
+        "tip_threshold_1p5_moment_margin_g": -45.531345283518824
+      }
+    },
+    {
+      "q_deg": [
+        0,
+        43.0,
+        -80.8,
+        0,
+        11.6
+      ],
+      "print_solid_mass_multiplier": 0.5,
+      "base_print_multiplier": null,
+      "total_mass_g": 485.73539485503125,
+      "com_world_mm": [
+        74.53510686635622,
+        -7.390857937978187,
+        70.88769181278214
+      ],
+      "tip_world_mm": [
+        333.56029086146214,
+        13.024964355307944,
+        97.3463958904406
+      ],
+      "reach_from_base_axis_mm": 333.8144953953322,
+      "joints": [
+        {
+          "joint": "J02_Shoulder_pitch",
+          "empty_Nm": 0.3908265938905343,
+          "signed_Nm": 0.3908265938905343,
+          "payload_Nm_per_g": 0.0034076077627051646,
+          "with_50g_Nm": 0.5612069820257926,
+          "with_100g_Nm": 0.7315873701610508,
+          "fraction_of_stall_empty": 0.4239704406948067,
+          "stall_4p8V_Nm": 0.9218251000000001,
+          "screen_cap_g": {
+            "0.3": 0.0,
+            "0.5": 20.567495143228356,
+            "1.0": 155.82735546063174
+          }
+        },
+        {
+          "joint": "J03_Elbow_pitch",
+          "empty_Nm": 0.14972053943612534,
+          "signed_Nm": 0.14972053943612534,
+          "payload_Nm_per_g": 0.00223080974451864,
+          "with_50g_Nm": 0.26126102666205736,
+          "with_100g_Nm": 0.3728015138879893,
+          "fraction_of_stall_empty": 0.16241751221150882,
+          "stall_4p8V_Nm": 0.9218251000000001,
+          "screen_cap_g": {
+            "0.3": 56.8524460122623,
+            "0.5": 139.49733334656162,
+            "1.0": 346.10955168230987
+          }
+        },
+        {
+          "joint": "J04_Wrist_roll",
+          "empty_Nm": 0.015001554245978438,
+          "signed_Nm": -0.015001554245978438,
+          "payload_Nm_per_g": 0.00026011963942662613,
+          "with_50g_Nm": 0.028007536217309746,
+          "with_100g_Nm": 0.04101351818864105,
+          "fraction_of_stall_empty": 0.08498515602495607,
+          "stall_4p8V_Nm": 0.1765197,
+          "screen_cap_g": {
+            "0.3": 145.91115010647871,
+            "0.5": 281.6330820521765,
+            "1.0": 620.9379119164211
+          }
+        },
+        {
+          "joint": "J05_Wrist_pitch",
+          "empty_Nm": 0.029933286568710242,
+          "signed_Nm": 0.029933286568710242,
+          "payload_Nm_per_g": 0.0010410148478884576,
+          "with_50g_Nm": 0.08198402896313312,
+          "with_100g_Nm": 0.134034771357556,
+          "fraction_of_stall_empty": 0.16957476456571274,
+          "stall_4p8V_Nm": 0.1765197,
+          "screen_cap_g": {
+            "0.3": 22.11555721610282,
+            "0.5": 56.028560543201124,
+            "1.0": 140.81106886094688
+          }
+        }
+      ],
+      "all_feet": {
+        "margin_mm": 22.561852306847754,
+        "minimum_empty_restoring_Nm": 0.10747196229157929,
+        "static_tip_threshold_g": 46.355792556171714,
+        "tip_threshold_1p5_moment_margin_g": 7.003857578553345
+      },
+      "base_only": {
+        "margin_mm": -9.908702643229304,
+        "minimum_empty_restoring_Nm": -0.04719948089139832,
+        "static_tip_threshold_g": -18.163996163206228,
+        "tip_threshold_1p5_moment_margin_g": -41.012909378492594
+      }
+    }
+  ],
+  "light_base_heavy_arm": {
+    "q_deg": [
+      0,
+      43.0,
+      -80.8,
+      0,
+      11.6
+    ],
+    "print_solid_mass_multiplier": 1.0,
+    "base_print_multiplier": 0.5,
+    "total_mass_g": 583.7099450525693,
+    "com_world_mm": [
+      86.66584823568405,
+      -6.059229619542836,
+      75.57191728619358
+    ],
+    "tip_world_mm": [
+      333.56029086146214,
+      13.024964355307944,
+      97.3463958904406
+    ],
+    "reach_from_base_axis_mm": 333.8144953953322,
+    "joints": [
+      {
+        "joint": "J02_Shoulder_pitch",
+        "empty_Nm": 0.5452527513425862,
+        "signed_Nm": 0.5452527513425862,
+        "payload_Nm_per_g": 0.0034076077627051646,
+        "with_50g_Nm": 0.7156331394778445,
+        "with_100g_Nm": 0.8860135276131027,
+        "fraction_of_stall_empty": 0.5914926284200617,
+        "stall_4p8V_Nm": 0.9218251000000001,
+        "screen_cap_g": {
+          "0.3": 0.0,
+          "0.5": 0.0,
+          "1.0": 110.50930003706412
+        }
+      },
+      {
+        "joint": "J03_Elbow_pitch",
+        "empty_Nm": 0.2104249842233572,
+        "signed_Nm": 0.2104249842233572,
+        "payload_Nm_per_g": 0.00223080974451864,
+        "with_50g_Nm": 0.3219654714492892,
+        "with_100g_Nm": 0.43350595867522124,
+        "fraction_of_stall_empty": 0.22826996598742774,
+        "stall_4p8V_Nm": 0.9218251000000001,
+        "screen_cap_g": {
+          "0.3": 29.640602897272434,
+          "0.5": 112.28549023157174,
+          "1.0": 318.89770856731997
+        }
+      },
+      {
+        "joint": "J04_Wrist_roll",
+        "empty_Nm": 0.021040792952746582,
+        "signed_Nm": -0.021040792952746582,
+        "payload_Nm_per_g": 0.00026011963942662613,
+        "with_50g_Nm": 0.034046774924077886,
+        "with_100g_Nm": 0.04705275689540919,
+        "fraction_of_stall_empty": 0.11919798726570792,
+        "stall_4p8V_Nm": 0.1765197,
+        "screen_cap_g": {
+          "0.3": 122.69399233984387,
+          "0.5": 258.4159242855417,
+          "1.0": 597.7207541497862
+        }
+      },
+      {
+        "joint": "J05_Wrist_pitch",
+        "empty_Nm": 0.04151525476317314,
+        "signed_Nm": 0.04151525476317314,
+        "payload_Nm_per_g": 0.0010410148478884576,
+        "with_50g_Nm": 0.09356599715759602,
+        "with_100g_Nm": 0.1456167395520189,
+        "fraction_of_stall_empty": 0.23518765759953783,
+        "stall_4p8V_Nm": 0.1765197,
+        "screen_cap_g": {
+          "0.3": 10.989905917319543,
+          "0.5": 44.90290924441785,
+          "1.0": 129.68541756216362
+        }
+      }
+    ],
+    "all_feet": {
+      "margin_mm": 10.434410134931952,
+      "minimum_empty_restoring_Nm": 0.059729058820494944,
+      "static_tip_threshold_g": 25.76288551190978,
+      "tip_threshold_1p5_moment_margin_g": -16.2384772800051
+    },
+    "base_only": {
+      "margin_mm": -21.880584009023863,
+      "minimum_empty_restoring_Nm": -0.12524969522968538,
+      "static_tip_threshold_g": -48.03781448456578,
+      "tip_threshold_1p5_moment_margin_g": -71.8531189472409
+    }
+  }
+}

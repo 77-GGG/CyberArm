@@ -1,0 +1,137 @@
+[
+  {
+    "name": "ARD_04_Arm_01",
+    "local_y_mm": 25,
+    "material_area_mm2": 451.6563397552591,
+    "com_xz": [
+      9.035825800073551e-05,
+      8.059830510808732
+    ],
+    "Ixx_mm4": 12839.594876669318,
+    "Izz_mm4": 40226.4497866614,
+    "Ixz_mm4": 0.0050511167325139605,
+    "Z_about_local_z_mm3": 2429.4155189110525,
+    "nominal_bending_MPa_at_0p5Nm": 0.20581081997208822,
+    "note": "Solid geometric section, ignores infill, stress concentration, torsion and anisotropy; nominal bending about local Z only."
+  },
+  {
+    "name": "ARD_04_Arm_01",
+    "local_y_mm": 40,
+    "material_area_mm2": 411.8697647288232,
+    "com_xz": [
+      -0.0005206509464042993,
+      7.973660901793815
+    ],
+    "Ixx_mm4": 11734.29120745443,
+    "Izz_mm4": 31993.06644966635,
+    "Ixz_mm4": 0.375600566367954,
+    "Z_about_local_z_mm3": 2071.566671457176,
+    "nominal_bending_MPa_at_0p5Nm": 0.24136321890537624,
+    "note": "Solid geometric section, ignores infill, stress concentration, torsion and anisotropy; nominal bending about local Z only."
+  },
+  {
+    "name": "ARD_04_Arm_01",
+    "local_y_mm": 60,
+    "material_area_mm2": 418.12109094440956,
+    "com_xz": [
+      0.0004827229232697157,
+      9.23401784914749
+    ],
+    "Ixx_mm4": 8416.244358935895,
+    "Izz_mm4": 20017.738165227154,
+    "Ixz_mm4": 0.04388204150821906,
+    "Z_about_local_z_mm3": 1334.3478313952353,
+    "nominal_bending_MPa_at_0p5Nm": 0.374714889353239,
+    "note": "Solid geometric section, ignores infill, stress concentration, torsion and anisotropy; nominal bending about local Z only."
+  },
+  {
+    "name": "ARD_04_Arm_01",
+    "local_y_mm": 80,
+    "material_area_mm2": 404.76194494288586,
+    "com_xz": [
+      -0.00033060879741255556,
+      7.955663064690607
+    ],
+    "Ixx_mm4": 11534.509367285245,
+    "Izz_mm4": 30656.130265482785,
+    "Ixz_mm4": -0.2578509580874735,
+    "Z_about_local_z_mm3": 2010.8300470977576,
+    "nominal_bending_MPa_at_0p5Nm": 0.24865353525110329,
+    "note": "Solid geometric section, ignores infill, stress concentration, torsion and anisotropy; nominal bending about local Z only."
+  },
+  {
+    "name": "ARD_04_Arm_01",
+    "local_y_mm": 95,
+    "material_area_mm2": 444.76150220968634,
+    "com_xz": [
+      0.00016176677272716568,
+      8.044624039224177
+    ],
+    "Ixx_mm4": 12645.671751268925,
+    "Izz_mm4": 38717.49680937491,
+    "Ixz_mm4": -0.13480263370138912,
+    "Z_about_local_z_mm3": 2365.611654721162,
+    "nominal_bending_MPa_at_0p5Nm": 0.21136182644438978,
+    "note": "Solid geometric section, ignores infill, stress concentration, torsion and anisotropy; nominal bending about local Z only."
+  },
+  {
+    "name": "ARD_05_Arm_02_v3",
+    "local_y_mm": -10,
+    "material_area_mm2": 272.6663011109189,
+    "com_xz": [
+      8.129997256160309e-06,
+      5.733638036293637
+    ],
+    "Ixx_mm4": 7316.274339141577,
+    "Izz_mm4": 60087.596682219155,
+    "Ixz_mm4": -0.016856137048196104,
+    "Z_about_local_z_mm3": 3162.5037353196035,
+    "nominal_bending_MPa_at_0p5Nm": 0.15810258005891964,
+    "note": "Solid geometric section, ignores infill, stress concentration, torsion and anisotropy; nominal bending about local Z only."
+  },
+  {
+    "name": "ARD_05_Arm_02_v3",
+    "local_y_mm": 0,
+    "material_area_mm2": 290.26563435478243,
+    "com_xz": [
+      -0.05087178348861573,
+      5.088583596026133
+    ],
+    "Ixx_mm4": 9927.299157723002,
+    "Izz_mm4": 44906.7271531558,
+    "Ixz_mm4": 38.03612995370468,
+    "Z_about_local_z_mm3": 2357.2121753691376,
+    "nominal_bending_MPa_at_0p5Nm": 0.21211497430081802,
+    "note": "Solid geometric section, ignores infill, stress concentration, torsion and anisotropy; nominal bending about local Z only."
+  },
+  {
+    "name": "ARD_05_Arm_02_v3",
+    "local_y_mm": 20,
+    "material_area_mm2": 484.9394218541785,
+    "com_xz": [
+      1.5257143199493014e-05,
+      5.500068251242804
+    ],
+    "Ixx_mm4": 49392.80843167401,
+    "Izz_mm4": 49020.116784748396,
+    "Ixz_mm4": 0.07827482601708094,
+    "Z_about_local_z_mm3": 2709.6523139993205,
+    "nominal_bending_MPa_at_0p5Nm": 0.18452551916597126,
+    "note": "Solid geometric section, ignores infill, stress concentration, torsion and anisotropy; nominal bending about local Z only."
+  },
+  {
+    "name": "ARD_05_Arm_02_v3",
+    "local_y_mm": 40,
+    "material_area_mm2": 459.4832793054405,
+    "com_xz": [
+      1.4736000135115261e-05,
+      5.500027113807676
+    ],
+    "Ixx_mm4": 46743.143756061705,
+    "Izz_mm4": 41749.431928422346,
+    "Ixz_mm4": 0.08720797928762165,
+    "Z_about_local_z_mm3": 2429.858956305698,
+    "nominal_bending_MPa_at_0p5Nm": 0.20577326050240732,
+    "note": "Solid geometric section, ignores infill, stress concentration, torsion and anisotropy; nominal bending about local Z only."
+  }
+]

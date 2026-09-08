@@ -1,0 +1,206 @@
+[
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Base_RevC_mm.stl",
+    "object": "ARD_01_Base",
+    "quantity": 1,
+    "bounds_mm": [
+      129.9950942993164,
+      129.99468994140625,
+      56.000003814697266
+    ],
+    "stats": {
+      "vertices": 11586,
+      "faces": 19799,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 109524.60118824801
+    },
+    "final_print_release": false
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Pata_de_Soporte_RevC_mm.stl",
+    "object": "ARD_02_Foot_1",
+    "quantity": 4,
+    "bounds_mm": [
+      69.10076904296875,
+      69.02117919921875,
+      12.892425537109375
+    ],
+    "stats": {
+      "vertices": 1366,
+      "faces": 2732,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 9496.45239299779
+    },
+    "final_print_release": false
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Waist_RevC_mm.stl",
+    "object": "ARD_03_Waist",
+    "quantity": 1,
+    "bounds_mm": [
+      96.98489379882812,
+      97.0,
+      65.27598571777344
+    ],
+    "stats": {
+      "vertices": 7809,
+      "faces": 11698,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 65810.92650280058
+    },
+    "final_print_release": false
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Arm_01_RevC_mm.stl",
+    "object": "ARD_04_Arm_01",
+    "quantity": 1,
+    "bounds_mm": [
+      43.22443389892578,
+      166.67572021484375,
+      21.20144271850586
+    ],
+    "stats": {
+      "vertices": 10910,
+      "faces": 16324,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 57852.02719086839
+    },
+    "final_print_release": false
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Arm_02_v3_RevC_mm.stl",
+    "object": "ARD_05_Arm_02_v3",
+    "quantity": 1,
+    "bounds_mm": [
+      38.0,
+      115.0,
+      27.0
+    ],
+    "stats": {
+      "vertices": 6542,
+      "faces": 9269,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 48276.14842760143
+    },
+    "final_print_release": false
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Arm_03_RevC_mm.stl",
+    "object": "ARD_06_Arm_03",
+    "quantity": 1,
+    "bounds_mm": [
+      33.0,
+      28.000003814697266,
+      45.999942779541016
+    ],
+    "stats": {
+      "vertices": 4519,
+      "faces": 6972,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 15685.131614896396
+    },
+    "final_print_release": false
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Gripper_base_RevC_mm.stl",
+    "object": "ARD_07_Gripper_base",
+    "quantity": 1,
+    "bounds_mm": [
+      44.400001525878906,
+      77.0,
+      28.0000057220459
+    ],
+    "stats": {
+      "vertices": 3350,
+      "faces": 3708,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 14818.188957458397
+    },
+    "final_print_release": false
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\gear1_RevC_mm.stl",
+    "object": "ARD_08_gear1",
+    "quantity": 1,
+    "bounds_mm": [
+      49.287315368652344,
+      26.63006591796875,
+      4.000001907348633
+    ],
+    "stats": {
+      "vertices": 920,
+      "faces": 1844,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 2640.9713434399237
+    },
+    "final_print_release": false
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\grip_link_1_RevC_mm.stl",
+    "object": "ARD_09_Link_Left",
+    "quantity": 2,
+    "bounds_mm": [
+      38.99602508544922,
+      7.997204780578613,
+      4.000000953674316
+    ],
+    "stats": {
+      "vertices": 764,
+      "faces": 1532,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 798.724559983802
+    },
+    "final_print_release": false
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Gripper_1_RevC_mm.stl",
+    "object": "ARD_10_Jaw_Left",
+    "quantity": 1,
+    "bounds_mm": [
+      65.31381225585938,
+      20.394254684448242,
+      15.50000286102295
+    ],
+    "stats": {
+      "vertices": 728,
+      "faces": 1460,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 7323.85899655478
+    },
+    "final_print_release": false
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\gear2_RevC_mm.stl",
+    "object": "ARD_08_gear2",
+    "quantity": 1,
+    "bounds_mm": [
+      49.02354431152344,
+      26.630050659179688,
+      4.000001907348633
+    ],
+    "stats": {
+      "vertices": 2300,
+      "faces": 2601,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 2538.2277977275617
+    },
+    "final_print_release": false
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Gripper_1_1_RevC_mm.stl",
+    "object": "ARD_10_Jaw_Right",
+    "quantity": 1,
+    "bounds_mm": [
+      65.31381225585938,
+      20.39307403564453,
+      15.500001907348633
+    ],
+    "stats": {
+      "vertices": 724,
+      "faces": 1452,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 7291.464614220882
+    },
+    "final_print_release": false
+  }
+]

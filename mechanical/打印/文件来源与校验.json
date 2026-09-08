@@ -1,0 +1,392 @@
+{
+  "version": "RevC",
+  "generated_at": "2026-09-08T23:59:18.4808276+08:00",
+  "units": "mm (import STL at 100%)",
+  "final_print_release": false,
+  "geometry_modified": false,
+  "source_files_modified": false,
+  "full_part_types": 12,
+  "assembled_printed_instances": 16,
+  "coupon_types": 6,
+  "no_dedicated_coupon_part_types": 7,
+  "total_stl_copies": 25,
+  "all_sha256_checks_passed": true,
+  "warning": "Folder 03 duplicates a subset of folder 01. Do not print both sets. No dedicated coupon does not mean fit or strength is verified.",
+  "files": [
+    {
+      "kind": "完整件",
+      "id": "ARD_01_Base",
+      "label": "底座壳",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Base_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\01_所有完整打印件\\01_底座壳_打印1件__Base_RevC_mm.stl",
+      "relative_path": "01_所有完整打印件\\01_底座壳_打印1件__Base_RevC_mm.stl",
+      "bounds_mm": [
+        129.9950942993164,
+        129.99468994140625,
+        56.000003814697266
+      ],
+      "sha256": "9587CC1E03BCB1F8A61C2B0B2F4D62B66061C3E95ADA5C2D00BDEAEEAC01ABB3"
+    },
+    {
+      "kind": "完整件分类副本_无专用接口试片",
+      "id": "ARD_01_Base",
+      "label": "底座壳",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Base_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\03_不单独打印试片的零件\\01_底座壳_打印1件__Base_RevC_mm.stl",
+      "relative_path": "03_不单独打印试片的零件\\01_底座壳_打印1件__Base_RevC_mm.stl",
+      "bounds_mm": [
+        129.9950942993164,
+        129.99468994140625,
+        56.000003814697266
+      ],
+      "sha256": "9587CC1E03BCB1F8A61C2B0B2F4D62B66061C3E95ADA5C2D00BDEAEEAC01ABB3"
+    },
+    {
+      "kind": "完整件",
+      "id": "ARD_02_Foot_1",
+      "label": "支脚",
+      "quantity": 4,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Pata_de_Soporte_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\01_所有完整打印件\\02_支脚_打印4件__Pata_de_Soporte_RevC_mm.stl",
+      "relative_path": "01_所有完整打印件\\02_支脚_打印4件__Pata_de_Soporte_RevC_mm.stl",
+      "bounds_mm": [
+        69.10076904296875,
+        69.02117919921875,
+        12.892425537109375
+      ],
+      "sha256": "B9E31F9B97BD0B647E1813B241E568DD8EAF4774EC344FE912DBBFFCDB23128F"
+    },
+    {
+      "kind": "完整件分类副本_无专用接口试片",
+      "id": "ARD_02_Foot_1",
+      "label": "支脚",
+      "quantity": 4,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Pata_de_Soporte_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\03_不单独打印试片的零件\\02_支脚_打印4件__Pata_de_Soporte_RevC_mm.stl",
+      "relative_path": "03_不单独打印试片的零件\\02_支脚_打印4件__Pata_de_Soporte_RevC_mm.stl",
+      "bounds_mm": [
+        69.10076904296875,
+        69.02117919921875,
+        12.892425537109375
+      ],
+      "sha256": "B9E31F9B97BD0B647E1813B241E568DD8EAF4774EC344FE912DBBFFCDB23128F"
+    },
+    {
+      "kind": "完整件",
+      "id": "ARD_03_Waist",
+      "label": "回转盘与肩部支架",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Waist_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\01_所有完整打印件\\03_回转盘与肩部支架_打印1件__Waist_RevC_mm.stl",
+      "relative_path": "01_所有完整打印件\\03_回转盘与肩部支架_打印1件__Waist_RevC_mm.stl",
+      "bounds_mm": [
+        96.98489379882812,
+        97.0,
+        65.27598571777344
+      ],
+      "sha256": "FB1A74B991E6DDAF3CD80649C03A04165550D2388333274DE36AE642E0C440E6"
+    },
+    {
+      "kind": "完整件",
+      "id": "ARD_04_Arm_01",
+      "label": "大臂",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Arm_01_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\01_所有完整打印件\\04_大臂_打印1件__Arm_01_RevC_mm.stl",
+      "relative_path": "01_所有完整打印件\\04_大臂_打印1件__Arm_01_RevC_mm.stl",
+      "bounds_mm": [
+        43.22443389892578,
+        166.67572021484375,
+        21.20144271850586
+      ],
+      "sha256": "0E2454071F27FD0FAB3F36514875CCA073713DEE3A94543885452C18DCB11DFC"
+    },
+    {
+      "kind": "完整件",
+      "id": "ARD_05_Arm_02_v3",
+      "label": "小臂",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Arm_02_v3_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\01_所有完整打印件\\05_小臂_打印1件__Arm_02_v3_RevC_mm.stl",
+      "relative_path": "01_所有完整打印件\\05_小臂_打印1件__Arm_02_v3_RevC_mm.stl",
+      "bounds_mm": [
+        38.0,
+        115.0,
+        27.0
+      ],
+      "sha256": "4DC4DC0E5471B9C7C0DA6AE230809300BB4301449035D114FE79514B6AD29C98"
+    },
+    {
+      "kind": "完整件分类副本_无专用接口试片",
+      "id": "ARD_05_Arm_02_v3",
+      "label": "小臂",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Arm_02_v3_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\03_不单独打印试片的零件\\05_小臂_打印1件__Arm_02_v3_RevC_mm.stl",
+      "relative_path": "03_不单独打印试片的零件\\05_小臂_打印1件__Arm_02_v3_RevC_mm.stl",
+      "bounds_mm": [
+        38.0,
+        115.0,
+        27.0
+      ],
+      "sha256": "4DC4DC0E5471B9C7C0DA6AE230809300BB4301449035D114FE79514B6AD29C98"
+    },
+    {
+      "kind": "完整件",
+      "id": "ARD_06_Arm_03",
+      "label": "腕部支架",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Arm_03_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\01_所有完整打印件\\06_腕部支架_打印1件__Arm_03_RevC_mm.stl",
+      "relative_path": "01_所有完整打印件\\06_腕部支架_打印1件__Arm_03_RevC_mm.stl",
+      "bounds_mm": [
+        33.0,
+        28.000003814697266,
+        45.999942779541016
+      ],
+      "sha256": "4F65F15127F64D4804778FDD7936616D46B15115F97DEE5E5A0E83AA8EF4675F"
+    },
+    {
+      "kind": "完整件",
+      "id": "ARD_07_Gripper_base",
+      "label": "夹爪底板",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Gripper_base_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\01_所有完整打印件\\07_夹爪底板_打印1件__Gripper_base_RevC_mm.stl",
+      "relative_path": "01_所有完整打印件\\07_夹爪底板_打印1件__Gripper_base_RevC_mm.stl",
+      "bounds_mm": [
+        44.400001525878906,
+        77.0,
+        28.0000057220459
+      ],
+      "sha256": "8EBC926D71A4360B45B18082C667B68E5B6346910BFB85F5C39B068EC37D4E63"
+    },
+    {
+      "kind": "完整件",
+      "id": "ARD_08_gear1",
+      "label": "从动齿轮连杆",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\gear1_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\01_所有完整打印件\\08_从动齿轮连杆_打印1件__gear1_RevC_mm.stl",
+      "relative_path": "01_所有完整打印件\\08_从动齿轮连杆_打印1件__gear1_RevC_mm.stl",
+      "bounds_mm": [
+        49.287315368652344,
+        26.63006591796875,
+        4.000001907348633
+      ],
+      "sha256": "B6C6DCC11BD40EF587594237D3009A1DC3E6086EF02F824DF49CF2E30A736B32"
+    },
+    {
+      "kind": "完整件分类副本_无专用接口试片",
+      "id": "ARD_08_gear1",
+      "label": "从动齿轮连杆",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\gear1_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\03_不单独打印试片的零件\\08_从动齿轮连杆_打印1件__gear1_RevC_mm.stl",
+      "relative_path": "03_不单独打印试片的零件\\08_从动齿轮连杆_打印1件__gear1_RevC_mm.stl",
+      "bounds_mm": [
+        49.287315368652344,
+        26.63006591796875,
+        4.000001907348633
+      ],
+      "sha256": "B6C6DCC11BD40EF587594237D3009A1DC3E6086EF02F824DF49CF2E30A736B32"
+    },
+    {
+      "kind": "完整件",
+      "id": "ARD_09_Link_Left",
+      "label": "夹爪短连杆",
+      "quantity": 2,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\grip_link_1_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\01_所有完整打印件\\09_夹爪短连杆_打印2件__grip_link_1_RevC_mm.stl",
+      "relative_path": "01_所有完整打印件\\09_夹爪短连杆_打印2件__grip_link_1_RevC_mm.stl",
+      "bounds_mm": [
+        38.99602508544922,
+        7.997204780578613,
+        4.000000953674316
+      ],
+      "sha256": "41E37A41F6BC3289953401B582B0EC54F04021242D4D9E8F1FC153AD30236BA6"
+    },
+    {
+      "kind": "完整件分类副本_无专用接口试片",
+      "id": "ARD_09_Link_Left",
+      "label": "夹爪短连杆",
+      "quantity": 2,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\grip_link_1_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\03_不单独打印试片的零件\\09_夹爪短连杆_打印2件__grip_link_1_RevC_mm.stl",
+      "relative_path": "03_不单独打印试片的零件\\09_夹爪短连杆_打印2件__grip_link_1_RevC_mm.stl",
+      "bounds_mm": [
+        38.99602508544922,
+        7.997204780578613,
+        4.000000953674316
+      ],
+      "sha256": "41E37A41F6BC3289953401B582B0EC54F04021242D4D9E8F1FC153AD30236BA6"
+    },
+    {
+      "kind": "完整件",
+      "id": "ARD_10_Jaw_Left",
+      "label": "左夹爪",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Gripper_1_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\01_所有完整打印件\\10_左夹爪_打印1件__Gripper_1_RevC_mm.stl",
+      "relative_path": "01_所有完整打印件\\10_左夹爪_打印1件__Gripper_1_RevC_mm.stl",
+      "bounds_mm": [
+        65.31381225585938,
+        20.394254684448242,
+        15.50000286102295
+      ],
+      "sha256": "82A93A27E2BB3100BBA669F2B32F912110884A91480C56D28859AFDF2B3C51B1"
+    },
+    {
+      "kind": "完整件分类副本_无专用接口试片",
+      "id": "ARD_10_Jaw_Left",
+      "label": "左夹爪",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Gripper_1_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\03_不单独打印试片的零件\\10_左夹爪_打印1件__Gripper_1_RevC_mm.stl",
+      "relative_path": "03_不单独打印试片的零件\\10_左夹爪_打印1件__Gripper_1_RevC_mm.stl",
+      "bounds_mm": [
+        65.31381225585938,
+        20.394254684448242,
+        15.50000286102295
+      ],
+      "sha256": "82A93A27E2BB3100BBA669F2B32F912110884A91480C56D28859AFDF2B3C51B1"
+    },
+    {
+      "kind": "完整件",
+      "id": "ARD_08_gear2",
+      "label": "主动齿轮连杆",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\gear2_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\01_所有完整打印件\\11_主动齿轮连杆_打印1件__gear2_RevC_mm.stl",
+      "relative_path": "01_所有完整打印件\\11_主动齿轮连杆_打印1件__gear2_RevC_mm.stl",
+      "bounds_mm": [
+        49.02354431152344,
+        26.630050659179688,
+        4.000001907348633
+      ],
+      "sha256": "71C8AD4872F2CFEC9B9EAC4CB3BCFE671820A17A27E61207DCBF4E86794A1033"
+    },
+    {
+      "kind": "完整件",
+      "id": "ARD_10_Jaw_Right",
+      "label": "右夹爪",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Gripper_1_1_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\01_所有完整打印件\\12_右夹爪_打印1件__Gripper_1_1_RevC_mm.stl",
+      "relative_path": "01_所有完整打印件\\12_右夹爪_打印1件__Gripper_1_1_RevC_mm.stl",
+      "bounds_mm": [
+        65.31381225585938,
+        20.39307403564453,
+        15.500001907348633
+      ],
+      "sha256": "EDE7E63A79E06105DAB3DD1B81775DD0C27F51FE1D7F562E0A05B2A2CE76DC32"
+    },
+    {
+      "kind": "完整件分类副本_无专用接口试片",
+      "id": "ARD_10_Jaw_Right",
+      "label": "右夹爪",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Gripper_1_1_RevC_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\03_不单独打印试片的零件\\12_右夹爪_打印1件__Gripper_1_1_RevC_mm.stl",
+      "relative_path": "03_不单独打印试片的零件\\12_右夹爪_打印1件__Gripper_1_1_RevC_mm.stl",
+      "bounds_mm": [
+        65.31381225585938,
+        20.39307403564453,
+        15.500001907348633
+      ],
+      "sha256": "EDE7E63A79E06105DAB3DD1B81775DD0C27F51FE1D7F562E0A05B2A2CE76DC32"
+    },
+    {
+      "kind": "局部试装片_不用于整机装配",
+      "id": "S01",
+      "label": "底座回转_MG996R圆盘",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S01_actual_interface_trial_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\02_先打印的接口试装片\\S01_底座回转_MG996R圆盘_试装1件_mm.stl",
+      "relative_path": "02_先打印的接口试装片\\S01_底座回转_MG996R圆盘_试装1件_mm.stl",
+      "bounds_mm": [
+        31.0,
+        31.0,
+        5.5
+      ],
+      "sha256": "55D13EAE38A8788C72268690CA26CCA60CDD518B49A020C00BE6EEAB98091070"
+    },
+    {
+      "kind": "局部试装片_不用于整机装配",
+      "id": "S02",
+      "label": "肩关节_MG996R圆盘",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S02_actual_interface_trial_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\02_先打印的接口试装片\\S02_肩关节_MG996R圆盘_试装1件_mm.stl",
+      "relative_path": "02_先打印的接口试装片\\S02_肩关节_MG996R圆盘_试装1件_mm.stl",
+      "bounds_mm": [
+        31.0,
+        31.0,
+        6.200000286102295
+      ],
+      "sha256": "4C312CE442202D6406BB11B8AA31D2444850A68652DFED2B94E9DE47BE114907"
+    },
+    {
+      "kind": "局部试装片_不用于整机装配",
+      "id": "S03",
+      "label": "肘关节_MG996R圆盘",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S03_actual_interface_trial_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\02_先打印的接口试装片\\S03_肘关节_MG996R圆盘_试装1件_mm.stl",
+      "relative_path": "02_先打印的接口试装片\\S03_肘关节_MG996R圆盘_试装1件_mm.stl",
+      "bounds_mm": [
+        31.0,
+        31.0,
+        6.2000041007995605
+      ],
+      "sha256": "689575C24D733066677E0A71A9AF9691F9E055963FC3DA7FF879B51A7BCD0107"
+    },
+    {
+      "kind": "局部试装片_不用于整机装配",
+      "id": "S04",
+      "label": "腕旋转_MG90S双臂",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S04_actual_interface_trial_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\02_先打印的接口试装片\\S04_腕旋转_MG90S双臂_试装1件_mm.stl",
+      "relative_path": "02_先打印的接口试装片\\S04_腕旋转_MG90S双臂_试装1件_mm.stl",
+      "bounds_mm": [
+        27.00000762939453,
+        28.0,
+        5.999994277954102
+      ],
+      "sha256": "4421FB51B1EF7DC3B990ABEFCCA3D62E67D4EC40ACD01B381852DCAC711C319C"
+    },
+    {
+      "kind": "局部试装片_不用于整机装配",
+      "id": "S05",
+      "label": "腕俯仰_MG90S十字长臂",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S05_actual_interface_trial_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\02_先打印的接口试装片\\S05_腕俯仰_MG90S十字长臂_试装1件_mm.stl",
+      "relative_path": "02_先打印的接口试装片\\S05_腕俯仰_MG90S十字长臂_试装1件_mm.stl",
+      "bounds_mm": [
+        28.0,
+        29.5,
+        6.031381607055664
+      ],
+      "sha256": "225BB4FD4DB371A0CF984B61CB1D4A841A17AF59425E23DB8E4E982D069716DD"
+    },
+    {
+      "kind": "局部试装片_不用于整机装配",
+      "id": "S06",
+      "label": "夹爪驱动_MG90S单臂",
+      "quantity": 1,
+      "source": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S06_actual_interface_trial_mm.stl",
+      "destination": "E:\\CyberArm\\mechanical\\打印\\02_先打印的接口试装片\\S06_夹爪驱动_MG90S单臂_试装1件_mm.stl",
+      "relative_path": "02_先打印的接口试装片\\S06_夹爪驱动_MG90S单臂_试装1件_mm.stl",
+      "bounds_mm": [
+        30.037309646606445,
+        26.630046844482422,
+        4.000000953674316
+      ],
+      "sha256": "EF533B82116C4090D605A3754C8CB7C3310C312D9F41558291696A674652C9D2"
+    }
+  ]
+}

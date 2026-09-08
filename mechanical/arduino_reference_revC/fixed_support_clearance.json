@@ -1,0 +1,86 @@
+[
+  {
+    "id": "S04",
+    "modified_fixed_support": "ARD_05_Arm_02_v3",
+    "before": {
+      "vertices": 6296,
+      "faces": 9339,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 48509.19205273045
+    },
+    "after": {
+      "vertices": 6542,
+      "faces": 9269,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 48276.14842760143
+    },
+    "cut": {
+      "opening_diameter_mm": 17.4,
+      "z_range_mm": [
+        -6,
+        -2.3
+      ],
+      "angular_clearance": "360 degree nut sweep ONLY; not whole-joint collision clearance"
+    }
+  },
+  {
+    "id": "S05",
+    "modified_fixed_support": "ARD_06_Arm_03",
+    "before": {
+      "vertices": 4217,
+      "faces": 7094,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 15916.364600076773
+    },
+    "after": {
+      "vertices": 4519,
+      "faces": 6972,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 15685.131614896396
+    },
+    "cut": {
+      "opening_diameter_mm": 17.4,
+      "z_range_mm": [
+        -6,
+        -2.3
+      ],
+      "angular_clearance": "360 degree nut sweep ONLY; not whole-joint collision clearance"
+    }
+  },
+  {
+    "id": "S06",
+    "modified_fixed_support": "ARD_07_Gripper_base",
+    "before": {
+      "vertices": 2605,
+      "faces": 3543,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 14930.292513045586
+    },
+    "after": {
+      "vertices": 3350,
+      "faces": 3708,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 14818.188957458397
+    },
+    "cut": {
+      "swept_hole_radii_mm": [
+        6,
+        11
+      ],
+      "tool_diameter_mm": 5.2,
+      "z_range_mm": [
+        -5.3,
+        -2.3
+      ],
+      "sweep_degrees": [
+        -10,
+        10
+      ],
+      "sample_step_degrees": 2,
+      "operating_preview_limit_degrees": [
+        -8,
+        8
+      ]
+    }
+  }
+]

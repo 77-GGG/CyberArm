@@ -1,0 +1,50 @@
+[
+  {
+    "id": "S01",
+    "object": "REVC_S01_CENTRE_OEM_LOCK",
+    "nominal": "M3 source head-under length 6.0000",
+    "source_head_height_mm": 2.3542051315307617,
+    "print_driver_access_diameter_mm": 7.7,
+    "physical_confirmation_required": true
+  },
+  {
+    "id": "S02",
+    "object": "REVC_S02_CENTRE_OEM_LOCK",
+    "nominal": "M3 source head-under length 6.0000",
+    "source_head_height_mm": 2.3542051315307617,
+    "print_driver_access_diameter_mm": 7.7,
+    "physical_confirmation_required": true
+  },
+  {
+    "id": "S03",
+    "object": "REVC_S03_CENTRE_OEM_LOCK",
+    "nominal": "M3 source head-under length 6.0000",
+    "source_head_height_mm": 2.3542051315307617,
+    "print_driver_access_diameter_mm": 7.7,
+    "physical_confirmation_required": true
+  },
+  {
+    "id": "S04",
+    "object": "REVC_S04_CENTRE_OEM_LOCK",
+    "nominal": "M2x5 envelope, NOT a purchase specification",
+    "source_head_height_mm": 1.6,
+    "print_driver_access_diameter_mm": 5.2,
+    "physical_confirmation_required": true
+  },
+  {
+    "id": "S05",
+    "object": "REVC_S05_CENTRE_OEM_LOCK",
+    "nominal": "M2x5 envelope, NOT a purchase specification",
+    "source_head_height_mm": 1.6,
+    "print_driver_access_diameter_mm": 5.2,
+    "physical_confirmation_required": true
+  },
+  {
+    "id": "S06",
+    "object": "REVC_S06_CENTRE_OEM_LOCK",
+    "nominal": "M2x5 envelope, NOT a purchase specification",
+    "source_head_height_mm": 1.6,
+    "print_driver_access_diameter_mm": 5.0,
+    "physical_confirmation_required": true
+  }
+]

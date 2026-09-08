@@ -1,0 +1,453 @@
+[
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Arm_01_RevC_mm.stl",
+    "triangles": 21840,
+    "vertices": 10910,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      10665,
+      245
+    ],
+    "signed_volume_mm3": 57852.02712739009,
+    "bounds_mm": [
+      [
+        -21.61221694946289,
+        21.61221694946289
+      ],
+      [
+        -83.33786010742188,
+        83.33786010742188
+      ],
+      [
+        0.0,
+        21.20144271850586
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Arm_02_v3_RevC_mm.stl",
+    "triangles": 13096,
+    "vertices": 6542,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      6542
+    ],
+    "signed_volume_mm3": 48276.14839623479,
+    "bounds_mm": [
+      [
+        -19.0,
+        19.0
+      ],
+      [
+        -57.5,
+        57.5
+      ],
+      [
+        0.0,
+        27.0
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Arm_03_RevC_mm.stl",
+    "triangles": 9054,
+    "vertices": 4519,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      4519
+    ],
+    "signed_volume_mm3": 15685.13133249078,
+    "bounds_mm": [
+      [
+        -16.5,
+        16.5
+      ],
+      [
+        -14.000001907348633,
+        14.000001907348633
+      ],
+      [
+        0.0,
+        45.999942779541016
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Base_RevC_mm.stl",
+    "triangles": 23194,
+    "vertices": 11583,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      11583
+    ],
+    "signed_volume_mm3": 109524.6034465549,
+    "bounds_mm": [
+      [
+        -64.99754333496094,
+        64.99755096435547
+      ],
+      [
+        -64.99734497070312,
+        64.99734497070312
+      ],
+      [
+        0.0,
+        56.000003814697266
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\gear1_RevC_mm.stl",
+    "triangles": 1844,
+    "vertices": 920,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      920
+    ],
+    "signed_volume_mm3": 2640.9712873002277,
+    "bounds_mm": [
+      [
+        -24.643657684326172,
+        24.643657684326172
+      ],
+      [
+        -13.315032958984375,
+        13.315032958984375
+      ],
+      [
+        0.0,
+        4.000001907348633
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\gear2_RevC_mm.stl",
+    "triangles": 4612,
+    "vertices": 2300,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      2300
+    ],
+    "signed_volume_mm3": 2538.2277230307486,
+    "bounds_mm": [
+      [
+        -24.51177215576172,
+        24.51177215576172
+      ],
+      [
+        -13.315025329589844,
+        13.315025329589844
+      ],
+      [
+        0.0,
+        4.000001907348633
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\grip_link_1_RevC_mm.stl",
+    "triangles": 1532,
+    "vertices": 764,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      764
+    ],
+    "signed_volume_mm3": 798.7245593938004,
+    "bounds_mm": [
+      [
+        -19.49801254272461,
+        19.49801254272461
+      ],
+      [
+        -3.9986023902893066,
+        3.9986023902893066
+      ],
+      [
+        0.0,
+        4.000000953674316
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Gripper_1_1_RevC_mm.stl",
+    "triangles": 1452,
+    "vertices": 724,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      724
+    ],
+    "signed_volume_mm3": 7291.464557309941,
+    "bounds_mm": [
+      [
+        -32.65690612792969,
+        32.65690612792969
+      ],
+      [
+        -10.196537017822266,
+        10.196537017822266
+      ],
+      [
+        0.0,
+        15.500001907348633
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Gripper_1_RevC_mm.stl",
+    "triangles": 1460,
+    "vertices": 728,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      728
+    ],
+    "signed_volume_mm3": 7323.8589872804005,
+    "bounds_mm": [
+      [
+        -32.65690612792969,
+        32.65690612792969
+      ],
+      [
+        -10.197127342224121,
+        10.197127342224121
+      ],
+      [
+        0.0,
+        15.50000286102295
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Gripper_base_RevC_mm.stl",
+    "triangles": 6724,
+    "vertices": 3350,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      3350
+    ],
+    "signed_volume_mm3": 14818.188996879106,
+    "bounds_mm": [
+      [
+        -22.200000762939453,
+        22.200000762939453
+      ],
+      [
+        -38.5,
+        38.5
+      ],
+      [
+        0.0,
+        28.0000057220459
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Pata_de_Soporte_RevC_mm.stl",
+    "triangles": 2732,
+    "vertices": 1366,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      1366
+    ],
+    "signed_volume_mm3": 9496.451695737023,
+    "bounds_mm": [
+      [
+        -34.550384521484375,
+        34.550384521484375
+      ],
+      [
+        -34.510589599609375,
+        34.510589599609375
+      ],
+      [
+        0.0,
+        12.892425537109375
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\STL_RevC_mm\\Waist_RevC_mm.stl",
+    "triangles": 15634,
+    "vertices": 7809,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      7809
+    ],
+    "signed_volume_mm3": 65810.92544973463,
+    "bounds_mm": [
+      [
+        -48.49244689941406,
+        48.49244689941406
+      ],
+      [
+        -48.5,
+        48.5
+      ],
+      [
+        0.0,
+        65.27598571777344
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S01_actual_interface_trial_mm.stl",
+    "triangles": 4138,
+    "vertices": 2065,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      2065
+    ],
+    "signed_volume_mm3": 3065.3086343449236,
+    "bounds_mm": [
+      [
+        -15.5,
+        15.5
+      ],
+      [
+        -15.5,
+        15.5
+      ],
+      [
+        0.0,
+        5.5
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S02_actual_interface_trial_mm.stl",
+    "triangles": 5248,
+    "vertices": 2620,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      2620
+    ],
+    "signed_volume_mm3": 4172.257356208434,
+    "bounds_mm": [
+      [
+        -15.5,
+        15.5
+      ],
+      [
+        -15.5,
+        15.5
+      ],
+      [
+        0.0,
+        6.200000286102295
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S03_actual_interface_trial_mm.stl",
+    "triangles": 5200,
+    "vertices": 2596,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      2596
+    ],
+    "signed_volume_mm3": 4172.257490213261,
+    "bounds_mm": [
+      [
+        -15.5,
+        15.5
+      ],
+      [
+        -15.5,
+        15.5
+      ],
+      [
+        0.0,
+        6.2000041007995605
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S04_actual_interface_trial_mm.stl",
+    "triangles": 3000,
+    "vertices": 1496,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      1496
+    ],
+    "signed_volume_mm3": 3484.297921500736,
+    "bounds_mm": [
+      [
+        -13.500003814697266,
+        13.500003814697266
+      ],
+      [
+        -14.0,
+        14.0
+      ],
+      [
+        0.0,
+        5.999994277954102
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S05_actual_interface_trial_mm.stl",
+    "triangles": 2998,
+    "vertices": 1495,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      1495
+    ],
+    "signed_volume_mm3": 3804.9811617886676,
+    "bounds_mm": [
+      [
+        -14.0,
+        14.0
+      ],
+      [
+        -14.75,
+        14.75
+      ],
+      [
+        0.0,
+        6.031381607055664
+      ]
+    ]
+  },
+  {
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S06_actual_interface_trial_mm.stl",
+    "triangles": 4328,
+    "vertices": 2160,
+    "nonmanifold_edges": 0,
+    "degenerate_index_triangles": 0,
+    "connected_vertex_components": [
+      2160
+    ],
+    "signed_volume_mm3": 1982.5309501996182,
+    "bounds_mm": [
+      [
+        -15.018654823303223,
+        15.018654823303223
+      ],
+      [
+        -13.315023422241211,
+        13.315023422241211
+      ],
+      [
+        0.0,
+        4.000000953674316
+      ]
+    ]
+  }
+]

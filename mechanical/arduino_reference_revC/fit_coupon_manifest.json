@@ -1,0 +1,104 @@
+[
+  {
+    "id": "S01",
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S01_actual_interface_trial_mm.stl",
+    "bounds_mm": [
+      31.0,
+      31.0,
+      5.5
+    ],
+    "source_part": "ARD_03_Waist",
+    "check": {
+      "vertices": 2065,
+      "faces": 1135,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 3065.308636202586
+    },
+    "scope": "Cropped mating plate; validates horn hole pitch, access, bolt stack. Does NOT validate neighbouring fixed support or full-part strength."
+  },
+  {
+    "id": "S02",
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S02_actual_interface_trial_mm.stl",
+    "bounds_mm": [
+      31.0,
+      31.0,
+      6.200000286102295
+    ],
+    "source_part": "ARD_04_Arm_01",
+    "check": {
+      "vertices": 2620,
+      "faces": 1314,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 4172.257423078505
+    },
+    "scope": "Cropped mating plate; validates horn hole pitch, access, bolt stack. Does NOT validate neighbouring fixed support or full-part strength."
+  },
+  {
+    "id": "S03",
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S03_actual_interface_trial_mm.stl",
+    "bounds_mm": [
+      31.0,
+      31.0,
+      6.2000041007995605
+    ],
+    "source_part": "ARD_04_Arm_01",
+    "check": {
+      "vertices": 2596,
+      "faces": 1302,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 4172.257398246022
+    },
+    "scope": "Cropped mating plate; validates horn hole pitch, access, bolt stack. Does NOT validate neighbouring fixed support or full-part strength."
+  },
+  {
+    "id": "S04",
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S04_actual_interface_trial_mm.stl",
+    "bounds_mm": [
+      27.00000762939453,
+      28.0,
+      5.999994277954102
+    ],
+    "source_part": "ARD_06_Arm_03",
+    "check": {
+      "vertices": 1496,
+      "faces": 1072,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 3484.297982634148
+    },
+    "scope": "Cropped mating plate; validates horn hole pitch, access, bolt stack. Does NOT validate neighbouring fixed support or full-part strength."
+  },
+  {
+    "id": "S05",
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S05_actual_interface_trial_mm.stl",
+    "bounds_mm": [
+      28.0,
+      29.5,
+      6.031381607055664
+    ],
+    "source_part": "ARD_07_Gripper_base",
+    "check": {
+      "vertices": 1495,
+      "faces": 1124,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 3804.98116352491
+    },
+    "scope": "Cropped mating plate; validates horn hole pitch, access, bolt stack. Does NOT validate neighbouring fixed support or full-part strength."
+  },
+  {
+    "id": "S06",
+    "file": "E:\\CyberArm\\mechanical\\arduino_reference_revC\\PRINT_FIRST_RevC_mm\\S06_actual_interface_trial_mm.stl",
+    "bounds_mm": [
+      30.037309646606445,
+      26.630046844482422,
+      4.000000953674316
+    ],
+    "source_part": "ARD_08_gear2",
+    "check": {
+      "vertices": 2160,
+      "faces": 2248,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 1982.530846693131
+    },
+    "scope": "Cropped mating plate; validates horn hole pitch, access, bolt stack. Does NOT validate neighbouring fixed support or full-part strength."
+  }
+]

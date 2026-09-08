@@ -1,0 +1,98 @@
+[
+  {
+    "id": "S01",
+    "part": "ARD_03_Waist",
+    "before": {
+      "vertices": 6552,
+      "faces": 11392,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 65895.76786981814
+    },
+    "after": {
+      "vertices": 7809,
+      "faces": 11698,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 65810.92650280058
+    }
+  },
+  {
+    "id": "S02",
+    "part": "ARD_04_Arm_01",
+    "before": {
+      "vertices": 7979,
+      "faces": 15978,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 57862.49684197885
+    },
+    "after": {
+      "vertices": 9446,
+      "faces": 16150,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 57857.261960770746
+    }
+  },
+  {
+    "id": "S03",
+    "part": "ARD_04_Arm_01",
+    "before": {
+      "vertices": 9446,
+      "faces": 16150,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 57857.261960770746
+    },
+    "after": {
+      "vertices": 10910,
+      "faces": 16324,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 57852.02719086839
+    }
+  },
+  {
+    "id": "S04",
+    "part": "ARD_06_Arm_03",
+    "before": {
+      "vertices": 3535,
+      "faces": 7082,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 15916.716798910844
+    },
+    "after": {
+      "vertices": 4217,
+      "faces": 7094,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 15916.364600076773
+    }
+  },
+  {
+    "id": "S05",
+    "part": "ARD_07_Gripper_base",
+    "before": {
+      "vertices": 1876,
+      "faces": 3358,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 14930.82178414371
+    },
+    "after": {
+      "vertices": 2605,
+      "faces": 3543,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 14930.292513045586
+    }
+  },
+  {
+    "id": "S06",
+    "part": "ARD_08_gear2",
+    "before": {
+      "vertices": 1572,
+      "faces": 2442,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 2577.34232717352
+    },
+    "after": {
+      "vertices": 2300,
+      "faces": 2601,
+      "nonmanifold_edges": 0,
+      "volume_mm3": 2538.2277977275617
+    }
+  }
+]

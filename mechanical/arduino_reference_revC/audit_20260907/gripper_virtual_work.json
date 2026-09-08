@@ -1,0 +1,102 @@
+[
+  {
+    "q_deg": -8,
+    "representative_pad_gap_mm": 20.349486103736453,
+    "pad_points_palm_mm": [
+      [
+        7.278698413817715,
+        20.550011675849408,
+        35.58464484723751
+      ],
+      [
+        27.628184517554168,
+        20.549997043142874,
+        34.30643382016791
+      ]
+    ],
+    "gap_derivative_m_per_rad": 0.019463504393416722,
+    "ideal_normal_each_jaw_N_at_half_stall": 4.534633035038271,
+    "friction_mass_g_if_mu_0p2_efficiency_0p6": 110.97693181761205,
+    "note": "Illustrative coefficient and efficiency, no object shape/pad compliance/slip validation; excludes gripper self-weight work. No safe payload rating."
+  },
+  {
+    "q_deg": -4,
+    "representative_pad_gap_mm": 18.854949824747763,
+    "pad_points_palm_mm": [
+      [
+        8.053858838207056,
+        20.550009752604456,
+        37.567035620313746
+      ],
+      [
+        26.90880866295482,
+        20.54999872750774,
+        36.32195776197821
+      ]
+    ],
+    "gap_derivative_m_per_rad": 0.023381534765282656,
+    "ideal_normal_each_jaw_N_at_half_stall": 3.7747671778607916,
+    "friction_mass_g_if_mu_0p2_efficiency_0p6": 92.38059099555812,
+    "note": "Illustrative coefficient and efficiency, no object shape/pad compliance/slip validation; excludes gripper self-weight work. No safe payload rating."
+  },
+  {
+    "q_deg": 0,
+    "representative_pad_gap_mm": 17.08637922095977,
+    "pad_points_palm_mm": [
+      [
+        8.966076954449811,
+        20.549978996146248,
+        39.49730926957449
+      ],
+      [
+        26.05245617540958,
+        20.549998966387825,
+        38.28571849170817
+      ]
+    ],
+    "gap_derivative_m_per_rad": 0.027249173193207802,
+    "ideal_normal_each_jaw_N_at_half_stall": 3.2389918539620086,
+    "friction_mass_g_if_mu_0p2_efficiency_0p6": 79.26846017252396,
+    "note": "Illustrative coefficient and efficiency, no object shape/pad compliance/slip validation; excludes gripper self-weight work. No safe payload rating."
+  },
+  {
+    "q_deg": 4,
+    "representative_pad_gap_mm": 15.051120365816509,
+    "pad_points_palm_mm": [
+      [
+        10.011918079853125,
+        20.54999425493531,
+        41.36548243101018
+      ],
+      [
+        25.063038445669633,
+        20.550000889632777,
+        40.187981030232606
+      ]
+    ],
+    "gap_derivative_m_per_rad": 0.031016220468554855,
+    "ideal_normal_each_jaw_N_at_half_stall": 2.8456029995492327,
+    "friction_mass_g_if_mu_0p2_efficiency_0p6": 69.64098034413544,
+    "note": "Illustrative coefficient and efficiency, no object shape/pad compliance/slip validation; excludes gripper self-weight work. No safe payload rating."
+  },
+  {
+    "q_deg": 8,
+    "representative_pad_gap_mm": 12.757926653411133,
+    "pad_points_palm_mm": [
+      [
+        11.187278896598805,
+        20.549977072901296,
+        43.16181394578703
+      ],
+      [
+        23.945205550009938,
+        20.549998966387825,
+        42.01936641205387
+      ]
+    ],
+    "gap_derivative_m_per_rad": 0.034668800709743236,
+    "ideal_normal_each_jaw_N_at_half_stall": 2.545800494771533,
+    "friction_mass_g_if_mu_0p2_efficiency_0p6": 62.303856948618325,
+    "note": "Illustrative coefficient and efficiency, no object shape/pad compliance/slip validation; excludes gripper self-weight work. No safe payload rating."
+  }
+]

@@ -1,0 +1,140 @@
+{
+  "sample_count": 405,
+  "angles_deg": [
+    -30,
+    0,
+    30
+  ],
+  "yaw_deg": [
+    -30,
+    -15,
+    0,
+    15,
+    30
+  ],
+  "not_collision_checked": true,
+  "worst_samples": {
+    "J02_Shoulder_pitch": {
+      "q_deg": [
+        -30,
+        30,
+        -30,
+        30,
+        -30
+      ],
+      "row": {
+        "joint": "J02_Shoulder_pitch",
+        "empty_Nm": 0.5053724054666253,
+        "signed_Nm": 0.5053724054666253,
+        "payload_Nm_per_g": 0.0031515104814688476,
+        "with_50g_Nm": 0.6629479295400678,
+        "with_100g_Nm": 0.8205234536135101,
+        "fraction_of_stall_empty": 0.5482302504744395,
+        "stall_4p8V_Nm": 0.9218251000000001,
+        "screen_cap_g": {
+          "0.3": 0.0,
+          "0.5": 0.0,
+          "1.0": 132.14383927394573
+        }
+      }
+    },
+    "J03_Elbow_pitch": {
+      "q_deg": [
+        15,
+        0,
+        -30,
+        30,
+        0
+      ],
+      "row": {
+        "joint": "J03_Elbow_pitch",
+        "empty_Nm": 0.20994955974136,
+        "signed_Nm": 0.20994955974136,
+        "payload_Nm_per_g": 0.002232316474789516,
+        "with_50g_Nm": 0.3215653834808358,
+        "with_100g_Nm": 0.4331812072203116,
+        "fraction_of_stall_empty": 0.2277542233785563,
+        "stall_4p8V_Nm": 0.9218251000000001,
+        "screen_cap_g": {
+          "0.3": 29.83357019972693,
+          "0.5": 112.42267532084722,
+          "1.0": 318.895438123648
+        }
+      }
+    },
+    "J04_Wrist_roll": {
+      "q_deg": [
+        -15,
+        -30,
+        0,
+        -30,
+        -30
+      ],
+      "row": {
+        "joint": "J04_Wrist_roll",
+        "empty_Nm": 0.029941511983187747,
+        "signed_Nm": -0.029941511983187747,
+        "payload_Nm_per_g": 0.0005426998735747405,
+        "with_50g_Nm": 0.05707650566192478,
+        "with_100g_Nm": 0.0842114993406618,
+        "fraction_of_stall_empty": 0.16962136227960814,
+        "stall_4p8V_Nm": 0.1765197,
+        "screen_cap_g": {
+          "0.3": 42.40722936826466,
+          "0.5": 107.45964916607018,
+          "1.0": 270.09069866058394
+        }
+      }
+    },
+    "J05_Wrist_pitch": {
+      "q_deg": [
+        15,
+        -30,
+        -30,
+        0,
+        30
+      ],
+      "row": {
+        "joint": "J05_Wrist_pitch",
+        "empty_Nm": 0.04126642331992686,
+        "signed_Nm": 0.04126642331992686,
+        "payload_Nm_per_g": 0.0010386650974212699,
+        "with_50g_Nm": 0.09319967819099034,
+        "with_100g_Nm": 0.14513293306205383,
+        "fraction_of_stall_empty": 0.23377800506077712,
+        "stall_4p8V_Nm": 0.1765197,
+        "screen_cap_g": {
+          "0.3": 11.254336656825227,
+          "0.5": 45.24406066666278,
+          "1.0": 130.21837069125667
+        }
+      }
+    },
+    "all_feet_margin": {
+      "q_deg": [
+        0,
+        30,
+        -30,
+        30,
+        -30
+      ],
+      "margin_mm": 32.19826746079465,
+      "minimum_empty_restoring_Nm": 0.2260723784699205,
+      "static_tip_threshold_g": 109.57394799621602,
+      "tip_threshold_1p5_moment_margin_g": 41.77155789704346
+    },
+    "base_only_margin": {
+      "q_deg": [
+        -30,
+        30,
+        -30,
+        30,
+        -30
+      ],
+      "margin_mm": -0.7527026579630558,
+      "minimum_empty_restoring_Nm": -0.005284920388139737,
+      "static_tip_threshold_g": -2.216959396206354,
+      "tip_threshold_1p5_moment_margin_g": -39.89725015830131
+    }
+  }
+}

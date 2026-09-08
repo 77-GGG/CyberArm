@@ -1,0 +1,44 @@
+[
+  {
+    "id": "S01",
+    "object": "REVC_S01_HORN_DRILL_2p2",
+    "hole_vertices_adjusted": 96,
+    "hole_diameter_mm": 2.2,
+    "requires_physical_drilling": true
+  },
+  {
+    "id": "S02",
+    "object": "REVC_S02_HORN_DRILL_2p2",
+    "hole_vertices_adjusted": 96,
+    "hole_diameter_mm": 2.2,
+    "requires_physical_drilling": true
+  },
+  {
+    "id": "S03",
+    "object": "REVC_S03_HORN_DRILL_2p2",
+    "hole_vertices_adjusted": 96,
+    "hole_diameter_mm": 2.2,
+    "requires_physical_drilling": true
+  },
+  {
+    "id": "S04",
+    "object": "REVC_S04_HORN_DRILL_2p2",
+    "hole_vertices_adjusted": 124,
+    "hole_diameter_mm": 2.2,
+    "requires_physical_drilling": true
+  },
+  {
+    "id": "S05",
+    "object": "REVC_S05_HORN_DRILL_2p2",
+    "hole_vertices_adjusted": 124,
+    "hole_diameter_mm": 2.2,
+    "requires_physical_drilling": true
+  },
+  {
+    "id": "S06",
+    "object": "REVC_S06_HORN_DRILL_2p2",
+    "hole_vertices_adjusted": 124,
+    "hole_diameter_mm": 2.2,
+    "requires_physical_drilling": true
+  }
+]

@@ -1,0 +1,4 @@
+{
+  "method": "Static vertex/face-centre samples of intersecting triangles against printed solids; .03 mm threshold, not continuous collision detection",
+  "suspected_interferences": []
+}

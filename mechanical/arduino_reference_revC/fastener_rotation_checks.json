@@ -1,0 +1,91 @@
+{
+  "scope": "New transmission bolts and nuts against adjacent FIXED print support only. Does not certify whole-arm motion, continuous clearance, servo limits, bearings, load or cables.",
+  "results": [
+    {
+      "id": "S04",
+      "fixed_support": "ARD_05_Arm_02_v3",
+      "sampled_angles_deg": [
+        -180,
+        -165,
+        -150,
+        -135,
+        -120,
+        -105,
+        -90,
+        -75,
+        -60,
+        -45,
+        -30,
+        -15,
+        0,
+        15,
+        30,
+        45,
+        60,
+        75,
+        90,
+        105,
+        120,
+        135,
+        150,
+        165,
+        180
+      ],
+      "tested_mesh_poses": 100,
+      "intersecting_samples": 0,
+      "suspected_penetrations": []
+    },
+    {
+      "id": "S05",
+      "fixed_support": "ARD_06_Arm_03",
+      "sampled_angles_deg": [
+        -180,
+        -165,
+        -150,
+        -135,
+        -120,
+        -105,
+        -90,
+        -75,
+        -60,
+        -45,
+        -30,
+        -15,
+        0,
+        15,
+        30,
+        45,
+        60,
+        75,
+        90,
+        105,
+        120,
+        135,
+        150,
+        165,
+        180
+      ],
+      "tested_mesh_poses": 100,
+      "intersecting_samples": 0,
+      "suspected_penetrations": []
+    },
+    {
+      "id": "S06",
+      "fixed_support": "ARD_07_Gripper_base",
+      "sampled_angles_deg": [
+        -8,
+        -6,
+        -4,
+        -2,
+        0,
+        2,
+        4,
+        6,
+        8
+      ],
+      "tested_mesh_poses": 36,
+      "intersecting_samples": 0,
+      "suspected_penetrations": []
+    }
+  ]
+}

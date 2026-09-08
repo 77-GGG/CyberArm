@@ -1,0 +1,62 @@
+[
+  {
+    "id": "S01",
+    "source_hub_radius_mm": 4.400000776363503,
+    "nut_max_corner_radius_mm": 2.3094010767585034,
+    "worst_orientation_radial_gap_mm": [
+      0.29059814687799435,
+      0.29059814687799435
+    ],
+    "physical_fit_required": true
+  },
+  {
+    "id": "S02",
+    "source_hub_radius_mm": 4.400005352244033,
+    "nut_max_corner_radius_mm": 2.3094010767585034,
+    "worst_orientation_radial_gap_mm": [
+      0.29059357099746386,
+      0.29059357099746386
+    ],
+    "physical_fit_required": true
+  },
+  {
+    "id": "S03",
+    "source_hub_radius_mm": 4.40001106859212,
+    "nut_max_corner_radius_mm": 2.3094010767585034,
+    "worst_orientation_radial_gap_mm": [
+      0.2905878546493774,
+      0.2905878546493774
+    ],
+    "physical_fit_required": true
+  },
+  {
+    "id": "S04",
+    "source_hub_radius_mm": 3.4773113107767397,
+    "nut_max_corner_radius_mm": 2.3094010767585034,
+    "worst_orientation_radial_gap_mm": [
+      0.21328761246475691,
+      0.21328761246475691
+    ],
+    "physical_fit_required": true
+  },
+  {
+    "id": "S05",
+    "source_hub_radius_mm": 3.477262354391563,
+    "nut_max_corner_radius_mm": 2.3094010767585034,
+    "worst_orientation_radial_gap_mm": [
+      0.2133365688499338,
+      0.2133365688499338
+    ],
+    "physical_fit_required": true
+  },
+  {
+    "id": "S06",
+    "source_hub_radius_mm": 3.477351957856804,
+    "nut_max_corner_radius_mm": 2.3094010767585034,
+    "worst_orientation_radial_gap_mm": [
+      0.21324696538469246,
+      5.213246965384693
+    ],
+    "physical_fit_required": true
+  }
+]

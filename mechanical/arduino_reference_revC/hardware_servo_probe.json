@@ -1,0 +1,248 @@
+[
+  {
+    "id": "S01",
+    "servo_hardware": [
+      {
+        "hardware": "REVC_S01_T1_M2x10",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S01_T1_WASHER",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S01_T1_NUT_M2",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S01_T2_M2x10",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S01_T2_WASHER",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S01_T2_NUT_M2",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      }
+    ]
+  },
+  {
+    "id": "S02",
+    "servo_hardware": [
+      {
+        "hardware": "REVC_S02_T1_M2x10",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S02_T1_WASHER",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S02_T1_NUT_M2",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S02_T2_M2x10",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S02_T2_WASHER",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S02_T2_NUT_M2",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      }
+    ]
+  },
+  {
+    "id": "S03",
+    "servo_hardware": [
+      {
+        "hardware": "REVC_S03_T1_M2x10",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S03_T1_WASHER",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S03_T1_NUT_M2",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S03_T2_M2x10",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S03_T2_WASHER",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S03_T2_NUT_M2",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      }
+    ]
+  },
+  {
+    "id": "S04",
+    "servo_hardware": [
+      {
+        "hardware": "REVC_S04_T1_M2x10",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S04_T1_WASHER",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S04_T1_NUT_M2",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S04_T2_M2x10",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S04_T2_WASHER",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S04_T2_NUT_M2",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      }
+    ]
+  },
+  {
+    "id": "S05",
+    "servo_hardware": [
+      {
+        "hardware": "REVC_S05_T1_M2x10",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S05_T1_WASHER",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S05_T1_NUT_M2",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S05_T2_M2x10",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S05_T2_WASHER",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S05_T2_NUT_M2",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      }
+    ]
+  },
+  {
+    "id": "S06",
+    "servo_hardware": [
+      {
+        "hardware": "REVC_S06_T1_M2x8",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S06_T1_WASHER",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S06_T1_NUT_M2",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S06_T2_M2x8",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S06_T2_WASHER",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      },
+      {
+        "hardware": "REVC_S06_T2_NUT_M2",
+        "surface_pairs": 0,
+        "penetrating_samples": 0,
+        "deepest": []
+      }
+    ]
+  }
+]
