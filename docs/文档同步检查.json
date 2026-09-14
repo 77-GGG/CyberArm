@@ -1,0 +1,16 @@
+{
+  "design_version": "2.0",
+  "source_sha256": "1cabe1fc301ea6ebc3f52148701538b45c805634c99c30a6f6a81cba0553b3b0",
+  "pdf_sha256": "6f2de424aa00752879e9ad022fb61e3aea08b1576383f72dab82793dbb887b9c",
+  "pages": 6,
+  "checked_documents": [
+    "CyberArm_设计文档.md",
+    "K230D_SYSTEM_DESIGN.md",
+    "固件实现方案.md",
+    "技术决策与问题记录.md"
+  ],
+  "broken_local_links": [],
+  "stale_configuration_terms": [],
+  "pdf_text_checks": "passed",
+  "scope": "Documentation synchronization only; no robot software or hardware tests performed."
+}

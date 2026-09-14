@@ -4,3 +4,11 @@
 .vscode/launch.json
 .vscode/ipch
 .codex
+simulator/.venv/
+simulator/.cache/
+simulator/frontend/node_modules/
+simulator/frontend/dist/
+simulator/core/build/
+simulator/**/__pycache__/
+simulator/.pytest_cache/
+simulator/workspace/
