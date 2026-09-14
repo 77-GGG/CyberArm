@@ -2,18 +2,21 @@ from pathlib import Path
 import ctypes as C
 import hashlib
 import json
+import os
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
+RESOURCE_ROOT = Path(os.environ.get('CYBERARM_RESOURCE_DIR', ROOT))
 PTR = C.POINTER(C.c_double)
 def pointer(a): return a.ctypes.data_as(PTR)
 
 class Robot:
     def __init__(self):
-        path=ROOT/'assets/revc/robot.json'
+        path=RESOURCE_ROOT/'assets/revc/robot.json'
         self.data=json.loads(path.read_text(encoding='utf-8'))
         self.version=hashlib.sha256(path.read_bytes()).hexdigest()[:16]
-        self.lib=C.CDLL(str(ROOT/'core/build/libcyberarm_core.dll'))
+        library = RESOURCE_ROOT/'core/libcyberarm_core.dll' if (RESOURCE_ROOT/'core/libcyberarm_core.dll').exists() else ROOT/'core/build/libcyberarm_core.dll'
+        self.lib=C.CDLL(str(library))
         self.lib.ca_fk.argtypes=[PTR]*6;self.lib.ca_fk.restype=C.c_int
         self.lib.ca_curve.argtypes=[C.c_double,C.c_double,PTR];self.lib.ca_curve.restype=C.c_int
         self.lib.ca_segment_distance.argtypes=[PTR]*4;self.lib.ca_segment_distance.restype=C.c_double
