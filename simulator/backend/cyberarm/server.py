@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .model import Robot, ROOT
 from .planner import plan_job, warm_worker, workspace_job
-from .reachability import reachability_job
+from .reachability import reachability_job, manual_job
 
 class Strict(BaseModel):
     model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
@@ -70,6 +70,21 @@ class Project(Strict):
         if len(self.steps)*self.loops>100:raise ValueError('展开动作不能超过 100 步')
         return self
 
+class Manual(Strict):
+    kind:Literal['joint','cartesian']
+    q_deg:list[float]|None=Field(default=None,min_length=6,max_length=6)
+    position_mm:list[float]|None=Field(default=None,min_length=3,max_length=3)
+    direction:list[float]|None=Field(default=None,min_length=3,max_length=3)
+    refine:bool=True
+    seq:int
+    revision:int
+    @model_validator(mode='after')
+    def target(self):
+        if self.kind=='joint' and self.q_deg is None:raise ValueError('缺少关节角度')
+        if self.kind=='cartesian' and self.position_mm is None:raise ValueError('缺少目标坐标')
+        if self.direction is not None and np.linalg.norm(self.direction)<1e-8:raise ValueError('工具方向不能为零')
+        return self
+
 class Controller:
     def __init__(self):
         self.r=Robot();self.q=np.zeros(6);self.mode='READY';self.seq=0;self.revision=0
@@ -116,7 +131,7 @@ class Controller:
                 'seq':self.seq,'revision':self.revision,'time':self.t,'duration':self.active['duration'] if self.active else 0,
                 'events':self.events[-12:],'planning':self.busy,'error':self.last_error,'obstacles':self.obstacles}
 
-c=None;pool=None;trial_busy=False;token=secrets.token_urlsafe(32)
+c=None;pool=None;trial_busy=False;manual_busy=False;token=secrets.token_urlsafe(32)
 async def ticker():
     previous=time.monotonic();accumulator=0.
     while True:
@@ -185,6 +200,24 @@ async def reachability(body:Reachability):
 @app.post('/api/heartbeat')
 async def heartbeat(request:Request):
     c.clients[request.headers.get('x-client','sdk')]=time.monotonic();return {'ok':True}
+
+@app.post('/api/manual')
+async def manual(body:Manual):
+    global manual_busy
+    if c.mode!='READY' or c.busy:raise HTTPException(409,'请先停止自动动作或等待路径检查完成')
+    if manual_busy:raise HTTPException(429,'手动更新正在处理')
+    if (body.seq,body.revision)!=(c.seq,c.revision):raise HTTPException(409,'当前位置或场景已改变')
+    manual_busy=True;generation=c.generation
+    try:
+        result=await asyncio.get_running_loop().run_in_executor(pool,manual_job,
+            {**body.model_dump(),'seed_deg':np.degrees(c.q).tolist(),'obstacles':c.obstacles})
+        if c.mode!='READY' or c.busy or generation!=c.generation or (body.seq,body.revision)!=(c.seq,c.revision):
+            raise HTTPException(409,'更新期间状态已改变，未应用手动目标')
+        if result['status']=='reachable':
+            c.q=np.radians(result['q_deg']);c.seq+=1;c.generation+=1;c.plans.clear();c.paused=None;c.last_error=''
+        return {**result,'state':c.snapshot()}
+    except ValueError as exc:raise HTTPException(422,str(exc))
+    finally:manual_busy=False
 
 async def make_plan(body,client):
     if c.mode not in ('READY','PAUSED'):raise HTTPException(409,'请先停止或暂停当前动作')

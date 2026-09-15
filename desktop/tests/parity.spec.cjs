@@ -18,8 +18,9 @@ test('桌面复用工作台：模型、控制、规划子进程、执行、文�
       });
     },output);
     await expect(page.locator('.connection')).toContainText('本地已连接',{timeout:60000});
-    await expect(page.locator('.scene-caption')).not.toContainText('正在加载',{timeout:60000});
-    await expect(page.locator('.scene-caption')).not.toContainText('失败');
+    await expect(page.locator('.scene-stage')).toHaveAttribute('data-model-status',/已载入/,{timeout:60000});
+    await page.getByRole('button',{name:'自动控制',exact:true}).click();
+    await page.getByRole('button',{name:'关闭面板'}).click();
     url=page.url();
     const api=async(route,body)=>page.evaluate(async({route,body})=>{
       const boot=await fetch('/api/bootstrap').then(r=>r.json());
@@ -49,6 +50,7 @@ test('桌面复用工作台：模型、控制、规划子进程、执行、文�
     await page.getByRole('button',{name:'取当前值'}).click();
     await page.getByRole('button',{name:'预览路径',exact:true}).click();
     await expect(page.locator('.feedback')).toContainText('预览通过',{timeout:90000});
+    await page.locator('summary').click();
     await page.getByLabel('末端直线运动 MoveL').check();
     await page.getByRole('button',{name:'预览路径',exact:true}).click();
     await expect(page.locator('.feedback')).toContainText('预览通过',{timeout:90000});

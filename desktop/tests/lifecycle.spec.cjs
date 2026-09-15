@@ -11,7 +11,9 @@ test('重复启动不创建第二个服务，主进程异常退出后清理后�
   try {
     const page=await app.firstWindow();
     await expect(page.locator('.connection')).toContainText('本地已连接',{timeout:60000});
-    await expect(page.getByTestId('reachability-status')).toContainText('目标可达',{timeout:60000});
+    await page.getByRole('button',{name:'自动控制',exact:true}).click();
+    await page.getByRole('button',{name:'关闭面板'}).click();
+    await page.getByRole('button',{name:'关节',exact:true}).click();
     const url=page.url();
     const second=spawn(packaged||require('electron'),args,{env,windowsHide:true,stdio:'ignore'});
     const code=await new Promise((resolve,reject)=>{second.on('error',reject);second.on('exit',resolve);});

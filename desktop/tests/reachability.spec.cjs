@@ -10,7 +10,9 @@ test('末端实时试摆、无解保留、过期响应和选定姿态执行',asy
  try{
   const page=await app.firstWindow();const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await expect(page.locator('.connection')).toContainText('本地已连接',{timeout:60000});
-  await expect(page.locator('.scene-caption')).toContainText('RevC 模型已载入',{timeout:60000});
+  await expect(page.locator('.scene-stage')).toHaveAttribute('data-model-status',/已载入/,{timeout:60000});
+  await page.getByRole('button',{name:'示教模式',exact:true}).click();
+  await page.getByRole('button',{name:'关闭面板'}).click();
   const status=page.getByTestId('reachability-status');
   await expect(status).toContainText('目标可达',{timeout:60000});
   const state=()=>page.evaluate(()=>fetch('/api/state').then(r=>r.json()));
@@ -22,7 +24,7 @@ test('末端实时试摆、无解保留、过期响应和选定姿态执行',asy
   const rect=await page.locator('.viewport canvas').boundingBox();
   const camera=new THREE.PerspectiveCamera(40,rect.width/rect.height,.001,10);
   camera.up.set(0,0,1);camera.position.set(.50,-.63,.38);camera.lookAt(.12,0,.115);
-  camera.setViewOffset(rect.width,rect.height,rect.width>900?110:0,0,rect.width,rect.height);camera.updateMatrixWorld();
+  camera.updateMatrixWorld();
   const tcp=new THREE.Vector3(...before.tcp.slice(0,3).map(r=>r[3]));
   const shaft=tcp.clone().add(new THREE.Vector3(0,0,.035)).project(camera);
   const x=rect.x+(shaft.x+1)*rect.width/2,z=rect.y+(1-shaft.y)*rect.height/2;
