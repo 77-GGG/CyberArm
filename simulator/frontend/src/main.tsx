@@ -5,6 +5,9 @@ import {SceneView} from './SceneView';
 import {useReachability} from './useReachability';
 import {useManualControl} from './useManualControl';
 import {api,client,session,setSession} from './api';
+import {CommandConsole} from './CommandConsole';
+import {FloatingConsole} from './FloatingConsole';
+import type {CommandResult} from './CommandConsole';
 import type {State,Model,Step,Plan} from './types';
 import './style.css';
 
@@ -29,12 +32,13 @@ function App(){
  const [view,setView]=useState('perspective'),[modelStatus,setModelStatus]=useState('正在加载模型');
  const [obstacle,setObstacle]=useState({name:'障碍物 1',center:[320,0,80],size:[40,60,100]});
  const [selectedJoint,setSelectedJoint]=useState(0);
+ const [commandBusy,setCommandBusy]=useState(false);
  const upload=useRef<HTMLInputElement>(null),editVersion=useRef(0),dragRef=useRef(false);
- const current=useRef({state,q,mode,showPath,tab,busy,connected});current.current={state,q,mode,showPath,tab,busy,connected};
+ const current=useRef({state,q,mode,showPath,tab,busy,connected});current.current={state,q,mode,showPath,tab,busy:busy||commandBusy,connected};
  const receiveState=(next:State)=>setState(old=>old&&(old.seq>next.seq||old.revision>next.revision)?old:next);
  const manual=useManualControl(state,receiveState);
  const running=Boolean(state&&['RUNNING','STOPPING'].includes(state.mode));
- const disabled=busy||running||!connected;
+ const disabled=busy||commandBusy||running||!connected;
  const liveManual=mode==='manual'&&!showPath;
  const trial=useReachability({enabled:!liveManual&&tab==='cartesian'&&!disabled,target,direction:constrained?direction:undefined,dragging,seq:state?.seq??0,revision:state?.revision??0,actual:state,reset:trialReset},api);
 
@@ -56,8 +60,19 @@ function App(){
    if(tab==='joint')setTarget(tcpPosition(state));
   }
  },[manual.busy,manual.result,state?.seq,liveManual,tab]);
+ useEffect(()=>{
+  if(liveManual&&!manual.busy&&state){setQ(state.q_deg);setTarget(tcpPosition(state));}
+ },[state?.seq,liveManual]);
 
  const invalidate=()=>{editVersion.current++;setPlan(null);setRunPlan(null);setError(false);};
+ const commandResult=async(result:CommandResult)=>{
+  if(!result.ok)return;
+  if(['help','status','joints','tcp','limits','events','device'].includes(result.command))return;
+  const next:State=await api('state');receiveState(next);setQ(next.q_deg);setTarget(tcpPosition(next));
+  invalidate();setTrialReset(v=>v+1);
+  if(result.command==='plan')setPlan(result.data);
+  setMessage(`命令 ${result.command} 已接受`);
+ };
  const fail=(e:unknown)=>{setError(true);setMessage(e instanceof Error?e.message:String(e));setPlan(null);};
  const changeQ=(i:number,v:number)=>{
   if(disabled)return;
@@ -169,7 +184,7 @@ function App(){
    <div className="connection"><i className={connected?'online':''}/>{connected?'本地已连接':'连接断开'}<span className="sim">仿真</span></div>
   </header>
   <div className="app-tools">
-   <nav aria-label="工作台工具"><button onClick={()=>toggle('project')}><Box size={17}/>项目</button><button onClick={()=>toggle('scene')}><Layers size={17}/>场景</button><button className={points.length?'active':''} disabled={disabled||manual.busy} onClick={sample}><Scan size={17}/>可达采样</button><button onClick={()=>toggle('settings')}><Settings2 size={17}/>设置</button></nav>
+   <nav aria-label="工作台工具"><button onClick={()=>toggle('project')}><Box size={17}/>项目</button><button onClick={()=>toggle('scene')}><Layers size={17}/>场景</button><button className={points.length?'active':''} disabled={disabled||manual.busy} onClick={sample}><Scan size={17}/>可达采样</button><button onClick={()=>toggle('settings')}><Settings2 size={17}/>设置</button><button className={drawer==='console'?'active':''} onClick={()=>toggle('console')}><Terminal size={17}/>控制台</button></nav>
    <button onClick={()=>toggle('actions')} className={drawer==='actions'?'active':''}><BookOpen size={17}/>动作序列 <span className="badge">{steps.length}</span></button>
   </div>
   <div className="workspace">
@@ -179,7 +194,10 @@ function App(){
      <label className="preview-toggle"><input aria-label="显示路径预览" type="checkbox" checked={showPath} disabled={disabled||manual.busy} onChange={e=>mode==='manual'?void transition(mode,e.target.checked):setShowPath(e.target.checked)}/>路径预览</label>
     </div>
     <SceneView state={displayState} model={boot.model} plan={shownPlan} points={points} drag={tab==='cartesian'&&!disabled} target={target} onTarget={changeTarget} onDragging={value=>{dragRef.current=value;setDragging(value);}} trialStatus={resultStatus} view={view} onLoad={setModelStatus}/>
-    {drawer&&<section className={'drawer '+(drawer==='actions'?'sequence-drawer':'')} role="dialog" aria-label={{actions:'动作序列',scene:'场景编辑',project:'项目',logs:'运行记录',settings:'设置'}[drawer]}>
+    <FloatingConsole open={drawer==='console'} onClose={()=>setDrawer('')}>
+     <CommandConsole connected={connected} onStart={()=>{manual.cancel();setCommandBusy(true);}} onResult={commandResult} onFinish={()=>setCommandBusy(false)}/>
+    </FloatingConsole>
+    {drawer&&drawer!=='console'&&<section className={'drawer '+(drawer==='actions'?'sequence-drawer':'')} role="dialog" aria-label={{actions:'动作序列',scene:'场景编辑',project:'项目',logs:'运行记录',settings:'设置'}[drawer]}>
      <div className="drawer-heading"><h2>{{actions:'动作序列',scene:'场景编辑',project:'项目',logs:'运行记录',settings:'设置'}[drawer]}</h2><button aria-label="关闭面板" onClick={()=>setDrawer('')}><X size={18}/></button></div>
      {drawer==='actions'&&<>
       <div className="action-toolbar"><button disabled={!canSave} onClick={saveTarget}><Plus size={16}/>保存当前目标</button><button disabled={disabled||manual.busy} onClick={()=>{setSteps(old=>[...old,{kind:'wait',seconds:1}]);invalidate();}}><Plus size={16}/>等待 1 秒</button><label>循环<input aria-label="循环次数" type="number" min="1" max="10" value={loops} onChange={e=>{setLoops(Math.max(1,Math.min(10,Number(e.target.value))));invalidate();}}/></label></div>

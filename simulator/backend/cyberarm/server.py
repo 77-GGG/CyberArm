@@ -14,6 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .model import Robot, ROOT
 from .planner import plan_job, warm_worker, workspace_job
 from .reachability import reachability_job, manual_job
+from .commands import CommandRequest, run_command, catalogue
 
 class Strict(BaseModel):
     model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
@@ -90,7 +91,7 @@ class Controller:
         self.r=Robot();self.q=np.zeros(6);self.mode='READY';self.seq=0;self.revision=0
         self.obstacles=[];self.plans={};self.active=None;self.t=0.;self.stop_t=0.;self.stop_duration=.1
         self.pause_requested=False;self.paused=None;self.events=[];self.clients={};self.owner=None
-        self.generation=0;self.busy=False;self.last_error='';self.last_dt=.02
+        self.generation=0;self.busy=False;self.planning_owner=None;self.execution=None;self.last_error='';self.last_dt=.02
     def log(self,message):
         self.events.append({'time':time.strftime('%H:%M:%S'),'message':message});self.events=self.events[-60:]
     def current_segment(self):
@@ -121,15 +122,17 @@ class Controller:
             self.t+=(new-old)-(new*new-old*old)/(2*self.stop_duration);self.stop_t=new
         self.t=min(self.t,self.active['duration']);self.evaluate();self.seq+=1
         if self.t>=self.active['duration']-1e-9:
+            self.execution={'plan_id':self.active.get('plan_id'),'status':'completed'}
             self.q=np.array(self.active['end']);self.mode='READY';self.active=None;self.paused=None;self.log('动作完成')
         elif self.mode=='STOPPING' and self.stop_t>=self.stop_duration:
+            self.execution={'plan_id':self.active.get('plan_id'),'status':'paused' if self.pause_requested else 'stopped'}
             self.paused=self.active if self.pause_requested else None
             self.mode='PAUSED' if self.pause_requested else 'READY';self.active=None;self.log('已暂停' if self.pause_requested else '已停止')
     def snapshot(self):
         matrices,tcp=self.r.transforms(self.q)
         return {'mode':self.mode,'q_deg':np.degrees(self.q).tolist(),'matrices':matrices,'tcp':tcp,
                 'seq':self.seq,'revision':self.revision,'time':self.t,'duration':self.active['duration'] if self.active else 0,
-                'events':self.events[-12:],'planning':self.busy,'error':self.last_error,'obstacles':self.obstacles}
+                'events':self.events[-12:],'planning':self.busy,'error':self.last_error,'obstacles':self.obstacles,'execution':self.execution}
 
 c=None;pool=None;trial_busy=False;manual_busy=False;token=secrets.token_urlsafe(32)
 async def ticker():
@@ -174,6 +177,10 @@ async def session_guard(request:Request,call_next):
 async def bootstrap():return {'session':token,'model':c.r.data,'version':c.r.version,'state':c.snapshot()}
 @app.get('/api/state')
 async def state():return c.snapshot()
+@app.get('/api/commands')
+async def commands():return {'protocol_version':1,'commands':catalogue()}
+@app.post('/api/command')
+async def command(body:CommandRequest,request:Request):return await run_command(body,request)
 @app.post('/api/pose')
 async def pose(body:Pose):
     q=np.radians(body.q_deg)
@@ -200,6 +207,12 @@ async def reachability(body:Reachability):
 @app.post('/api/heartbeat')
 async def heartbeat(request:Request):
     c.clients[request.headers.get('x-client','sdk')]=time.monotonic();return {'ok':True}
+@app.post('/api/release')
+async def release(request:Request):
+    client=request.headers.get('x-client','sdk')
+    c.clients.pop(client,None)
+    if c.owner==client or c.planning_owner==client:c.stop(True)
+    return {'ok':True}
 
 @app.post('/api/manual')
 async def manual(body:Manual):
@@ -222,7 +235,7 @@ async def manual(body:Manual):
 async def make_plan(body,client):
     if c.mode not in ('READY','PAUSED'):raise HTTPException(409,'请先停止或暂停当前动作')
     if c.busy:raise HTTPException(409,'已有规划任务；可停止取消其结果')
-    c.busy=True;generation=c.generation;seq=c.seq;revision=c.revision;start=c.q.copy();begin=time.monotonic()
+    c.busy=True;c.planning_owner=client;generation=c.generation;seq=c.seq;revision=c.revision;start=c.q.copy();begin=time.monotonic()
     try:
         result=await asyncio.get_running_loop().run_in_executor(pool,plan_job,{'start':start.tolist(),'obstacles':c.obstacles,**body.model_dump(exclude_none=True)})
         if (generation,seq,revision)!=(c.generation,c.seq,c.revision):raise HTTPException(409,'规划期间状态已改变，请重新预览')
@@ -231,7 +244,7 @@ async def make_plan(body,client):
         return result
     except ValueError as e:
         c.last_error=str(e);c.log('拒绝：'+str(e));raise HTTPException(422,str(e))
-    finally:c.busy=False
+    finally:c.busy=False;c.planning_owner=None
 
 @app.post('/api/plan')
 async def plan(body:PlanRequest,request:Request):return await make_plan(body,request.headers.get('x-client','sdk'))
@@ -239,12 +252,13 @@ async def plan(body:PlanRequest,request:Request):return await make_plan(body,req
 async def execute(body:Execute,request:Request):
     client=request.headers.get('x-client','sdk');p=c.plans.get(body.plan_id)
     if not p or c.mode not in ('READY','PAUSED') or (p['seq'],p['revision'],p['version'])!=(c.seq,c.revision,c.r.version) or time.monotonic()-p['created']>120 or p['owner']!=client:raise HTTPException(409,'预览已失效、来源不符或控制器忙，请重新预览')
-    c.active=p;c.plans.clear();c.paused=None;c.mode='RUNNING';c.t=0.;c.owner=client;c.clients[client]=time.monotonic();c.seq+=1;c.log('开始模拟执行');return {'ok':True}
+    c.active=p;c.plans.clear();c.paused=None;c.mode='RUNNING';c.t=0.;c.owner=client;c.clients[client]=time.monotonic();c.seq+=1
+    c.execution={'plan_id':p['plan_id'],'status':'running'};c.log('开始模拟执行');return {'ok':True,'plan_id':p['plan_id']}
 @app.post('/api/control')
 async def control(body:Control):
     if body.action=='reset':
         if c.mode in ('RUNNING','STOPPING'):raise HTTPException(409,'请先停止动作')
-        c.q=np.zeros(6);c.seq+=1;c.generation+=1;c.plans.clear();c.paused=None;c.mode='READY';c.log('重置模拟状态，非实物回零')
+        c.q=np.zeros(6);c.seq+=1;c.generation+=1;c.plans.clear();c.paused=None;c.execution=None;c.mode='READY';c.log('重置模拟状态，非实物回零')
     else:c.stop(body.action=='pause')
     return c.snapshot()
 @app.post('/api/resume')
@@ -280,7 +294,7 @@ async def websocket(ws:WebSocket):
                 pass
     except (WebSocketDisconnect,RuntimeError):
         c.clients.pop(client,None)
-        if c.owner==client:c.stop(True)
+        if c.owner==client or c.planning_owner==client:c.stop(True)
 
 app.mount('/models',StaticFiles(directory=ROOT/'assets/revc'),name='models')
 if (ROOT/'frontend/dist').exists():app.mount('/',StaticFiles(directory=ROOT/'frontend/dist',html=True),name='frontend')
