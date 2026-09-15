@@ -13,6 +13,13 @@ test('浅色工作台：手动实时位置、预览开关、模式切换及小�
   let plans=0;page.on('request',r=>{if(r.url().endsWith('/api/plan'))plans++;});
   await expect(page.locator('.connection')).toContainText('本地已连接',{timeout:60000});
   await expect(page.locator('.scene-stage')).toHaveAttribute('data-model-status',/已载入/,{timeout:60000});
+  await page.getByRole('button',{name:'实机',exact:true}).click();
+  await expect(page.getByRole('dialog',{name:'实机连接与校准'})).toContainText('未连接控制器');
+  await expect(page.getByLabel('ESP32-S3 串口')).toBeVisible();
+  await expect(page.getByRole('button',{name:'连接',exact:true})).toBeVisible();
+  expect(await page.evaluate(()=>fetch('/api/hardware/ports').then(async r=>({status:r.status,data:await r.json()})))).toMatchObject({status:200,data:{ports:expect.any(Array)}});
+  await page.screenshot({path:path.join(output,'hardware-panel.png')});
+  await page.getByRole('button',{name:'关闭面板'}).click();
   const state=()=>page.evaluate(()=>fetch('/api/state').then(r=>r.json()));
   await expect(page.getByLabel('显示路径预览')).not.toBeChecked();
   await expect(page.getByRole('button',{name:'预览路径',exact:true})).toHaveCount(0);

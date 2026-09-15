@@ -45,7 +45,7 @@ def run(arm, line, raw, wait=False):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description='CyberArm 仿真命令行；桌面控制台显示本次本地服务 URL。')
+    parser = argparse.ArgumentParser(description='CyberArm 仿真与实机命令行；桌面控制台显示本次本地服务 URL。')
     parser.add_argument('--url', default='http://127.0.0.1:8765')
     parser.add_argument('-c', '--command', help='执行单条命令；运动会等待结束并维持心跳')
     parser.add_argument('--json', action='store_true', help='每条响应输出一行 JSON')
@@ -63,7 +63,7 @@ def main(argv=None):
                     time.sleep(args.watch)
             interactive = sys.stdin.isatty()
             if interactive and not args.json:
-                print('CyberArm 仿真控制台。help 查看命令；quit 退出并暂停本客户端运动。')
+                print('CyberArm 控制台。help 查看命令，hwstatus 查询实机；quit 退出并暂停本客户端运动。')
             code = 0
             while True:
                 try:

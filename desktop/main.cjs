@@ -47,6 +47,10 @@ async function post(action) {
   return fetch(origin + '/api/control', {method: 'POST', headers: {'Content-Type':'application/json', 'X-Session':session},
     body: JSON.stringify({action}), signal: AbortSignal.timeout(3000)});
 }
+async function postHardware(action) {
+  return fetch(origin + '/api/hardware/' + action, {method: 'POST', headers: {'Content-Type':'application/json', 'X-Session':session},
+    body: '{}', signal: AbortSignal.timeout(3000)});
+}
 async function stopBackend() {
   if (!backend?.pid) return;
   const child = backend;
@@ -58,6 +62,7 @@ async function stopBackend() {
         if (!['RUNNING','STOPPING'].includes(state.mode)) break;
         await new Promise(r=>setTimeout(r,100));
       }
+      await postHardware('disconnect');
     }
   } catch(e) { log(`停止服务：${e.message}`); }
   // Shut down the whole owned process tree, including active planning workers.
@@ -98,7 +103,7 @@ async function start() {
     {label:'应用',submenu:[{label:'重新连接',click:async()=>{await post('pause').catch(()=>{});window.reload();}}, {label:'退出',click:()=>app.quit()}]},
     {label:'编辑',submenu:[{role:'undo'},{role:'redo'},{type:'separator'},{role:'cut'},{role:'copy'},{role:'paste'},{role:'selectAll'}]},
     {label:'视图',submenu:[{role:'resetZoom'},{role:'zoomIn'},{role:'zoomOut'},{role:'togglefullscreen'}]},
-    {label:'帮助',submenu:[{label:'关于',click:()=>dialog.showMessageBox(window,{message:`CyberArm Studio ${app.getVersion()}`,detail:`本地模拟模式\n日志：${logPath}`})}]}
+    {label:'帮助',submenu:[{label:'关于',click:()=>dialog.showMessageBox(window,{message:`CyberArm Studio ${app.getVersion()}`,detail:`本地仿真与实机控制\n日志：${logPath}`})}]}
   ]));
   await window.loadURL(origin);
   window.show();

@@ -24,7 +24,7 @@ export function CommandConsole({connected,onStart,onResult,onFinish}:{connected:
   finally{locked.current=false;setBusy(false);onFinish();}
  };
  return <div className="command-console">
-  <details className="console-guide"><summary>仿真 · ° / mm · help 查看命令</summary><p>Enter 执行，↑↓ 历史，Tab 补全，clear 清屏。movej / moveto / movel 检查后立即运动。Esc 或底部停止可取消运动。</p></details>
+  <details className="console-guide"><summary>控制 · ° / mm · help 查看命令</summary><p>Enter 执行，↑↓ 历史，Tab 补全，clear 清屏。hwstatus 查询实机，movej / moveto / movel 检查后运动。Esc 或底部停止可取消运动。</p></details>
   <div className="console-address">本地服务：<code>{location.origin}</code></div>
   <div className="console-output" role="log" aria-label="命令输出" ref={output}>
    {!entries.length&&<span className="console-empty">输入 status 查看状态，或输入 help 查看命令。</span>}

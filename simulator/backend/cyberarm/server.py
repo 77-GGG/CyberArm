@@ -15,6 +15,7 @@ from .model import Robot, ROOT
 from .planner import plan_job, warm_worker, workspace_job
 from .reachability import reachability_job, manual_job
 from .commands import CommandRequest, run_command, catalogue
+from .hardware import DEFAULT_BAUD, HardwareBridge, HardwareError
 
 class Strict(BaseModel):
     model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
@@ -48,6 +49,20 @@ class Control(Strict):
     action:Literal['pause','stop','reset']
 class Pose(Strict):
     q_deg:list[float]=Field(min_length=6,max_length=6)
+class HardwareConnect(Strict):
+    port:str=Field(min_length=1,max_length=128)
+    baud:int=Field(default=DEFAULT_BAUD,ge=9600,le=3000000)
+class HardwareCalibration(Strict):
+    axis:int=Field(ge=1,le=6)
+    min_us:int=Field(ge=500,le=2500)
+    center_us:int=Field(ge=500,le=2500)
+    max_us:int=Field(ge=500,le=2500)
+    reversed:bool=False
+class HardwareAxis(Strict):
+    axis:int=Field(ge=1,le=6)
+    confirmation:Literal['SUPPORTED']
+class HardwareArm(Strict):
+    confirmation:Literal['SUPPORTED']
 class Reachability(Strict):
     position_mm:list[float]=Field(min_length=3,max_length=3)
     seed_deg:list[float]=Field(min_length=6,max_length=6)
@@ -132,23 +147,44 @@ class Controller:
         matrices,tcp=self.r.transforms(self.q)
         return {'mode':self.mode,'q_deg':np.degrees(self.q).tolist(),'matrices':matrices,'tcp':tcp,
                 'seq':self.seq,'revision':self.revision,'time':self.t,'duration':self.active['duration'] if self.active else 0,
-                'events':self.events[-12:],'planning':self.busy,'error':self.last_error,'obstacles':self.obstacles,'execution':self.execution}
+                'events':self.events[-12:],'planning':self.busy,'error':self.last_error,'obstacles':self.obstacles,'execution':self.execution,
+                'hardware':hardware.snapshot() if hardware else None}
 
-c=None;pool=None;trial_busy=False;manual_busy=False;token=secrets.token_urlsafe(32)
+c=None;pool=None;hardware=None;trial_busy=False;manual_busy=False;token=secrets.token_urlsafe(32)
+
+async def pause_hardware(reason):
+    state=hardware.snapshot() if hardware else {}
+    if not state.get('connected') or not state.get('armed'):return
+    try:await hardware.control('pause')
+    except HardwareError as exc:c.log(reason+'；实机通信异常：'+str(exc))
+
 async def ticker():
     previous=time.monotonic();accumulator=0.
     while True:
         await asyncio.sleep(.01);now=time.monotonic();dt=now-previous;previous=now
         if dt>.3:
-            c.stop(True);c.log('系统时钟停顿：已冻结追赶并请求暂停');accumulator=0.;continue
+            c.stop(True);c.log('系统时钟停顿：已冻结追赶并请求暂停');asyncio.create_task(pause_hardware('系统时钟停顿'));accumulator=0.;continue
         accumulator+=dt
-        if c.mode=='RUNNING' and c.owner and now-c.clients.get(c.owner,0)>1.5:c.stop(True);c.log('操控端失联，自动暂停')
+        if c.mode=='RUNNING' and c.owner and now-c.clients.get(c.owner,0)>1.5:
+            c.stop(True);c.log('操控端失联，自动暂停');asyncio.create_task(pause_hardware('操控端失联'))
         while accumulator>=.02:c.advance(.02);accumulator-=.02
+
+async def hardware_heartbeat():
+    while True:
+        await asyncio.sleep(.4)
+        before=hardware.snapshot()
+        if not before.get('connected'):continue
+        try:await hardware.heartbeat()
+        except HardwareError as exc:
+            if before.get('armed'):
+                c.stop(True);c.log('ESP32-S3 失联，仿真已暂停；固件看门狗将保持当前位置：'+str(exc))
 
 @asynccontextmanager
 async def lifespan(app):
-    global c,pool
-    c=Controller();pool=ProcessPoolExecutor(max_workers=2);c.log('RevC 模拟器就绪；临时关节限制，未连接实机')
+    global c,pool,hardware
+    c=Controller();pool=ProcessPoolExecutor(max_workers=2)
+    hardware=HardwareBridge(c.r.data['model_id'],c.r.data['limits_deg'])
+    c.log('RevC 模拟器就绪；实机输出默认关闭')
     # Every worker pays about a second of import and collision-archive
     # decompression on its first job. Both are cached for the life of the
     # process, so warming each worker now moves that cost into startup instead
@@ -158,9 +194,9 @@ async def lifespan(app):
         if not future.cancelled() and future.exception():c.log('规划进程预热失败：'+repr(future.exception()))
     loop=asyncio.get_running_loop()
     for _ in range(2):loop.run_in_executor(pool,warm_worker).add_done_callback(report)
-    task=asyncio.create_task(ticker())
+    task=asyncio.create_task(ticker());hardware_task=asyncio.create_task(hardware_heartbeat())
     yield
-    task.cancel();pool.shutdown(wait=False,cancel_futures=True)
+    task.cancel();hardware_task.cancel();await hardware.disconnect();pool.shutdown(wait=False,cancel_futures=True)
 
 app=FastAPI(title='CyberArm Studio',lifespan=lifespan)
 @app.middleware('http')
@@ -177,6 +213,47 @@ async def session_guard(request:Request,call_next):
 async def bootstrap():return {'session':token,'model':c.r.data,'version':c.r.version,'state':c.snapshot()}
 @app.get('/api/state')
 async def state():return c.snapshot()
+@app.get('/api/hardware')
+async def hardware_state():return hardware.snapshot()
+@app.get('/api/hardware/ports')
+async def hardware_ports():
+    try:return {'ports':await hardware.list_ports()}
+    except HardwareError as exc:raise HTTPException(503,str(exc))
+@app.post('/api/hardware/connect')
+async def hardware_connect(body:HardwareConnect):
+    try:
+        result=await hardware.connect(body.port,body.baud);c.log(f'ESP32-S3 已连接：{body.port}');return result
+    except HardwareError as exc:raise HTTPException(502,str(exc))
+@app.post('/api/hardware/disconnect')
+async def hardware_disconnect():
+    if c.mode in ('RUNNING','STOPPING'):
+        c.stop(True)
+    result=await hardware.disconnect();c.log('ESP32-S3 已断开，实机输出关闭');return result
+@app.post('/api/hardware/calibration')
+async def hardware_calibration(body:HardwareCalibration):
+    if c.mode in ('RUNNING','STOPPING'):raise HTTPException(409,'请先停止动作再修改实机校准')
+    try:
+        result=await hardware.set_calibration(body.axis,body.min_us,body.center_us,body.max_us,body.reversed)
+        c.log(f'实机通道 {body.axis} 校准已保存');return result
+    except HardwareError as exc:raise HTTPException(422,str(exc))
+@app.post('/api/hardware/center')
+async def hardware_center(body:HardwareAxis):
+    if c.mode in ('RUNNING','STOPPING'):raise HTTPException(409,'请先停止动作再测试中位')
+    try:
+        result=await hardware.center_axis(body.axis,body.confirmation);c.log(f'实机通道 {body.axis} 正在输出中位');return result
+    except HardwareError as exc:raise HTTPException(409,str(exc))
+@app.post('/api/hardware/arm')
+async def hardware_arm(body:HardwareArm):
+    if c.mode in ('RUNNING','STOPPING'):raise HTTPException(409,'运动中不能使能实机跟随')
+    try:
+        result=await hardware.arm(c.snapshot()['q_deg'],body.confirmation);c.log('实机跟随已使能');return result
+    except HardwareError as exc:raise HTTPException(409,str(exc))
+@app.post('/api/hardware/disarm')
+async def hardware_disarm():
+    try:
+        if c.mode in ('RUNNING','STOPPING'):c.stop(True)
+        result=await hardware.disarm();c.log('实机跟随已关闭，PWM 已释放');return result
+    except HardwareError as exc:raise HTTPException(502,str(exc))
 @app.get('/api/commands')
 async def commands():return {'protocol_version':1,'commands':catalogue()}
 @app.post('/api/command')
@@ -211,7 +288,8 @@ async def heartbeat(request:Request):
 async def release(request:Request):
     client=request.headers.get('x-client','sdk')
     c.clients.pop(client,None)
-    if c.owner==client or c.planning_owner==client:c.stop(True)
+    if c.owner==client or c.planning_owner==client:
+        c.stop(True);await pause_hardware('控制客户端释放')
     return {'ok':True}
 
 @app.post('/api/manual')
@@ -227,6 +305,11 @@ async def manual(body:Manual):
         if c.mode!='READY' or c.busy or generation!=c.generation or (body.seq,body.revision)!=(c.seq,c.revision):
             raise HTTPException(409,'更新期间状态已改变，未应用手动目标')
         if result['status']=='reachable':
+            if hardware.snapshot().get('armed'):
+                try:await hardware.target(result['q_deg'])
+                except HardwareError as exc:raise HTTPException(502,'实机未接受手动目标：'+str(exc))
+                if c.mode!='READY' or c.busy or generation!=c.generation or (body.seq,body.revision)!=(c.seq,c.revision):
+                    raise HTTPException(409,'实机下发期间状态已改变，目标已停止')
             c.q=np.radians(result['q_deg']);c.seq+=1;c.generation+=1;c.plans.clear();c.paused=None;c.last_error=''
         return {**result,'state':c.snapshot()}
     except ValueError as exc:raise HTTPException(422,str(exc))
@@ -252,14 +335,36 @@ async def plan(body:PlanRequest,request:Request):return await make_plan(body,req
 async def execute(body:Execute,request:Request):
     client=request.headers.get('x-client','sdk');p=c.plans.get(body.plan_id)
     if not p or c.mode not in ('READY','PAUSED') or (p['seq'],p['revision'],p['version'])!=(c.seq,c.revision,c.r.version) or time.monotonic()-p['created']>120 or p['owner']!=client:raise HTTPException(409,'预览已失效、来源不符或控制器忙，请重新预览')
+    generation=c.generation;delay=0.
+    if hardware.snapshot().get('armed'):
+        c.busy=True
+        try:delay=await hardware.prepare_plan(p)
+        except HardwareError as exc:raise HTTPException(502,'实机轨迹下发失败：'+str(exc))
+        finally:c.busy=False
+        if generation!=c.generation or c.plans.get(body.plan_id) is not p:
+            try:await hardware.control('stop')
+            except HardwareError:pass
+            raise HTTPException(409,'轨迹下发期间状态已改变，执行已取消')
+        if delay:await asyncio.sleep(delay)
+        if generation!=c.generation or c.plans.get(body.plan_id) is not p:
+            try:await hardware.control('stop')
+            except HardwareError:pass
+            raise HTTPException(409,'同步启动等待期间状态已改变，执行已取消')
     c.active=p;c.plans.clear();c.paused=None;c.mode='RUNNING';c.t=0.;c.owner=client;c.clients[client]=time.monotonic();c.seq+=1
-    c.execution={'plan_id':p['plan_id'],'status':'running'};c.log('开始模拟执行');return {'ok':True,'plan_id':p['plan_id']}
+    c.execution={'plan_id':p['plan_id'],'status':'running'};c.log('开始'+('实机同步' if hardware.snapshot().get('armed') else '模拟')+'执行');return {'ok':True,'plan_id':p['plan_id']}
 @app.post('/api/control')
 async def control(body:Control):
     if body.action=='reset':
         if c.mode in ('RUNNING','STOPPING'):raise HTTPException(409,'请先停止动作')
+        if hardware.snapshot().get('armed'):raise HTTPException(409,'实机已使能；请先关闭实机跟随再重置仿真')
         c.q=np.zeros(6);c.seq+=1;c.generation+=1;c.plans.clear();c.paused=None;c.execution=None;c.mode='READY';c.log('重置模拟状态，非实物回零')
-    else:c.stop(body.action=='pause')
+    else:
+        hardware_error=None
+        if hardware.snapshot().get('armed'):
+            try:await hardware.control(body.action)
+            except HardwareError as exc:hardware_error=exc
+        c.stop(body.action=='pause')
+        if hardware_error:raise HTTPException(502,'仿真已停止，但实机通信失败；请切断舵机电源：'+str(hardware_error))
     return c.snapshot()
 @app.post('/api/resume')
 async def resume(request:Request):
@@ -294,7 +399,8 @@ async def websocket(ws:WebSocket):
                 pass
     except (WebSocketDisconnect,RuntimeError):
         c.clients.pop(client,None)
-        if c.owner==client or c.planning_owner==client:c.stop(True)
+        if c.owner==client or c.planning_owner==client:
+            c.stop(True);await pause_hardware('界面连接断开')
 
 app.mount('/models',StaticFiles(directory=ROOT/'assets/revc'),name='models')
 if (ROOT/'frontend/dist').exists():app.mount('/',StaticFiles(directory=ROOT/'frontend/dist',html=True),name='frontend')

@@ -3,4 +3,5 @@ uvicorn==0.52.4
 numpy==2.5.3
 scipy==1.18.1
 websockets==17.1
+pyserial==3.5
 pyinstaller==6.22.3

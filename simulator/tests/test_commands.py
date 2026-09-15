@@ -36,14 +36,15 @@ def send(connection, text=None, **body):
 def test_catalogue_status_and_structured_parity(connection):
     client, headers = connection
     specs = client.get('/api/commands').json()['commands']
-    assert len(specs) == 19
-    for name in ('status', 'joints', 'tcp', 'limits', 'events', 'device'):
+    assert len(specs) == 27
+    for name in ('status', 'joints', 'tcp', 'limits', 'events', 'device', 'hwstatus'):
         text = send(connection, name)
         structured = send(connection, command=name, args={}, request_id='correlation-test')
         assert text['ok'] and structured['ok']
         assert text['data'] == structured['data']
         assert structured['request_id'] == 'correlation-test'
     assert send(connection, 'device')['data']['measured_feedback'] is False
+    assert send(connection, 'device')['data']['hardware_transports'] == ['usb-cdc-jsonl-v1']
     assert send(connection, 'help joint')['data'][0]['args_schema']['properties']['index']['maximum'] == 6
     assert client.post('/api/command', json={'text': 'stop'}).status_code == 403
     assert client.post('/api/command', headers=headers, json={'text': 'stop', 'command': 'status'}).status_code == 422

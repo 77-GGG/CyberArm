@@ -73,6 +73,34 @@ class Execute(Strict):
     plan_id: str = Field(min_length=1, max_length=128)
 
 
+class HardwareConnect(Strict):
+    port: str = Field(min_length=1, max_length=128)
+    baud: int = Field(default=921600, ge=9600, le=3000000)
+
+
+class HardwareCalibration(Strict):
+    axis: int = Field(ge=1, le=6)
+    min_us: int = Field(ge=500, le=2500)
+    center_us: int = Field(ge=500, le=2500)
+    max_us: int = Field(ge=500, le=2500)
+    reversed: bool = False
+
+    @model_validator(mode='after')
+    def ordered(self):
+        if not self.min_us < self.center_us < self.max_us:
+            raise ValueError('脉宽必须满足 min < center < max')
+        return self
+
+
+class HardwareAxis(Strict):
+    axis: int = Field(ge=1, le=6)
+    confirmation: Literal['SUPPORTED']
+
+
+class HardwareArm(Strict):
+    confirmation: Literal['SUPPORTED']
+
+
 @dataclass(frozen=True)
 class Spec:
     model: type[BaseModel]
@@ -88,12 +116,20 @@ def registry():
         'status': Spec(Empty, 'status', '当前状态、关节、TCP、规划与错误'),
         'joints': Spec(Empty, 'joints', '查询 J1–J5 和夹爪角度（度）'),
         'tcp': Spec(Empty, 'tcp', '查询 TCP 位置（mm）和工具方向，底座坐标系'),
-        'limits': Spec(Empty, 'limits', '查询模型限位（尚未经实物标定）'),
+        'limits': Spec(Empty, 'limits', '查询模型限位与六路实机校准状态'),
         'events': Spec(Empty, 'events', '最近运行记录'),
-        'device': Spec(Empty, 'device', '通信能力与状态来源；当前为仿真'),
-        'joint': Spec(Joint, 'joint <1..6> <角度>', '检查整段路径后更新一个仿真关节；6 为夹爪', True),
-        'grip': Spec(Grip, 'grip <角度>', '检查后更新仿真夹爪角度，非开口毫米数', True),
-        'pose': Spec(Pose, 'pose <J1 J2 J3 J4 J5 G>', '检查后直接更新仿真姿态，无动画', True),
+        'device': Spec(Empty, 'device', '通信能力、状态来源与已连接设备'),
+        'hwstatus': Spec(Empty, 'hwstatus', '查询 ESP32-S3、PWM、校准和实机跟随状态'),
+        'hwports': Spec(Empty, 'hwports', '列出可用串口'),
+        'hwconnect': Spec(HardwareConnect, 'hwconnect <串口> [波特率]', '连接 ESP32-S3；连接不会使舵机动作', True),
+        'hwdisconnect': Spec(Empty, 'hwdisconnect', '关闭 PWM 并断开 ESP32-S3', True),
+        'hwcal': Spec(HardwareCalibration, 'hwcal <1..6> <min_us> <center_us> <max_us> [true|false]', '保存一路舵机脉宽和方向校准', True),
+        'hwcenter': Spec(HardwareAxis, 'hwcenter <1..6> SUPPORTED', '机械臂已支撑时，仅输出一路舵机中位', True),
+        'hwarm': Spec(HardwareArm, 'hwarm SUPPORTED', '确认机械臂已支撑并使能实机跟随', True),
+        'hwdisarm': Spec(Empty, 'hwdisarm', '关闭实机跟随并释放全部 PWM', True),
+        'joint': Spec(Joint, 'joint <1..6> <角度>', '检查路径后更新一个关节；实机使能时同步，6 为夹爪', True),
+        'grip': Spec(Grip, 'grip <角度>', '检查后更新夹爪驱动角；实机使能时同步，非开口毫米数', True),
+        'pose': Spec(Pose, 'pose <J1 J2 J3 J4 J5 G>', '检查后更新整组姿态；实机端做短时平滑跟随', True),
         'movej': Spec(MoveJ, 'movej <J1 J2 J3 J4 J5 G> [速度0.05..1]', '规划并立即执行关节运动', True),
         'moveto': Spec(MoveTo, 'moveto <X Y Z> [速度0.05..1]', '逆解、检查后立即执行点到点运动（mm）', True),
         'movel': Spec(MoveTo, 'movel <X Y Z> [速度0.05..1]', '检查后立即执行 TCP 直线运动（mm）', True),
@@ -142,16 +178,36 @@ def parse_text(text):
         return name, {'position_mm': [float(v) for v in words[:3]], **({'speed': float(words[3])} if len(words) == 4 else {})}
     if name == 'execute' and len(words) == 1:
         return name, {'plan_id': words[0]}
+    if name == 'hwconnect' and len(words) in (1, 2):
+        return name, {'port': words[0], **({'baud': int(words[1])} if len(words) == 2 else {})}
+    if name == 'hwcal' and len(words) in (4, 5):
+        reverse = words[4].lower() in ('1', 'true', 'yes', 'reverse') if len(words) == 5 else False
+        if len(words) == 5 and words[4].lower() not in ('0', '1', 'true', 'false', 'yes', 'no', 'reverse', 'normal'):
+            raise ValueError('方向使用 true/false')
+        return name, {'axis': int(words[0]), 'min_us': int(words[1]), 'center_us': int(words[2]),
+                      'max_us': int(words[3]), 'reversed': reverse}
+    if name == 'hwcenter' and len(words) == 2:
+        return name, {'axis': int(words[0]), 'confirmation': words[1]}
+    if name == 'hwarm' and len(words) == 1:
+        return name, {'confirmation': words[0]}
     raise ValueError('用法：' + specs[name].usage)
 
 
 def device_info():
+    from . import server as s
+    hardware = s.hardware.snapshot() if s.hardware else {'connected': False, 'measured_feedback': False}
     return {'backend': 'simulator', 'connected': True, 'protocol_version': 1,
             'transport': 'local-http-websocket', 'state_source': 'simulation',
-            'hardware_connected': False, 'measured_feedback': False,
-            'devices': [{'name': name, 'connected': False} for name in ('ESP32-S3', 'K230D', 'servo')],
+            'hardware_connected': hardware.get('connected', False),
+            'hardware_armed': hardware.get('armed', False),
+            'measured_feedback': hardware.get('measured_feedback', False),
+            'devices': [{'name': 'ESP32-S3', 'connected': hardware.get('connected', False)},
+                        {'name': 'PCA9685', 'connected': hardware.get('driver_ready', False)},
+                        {'name': 'K230D', 'connected': False},
+                        {'name': 'servo-feedback', 'connected': hardware.get('measured_feedback', False)}],
             'units': {'joint': 'degree', 'position': 'mm', 'frame': 'base'},
-            'hardware_transports': [], 'commands': list(registry())}
+            'hardware_transports': ['usb-cdc-jsonl-v1'], 'hardware': hardware,
+            'commands': list(registry())}
 
 
 async def dispatch(name, args, request):
@@ -161,16 +217,40 @@ async def dispatch(name, args, request):
         return catalogue(args.name)
     if name == 'device':
         return device_info()
+    if name == 'hwstatus':
+        return s.hardware.snapshot()
+    if name == 'hwports':
+        try:return {'ports': await s.hardware.list_ports()}
+        except Exception as exc:raise HTTPException(503, str(exc))
+    if name == 'hwconnect':
+        return await s.hardware_connect(s.HardwareConnect(port=args.port, baud=args.baud))
+    if name == 'hwdisconnect':
+        return await s.hardware_disconnect()
+    if name == 'hwcal':
+        return await s.hardware_calibration(s.HardwareCalibration(**args.model_dump()))
+    if name == 'hwcenter':
+        return await s.hardware_center(s.HardwareAxis(**args.model_dump()))
+    if name == 'hwarm':
+        return await s.hardware_arm(s.HardwareArm(**args.model_dump()))
+    if name == 'hwdisarm':
+        return await s.hardware_disarm()
     if name == 'status':
-        return {**s.c.snapshot(), 'state_source': 'simulation', 'hardware_connected': False}
+        snapshot=s.c.snapshot()
+        return {**snapshot, 'state_source': 'simulation',
+                'hardware_connected': bool(snapshot.get('hardware', {}).get('connected'))}
     if name == 'joints':
-        return {'q_deg': s.c.snapshot()['q_deg'], 'state_source': 'simulation'}
+        snapshot=s.c.snapshot();hardware=snapshot.get('hardware') or {}
+        return {'q_deg': snapshot['q_deg'], 'state_source': 'simulation',
+                'hardware_commanded_q_deg': hardware.get('commanded_q_deg'),
+                'hardware_measured_q_deg': hardware.get('measured_q_deg')}
     if name == 'tcp':
         tcp = s.c.snapshot()['tcp']
         return {'position_mm': [tcp[i][3]*1000 for i in range(3)],
                 'direction': [tcp[i][2] for i in range(3)], 'frame': 'base', 'state_source': 'simulation'}
     if name == 'limits':
-        return {'limits_deg': s.c.r.data['limits_deg'], 'calibrated': False}
+        calibrated=(s.hardware.snapshot().get('calibrated') if s.hardware else [False]*6)
+        return {'limits_deg': s.c.r.data['limits_deg'], 'calibrated': calibrated,
+                'all_calibrated': all(calibrated)}
     if name == 'events':
         return list(s.c.events)
     if name in ('joint', 'grip', 'pose'):
@@ -196,8 +276,10 @@ async def dispatch(name, args, request):
         step = s.Step(kind={'movej': 'joint', 'moveto': 'cartesian', 'movel': 'linear'}[name], **target)
         plan = await s.make_plan(s.PlanRequest(steps=[step], speed=args.speed), client)
     await s.execute(s.Execute(plan_id=plan['plan_id']), request)
+    mirrored=bool(s.hardware.snapshot().get('armed'))
     return {'accepted': True, 'plan_id': plan['plan_id'], 'duration': plan['duration'],
-            'message': '已开始模拟执行；用 status 查询完成状态'}
+            'hardware_mirroring': mirrored,
+            'message': '已开始'+('实机同步' if mirrored else '模拟')+'执行；用 status 查询完成状态'}
 
 
 async def run_command(body, request):

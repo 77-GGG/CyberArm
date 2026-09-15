@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import {Play,Pause,Square,RotateCcw,Box,Move3d,Layers,Terminal,Download,Upload,Plus,Trash2,ChevronDown,ChevronUp,Target,Scan,Settings2,Hand,Route,BookOpen,X,CheckCircle2,AlertCircle,Loader2} from 'lucide-react';
+import {Play,Pause,Square,RotateCcw,Box,Move3d,Layers,Terminal,Download,Upload,Plus,Trash2,ChevronDown,ChevronUp,Target,Scan,Settings2,Hand,Route,BookOpen,X,CheckCircle2,AlertCircle,Loader2,Cable} from 'lucide-react';
 import {SceneView} from './SceneView';
 import {useReachability} from './useReachability';
 import {useManualControl} from './useManualControl';
@@ -8,13 +8,14 @@ import {api,client,session,setSession} from './api';
 import {CommandConsole} from './CommandConsole';
 import {FloatingConsole} from './FloatingConsole';
 import type {CommandResult} from './CommandConsole';
-import type {State,Model,Step,Plan} from './types';
+import type {State,Model,Step,Plan,HardwareState,ServoCalibration} from './types';
 import './style.css';
 
 const names=['底座旋转','肩部俯仰','肘部俯仰','腕部旋转','腕部俯仰','夹爪开合'];
 type Mode='manual'|'teach'|'auto';
 const modes={manual:'手动控制',teach:'示教模式',auto:'自动控制'};
 const tcpPosition=(s:State)=>s.tcp.slice(0,3).map(row=>row[3]*1000);
+const defaultCalibration=():ServoCalibration=>({min_us:1300,center_us:1500,max_us:1700,reversed:false,confirmed:false});
 
 function App(){
  const [boot,setBoot]=useState<{model:Model;version:string}|null>(null);
@@ -33,6 +34,9 @@ function App(){
  const [obstacle,setObstacle]=useState({name:'障碍物 1',center:[320,0,80],size:[40,60,100]});
  const [selectedJoint,setSelectedJoint]=useState(0);
  const [commandBusy,setCommandBusy]=useState(false);
+ const [hardwareBusy,setHardwareBusy]=useState(false),[ports,setPorts]=useState<{device:string;description:string}[]>([]);
+ const [selectedPort,setSelectedPort]=useState(''),[supported,setSupported]=useState(false);
+ const [calibration,setCalibration]=useState<ServoCalibration[]>(Array.from({length:6},defaultCalibration));
  const upload=useRef<HTMLInputElement>(null),editVersion=useRef(0),dragRef=useRef(false);
  const current=useRef({state,q,mode,showPath,tab,busy,connected});current.current={state,q,mode,showPath,tab,busy:busy||commandBusy,connected};
  const receiveState=(next:State)=>setState(old=>old&&(old.seq>next.seq||old.revision>next.revision)?old:next);
@@ -67,7 +71,7 @@ function App(){
  const invalidate=()=>{editVersion.current++;setPlan(null);setRunPlan(null);setError(false);};
  const commandResult=async(result:CommandResult)=>{
   if(!result.ok)return;
-  if(['help','status','joints','tcp','limits','events','device'].includes(result.command))return;
+  if(['help','status','joints','tcp','limits','events','device','hwstatus','hwports'].includes(result.command))return;
   const next:State=await api('state');receiveState(next);setQ(next.q_deg);setTarget(tcpPosition(next));
   invalidate();setTrialReset(v=>v+1);
   if(result.command==='plan')setPlan(result.data);
@@ -145,6 +149,40 @@ function App(){
  const updateScene=async(obstacles:State['obstacles'])=>{
   try{const next=await api('scene',{obstacles});receiveState(next);manual.cancel();invalidate();setMessage('场景已更新');}catch(e){fail(e);}
  };
+ const receiveHardware=(next:HardwareState)=>setState(old=>old?{...old,hardware:next}:old);
+ const loadCalibration=(next:HardwareState)=>setCalibration(next.calibration.map(item=>item??defaultCalibration()));
+ const refreshPorts=async()=>{
+  setHardwareBusy(true);
+  try{const result=await api('hardware/ports');setPorts(result.ports);if(!selectedPort&&result.ports.length)setSelectedPort(result.ports[0].device);setMessage(`找到 ${result.ports.length} 个串口`);}
+  catch(e){fail(e);}finally{setHardwareBusy(false);}
+ };
+ const openHardware=()=>{
+  if(drawer==='hardware'){setDrawer('');return;}
+  setDrawer('hardware');if(state?.hardware)loadCalibration(state.hardware);void refreshPorts();
+ };
+ const hardwareAction=async(path:string,body:unknown={})=>{
+  setHardwareBusy(true);
+  try{const next:HardwareState=await api(path,body);receiveHardware(next);loadCalibration(next);setError(false);return next;}
+  catch(e){fail(e);return null;}finally{setHardwareBusy(false);}
+ };
+ const connectHardware=async()=>{
+  if(!selectedPort)return;
+  const next=await hardwareAction('hardware/connect',{port:selectedPort,baud:921600});
+  if(next)setMessage('ESP32-S3 已连接；舵机输出仍保持关闭');
+ };
+ const disconnectHardware=async()=>{if(await hardwareAction('hardware/disconnect')){setSupported(false);setMessage('ESP32-S3 已断开，舵机 PWM 已释放');}};
+ const disableHardwareOutput=async()=>{if(await hardwareAction('hardware/disarm'))setMessage('舵机 PWM 已释放，ESP32-S3 保持连接');};
+ const saveAxis=async(index:number)=>{
+  const item=calibration[index];
+  const next=await hardwareAction('hardware/calibration',{axis:index+1,min_us:item.min_us,center_us:item.center_us,max_us:item.max_us,reversed:item.reversed});
+  if(next)setMessage(`通道 ${index+1} 校准已保存到 ESP32-S3`);
+ };
+ const centerAxis=async(index:number)=>{if(await hardwareAction('hardware/center',{axis:index+1,confirmation:'SUPPORTED'}))setMessage(`通道 ${index+1} 正在输出中位；装好舵盘后请关闭输出`);};
+ const toggleHardwareArm=async()=>{
+  const armed=state?.hardware?.armed;
+  const next=await hardwareAction(armed?'hardware/disarm':'hardware/arm',armed?{}:{confirmation:'SUPPORTED'});
+  if(next)setMessage(armed?'实机跟随已关闭，PWM 已释放':'实机跟随已使能；仿真运动将同步到机械臂');
+ };
  useEffect(()=>{
   const key=(e:KeyboardEvent)=>{
    if(e.key==='Escape'){void control('stop');return;}
@@ -181,10 +219,10 @@ function App(){
   <header className="app-header">
    <div className="brand"><span className="brandmark">C</span><span>CyberArm <b>Studio</b></span></div>
    <nav className="mode-switch" aria-label="控制模式">{(['manual','teach','auto'] as Mode[]).map((item,i)=>{const Icon=[Hand,BookOpen,Route][i];return <button key={item} aria-pressed={mode===item} className={mode===item?'selected':''} disabled={disabled||manual.busy} onClick={()=>void transition(item)}><Icon size={17}/>{modes[item]}</button>;})}</nav>
-   <div className="connection"><i className={connected?'online':''}/>{connected?'本地已连接':'连接断开'}<span className="sim">仿真</span></div>
+   <div className="connection"><i className={connected?'online':''}/>{connected?'本地已连接':'连接断开'}<span className={'sim '+(state.hardware?.armed?'hardware-live':'')}>{state.hardware?.armed?'实机跟随':'仿真'}</span></div>
   </header>
   <div className="app-tools">
-   <nav aria-label="工作台工具"><button onClick={()=>toggle('project')}><Box size={17}/>项目</button><button onClick={()=>toggle('scene')}><Layers size={17}/>场景</button><button className={points.length?'active':''} disabled={disabled||manual.busy} onClick={sample}><Scan size={17}/>可达采样</button><button onClick={()=>toggle('settings')}><Settings2 size={17}/>设置</button><button className={drawer==='console'?'active':''} onClick={()=>toggle('console')}><Terminal size={17}/>控制台</button></nav>
+   <nav aria-label="工作台工具"><button onClick={()=>toggle('project')}><Box size={17}/>项目</button><button onClick={()=>toggle('scene')}><Layers size={17}/>场景</button><button className={points.length?'active':''} disabled={disabled||manual.busy} onClick={sample}><Scan size={17}/>可达采样</button><button className={drawer==='hardware'?'active':''} onClick={openHardware}><Cable size={17}/>实机</button><button onClick={()=>toggle('settings')}><Settings2 size={17}/>设置</button><button className={drawer==='console'?'active':''} onClick={()=>toggle('console')}><Terminal size={17}/>控制台</button></nav>
    <button onClick={()=>toggle('actions')} className={drawer==='actions'?'active':''}><BookOpen size={17}/>动作序列 <span className="badge">{steps.length}</span></button>
   </div>
   <div className="workspace">
@@ -197,8 +235,8 @@ function App(){
     <FloatingConsole open={drawer==='console'} onClose={()=>setDrawer('')}>
      <CommandConsole connected={connected} onStart={()=>{manual.cancel();setCommandBusy(true);}} onResult={commandResult} onFinish={()=>setCommandBusy(false)}/>
     </FloatingConsole>
-    {drawer&&drawer!=='console'&&<section className={'drawer '+(drawer==='actions'?'sequence-drawer':'')} role="dialog" aria-label={{actions:'动作序列',scene:'场景编辑',project:'项目',logs:'运行记录',settings:'设置'}[drawer]}>
-     <div className="drawer-heading"><h2>{{actions:'动作序列',scene:'场景编辑',project:'项目',logs:'运行记录',settings:'设置'}[drawer]}</h2><button aria-label="关闭面板" onClick={()=>setDrawer('')}><X size={18}/></button></div>
+    {drawer&&drawer!=='console'&&<section className={'drawer '+(drawer==='actions'?'sequence-drawer':'')+(drawer==='hardware'?' hardware-drawer':'')} role="dialog" aria-label={{actions:'动作序列',scene:'场景编辑',project:'项目',logs:'运行记录',settings:'设置',hardware:'实机连接与校准'}[drawer]}>
+     <div className="drawer-heading"><h2>{{actions:'动作序列',scene:'场景编辑',project:'项目',logs:'运行记录',settings:'设置',hardware:'实机连接与校准'}[drawer]}</h2><button aria-label="关闭面板" onClick={()=>setDrawer('')}><X size={18}/></button></div>
      {drawer==='actions'&&<>
       <div className="action-toolbar"><button disabled={!canSave} onClick={saveTarget}><Plus size={16}/>保存当前目标</button><button disabled={disabled||manual.busy} onClick={()=>{setSteps(old=>[...old,{kind:'wait',seconds:1}]);invalidate();}}><Plus size={16}/>等待 1 秒</button><label>循环<input aria-label="循环次数" type="number" min="1" max="10" value={loops} onChange={e=>{setLoops(Math.max(1,Math.min(10,Number(e.target.value))));invalidate();}}/></label></div>
       <div className="step-list">{steps.length===0?<div className="empty"><BookOpen size={28}/><p>还没有动作</p><span>调整姿态后，保存到这里。</span></div>:steps.map((step,i)=><div className="step" key={i}><b>{String(i+1).padStart(2,'0')}</b><span>{step.kind==='wait'?`等待 ${step.seconds} 秒`:step.kind==='joint'?`关节姿态 · ${step.q_deg?.slice(0,5).map(v=>v.toFixed(1)).join(' / ')}°`:`${step.kind==='linear'?'直线':'末端'} · ${step.position_mm?.map(v=>v.toFixed(1)).join(', ')} mm`}</span><button disabled={i===0||disabled} aria-label={'上移动作'+(i+1)} onClick={()=>{setSteps(old=>{const next=[...old];[next[i-1],next[i]]=[next[i],next[i-1]];return next;});invalidate();}}><ChevronUp size={16}/></button><button disabled={disabled} aria-label={'删除动作'+(i+1)} onClick={()=>{setSteps(old=>old.filter((_,j)=>j!==i));invalidate();}}><Trash2 size={16}/></button></div>)}</div>
@@ -212,9 +250,18 @@ function App(){
      </>}
      {drawer==='project'&&<><p>保存场景、动作序列和执行速度。</p><div className="project-actions"><button className="solid" onClick={exportProject}><Download size={18}/>导出项目</button><button disabled={disabled||manual.busy} onClick={()=>upload.current?.click()}><Upload size={18}/>导入项目</button></div><p className="hint">导入的动作在执行前会重新检查。</p></>}
      {drawer==='logs'&&<div className="logs">{state.events.length?state.events.map((event,i)=><p key={i}><time>{event.time}</time>{event.message}</p>):<p>暂无运行记录</p>}</div>}
+     {drawer==='hardware'&&<div className="hardware-panel">
+      <div className="hardware-summary"><div><i className={state.hardware?.connected?'online':''}/><b>{state.hardware?.connected?'ESP32-S3 已连接':'未连接控制器'}</b><span>{state.hardware?.connected?`${state.hardware.port} · 固件 ${state.hardware.firmware_version??'未知'}`:'USB CDC 串口 · 921600 baud'}</span></div><span className={state.hardware?.armed?'armed':''}>{state.hardware?.armed?'跟随已使能':state.hardware?.outputs_enabled?'PWM 输出中':'PWM 已关闭'}</span></div>
+      {!state.hardware?.connected?<><div className="hardware-connect"><select aria-label="ESP32-S3 串口" value={selectedPort} onChange={e=>setSelectedPort(e.target.value)}><option value="">选择串口</option>{ports.map(port=><option key={port.device} value={port.device}>{port.device}{port.description?` · ${port.description}`:''}</option>)}</select><button disabled={hardwareBusy} onClick={()=>void refreshPorts()}>刷新</button><button className="solid" disabled={hardwareBusy||!selectedPort} onClick={()=>void connectHardware()}>连接</button></div><p className="hint">连接只进行握手，不会输出舵机 PWM。ESP32-S3 原生 USB 使用标有 USB 的接口。</p></>:<>
+       <div className="hardware-actions"><button disabled={hardwareBusy} onClick={()=>void disconnectHardware()}>断开</button>{state.hardware.outputs_enabled&&!state.hardware.armed&&<button disabled={hardwareBusy} onClick={()=>void disableHardwareOutput()}>关闭 PWM</button>}<button className={state.hardware.armed?'danger':'solid'} disabled={hardwareBusy||(!state.hardware.armed&&(!supported||!state.hardware.driver_ready||!state.hardware.calibrated.every(Boolean)))} onClick={()=>void toggleHardwareArm()}>{state.hardware.armed?'关闭实机跟随':'使能实机跟随'}</button></div>
+       <label className="check hardware-confirm"><input aria-label="确认机械臂已支撑且舵盘已对中" type="checkbox" checked={supported} onChange={e=>setSupported(e.target.checked)}/>机械臂已可靠支撑，舵盘已按中位安装，周围无人和障碍物</label>
+       <div className="servo-calibration"><h3>通道校准 <span>μs · 模型 0° 对应中位</span></h3><p className="hint">负/正限位脉宽对应当前模型允许的关节角，不是舵机标称 0°/180° 的电气端点。</p>{calibration.map((item,index)=><div className="servo-row" key={index}><div className="servo-title"><b>{index===5?'G':'J'+(index+1)}</b><span>{state.hardware?.calibrated[index]?'已保存':'待校准'}</span><label><input aria-label={`通道 ${index+1} 反向`} type="checkbox" checked={item.reversed} disabled={state.hardware?.outputs_enabled} onChange={e=>setCalibration(old=>old.map((v,i)=>i===index?{...v,reversed:e.target.checked}:v))}/>反向</label></div><div className="pulse-fields">{(['min_us','center_us','max_us'] as const).map(key=><label key={key}>{key==='min_us'?'负限位':key==='center_us'?'中位':'正限位'}<input aria-label={`通道 ${index+1} ${key}`} type="number" min="500" max="2500" step="5" value={item[key]} disabled={state.hardware?.outputs_enabled} onChange={e=>setCalibration(old=>old.map((v,i)=>i===index?{...v,[key]:Number(e.target.value)}:v))}/></label>)}</div><div className="servo-actions"><button disabled={hardwareBusy||state.hardware?.outputs_enabled} onClick={()=>void saveAxis(index)}>保存校准</button><button disabled={hardwareBusy||!supported||!state.hardware?.calibrated[index]||state.hardware?.armed} onClick={()=>void centerAxis(index)}>测试中位</button></div></div>)}</div>
+       <div className="feedback-note"><b>角度来源</b><p>当前实体角度为“已下发指令”，普通三线 180° 舵机不能回传真实位置。要显示实测角度，需要加绝对编码器或改用可读位置的总线舵机。</p></div>
+      </>}
+     </div>}
      {drawer==='settings'&&<>
       <h3>模型</h3><p>{boot.model.model_id}</p><p data-testid="model-status">{modelStatus}</p>
-      <h3>控制说明</h3><p>手动模式直接更新当前仿真姿态。打开路径预览后，可以编辑目标、检查路径并执行。示教模式可保存姿态，自动模式执行动作序列。</p>
+      <h3>控制说明</h3><p>手动模式直接更新当前仿真姿态；实机跟随使能后同步下发目标。打开路径预览后，可以编辑目标、检查路径并执行。示教模式可保存姿态，自动模式执行动作序列。</p>
       <h3>关节范围</h3><p>五个关节 ±30°，夹爪 ±8°，沿用当前模型配置，尚未经实物标定。</p>
       <h3>视图与快捷键</h3><p>拖动旋转视图，右键平移，滚轮缩放。网格间距 25 mm。选中关节后按 [ / ] 微调，Esc 停止，执行中切出窗口会暂停。</p>
       {workspaceLabel&&<><h3>可达采样</h3><p>{workspaceLabel}</p></>}
@@ -223,7 +270,7 @@ function App(){
     </section>}
    </section>
    <aside className="control-panel">
-    <div className="panel-heading"><div><h1>{modes[mode]}</h1><span>{liveManual?'实时调整仿真位置':mode==='teach'?'编辑并记录目标姿态':'目标与路径'}</span></div><span className="status">{statuses[state.mode]}</span></div>
+    <div className="panel-heading"><div><h1>{modes[mode]}</h1><span>{liveManual?(state.hardware?.armed?'实时调整仿真与实机':'实时调整仿真位置'):mode==='teach'?'编辑并记录目标姿态':'目标与路径'}</span></div><span className="status">{statuses[state.mode]}</span></div>
     <div className="tabs" aria-label="调整方式"><button className={tab==='cartesian'?'selected':''} disabled={disabled||manual.busy} onClick={()=>{setTab('cartesian');setTarget(tcpPosition(state));setTrialReset(v=>v+1);invalidate();}}><Move3d size={17}/>末端</button><button className={tab==='joint'?'selected':''} disabled={disabled||manual.busy} onClick={()=>{setTab('joint');setQ(state.q_deg);invalidate();}}><Settings2 size={17}/>关节</button></div>
     <div className="panel-content">
      {tab==='joint'?<div className="joint-list">{q.map((value,i)=><div className={'joint-row '+(selectedJoint===i?'focused':'')} key={i} onClick={()=>setSelectedJoint(i)}><div className="joint-label"><strong>{i===5?'G':'J'+(i+1)}</strong><label htmlFor={'joint-'+i}>{names[i]}</label><input id={'joint-'+i} aria-label={names[i]+'目标角度'} type="number" step=".5" min={boot.model.limits_deg[i][0]} max={boot.model.limits_deg[i][1]} value={Number(value.toFixed(2))} disabled={disabled} onChange={e=>changeQ(i,Number(e.target.value))}/><span>°</span></div><div className="slider-line"><button disabled={disabled} title="目标减小 1 度" onClick={()=>changeQ(i,Math.max(boot.model.limits_deg[i][0],value-1))}>−</button><input aria-label={names[i]+'滑条'} type="range" min={boot.model.limits_deg[i][0]} max={boot.model.limits_deg[i][1]} step=".1" value={value} disabled={disabled} onChange={e=>changeQ(i,Number(e.target.value))}/><button disabled={disabled} title="目标增大 1 度" onClick={()=>changeQ(i,Math.min(boot.model.limits_deg[i][1],value+1))}>+</button></div></div>)}</div>:<div className="cartesian">
