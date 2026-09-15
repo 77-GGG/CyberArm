@@ -26,6 +26,7 @@ test('桌面复用工作台：模型、控制、规划子进程、执行、文�
       const response=await fetch('/api/'+route,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json','X-Session':boot.session,'X-Client':'test'},body:body===undefined?undefined:JSON.stringify(body)});
       return {status:response.status,data:await response.json()};
     },{route,body});
+    await page.getByRole('button',{name:'关节',exact:true}).click();
     await page.getByTitle('目标增大 1 度').first().click();
     await page.getByRole('button',{name:'预览路径',exact:true}).click();
     await expect(page.locator('.feedback')).toContainText('预览通过',{timeout:90000});

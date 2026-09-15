@@ -1,7 +1,7 @@
 {
   "name": "cyberarm-desktop",
   "productName": "CyberArm Studio",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "CyberArm 机械臂模拟工作台",
   "author": "CyberArm contributors",
@@ -10,6 +10,7 @@
     "start": "electron .",
     "prepare:app": "node scripts/prepare.cjs",
     "build:dir": "npm run prepare:app && electron-builder --dir --publish never",
+    "build:tcp": "npm run prepare:app && electron-builder --dir --publish never --config.directories.output=dist/live-tcp",
     "build:win": "npm run prepare:app && electron-builder --win nsis --x64 --publish never",
     "test": "playwright test"
   },

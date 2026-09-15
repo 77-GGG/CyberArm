@@ -267,7 +267,7 @@ class Geometry:
             stack.extend([(lo,mid,depth+1),(mid,hi,depth+1)])
         return count
 
-def inverse(robot,target,start,direction=None,attempts=7):
+def inverse(robot,target,start,direction=None,attempts=7,deadline=None):
     target=np.asarray(target,dtype=float);start=np.asarray(start,dtype=float)
     if target.shape!=(3,) or not np.isfinite(target).all():raise Rejected('目标坐标非法')
     direction=None if direction is None else np.asarray(direction,dtype=float)
@@ -275,6 +275,8 @@ def inverse(robot,target,start,direction=None,attempts=7):
         if direction.shape!=(3,) or not np.isfinite(direction).all() or np.linalg.norm(direction)<1e-8:raise Rejected('工具方向非法')
         direction=direction/np.linalg.norm(direction)
     def system(x):
+        if deadline is not None and time.monotonic()>=deadline:
+            raise Rejected('本次求解时间已用完，尚未找到有效解')
         # Every joint turns about the local z axis of its own chain frame, so the
         # task Jacobian follows from a single forward kinematics evaluation
         # instead of the finite differences least_squares would fall back to.
@@ -324,7 +326,8 @@ def inverse(robot,target,start,direction=None,attempts=7):
             x=candidate;residual=trial_residual;jacobian=trial_jacobian;cost=trial_cost
             damping=max(damping*.3,1e-10)
         return x if float(np.max(np.abs(residual)))<=POLISH_TOLERANCE else None
-    seeds=[np.clip(start[:5],lower,upper),np.zeros(5)]
+    seeds=[np.clip(start[:5],lower,upper)]
+    if attempts>1:seeds.append(np.zeros(5))
     seeds.extend(rng.uniform(lower,upper) for _ in range(max(0,attempts-2)))
     polished=polish(seeds[0])
     if polished is not None:
@@ -375,8 +378,9 @@ def straight_waypoints(robot,origin,target,start,direction,max_depth=6,min_span=
     """
     line=np.asarray(target,dtype=float)-origin
     span=float(np.linalg.norm(line))
-    if span<1e-9:return []
-    square=float(line@line);out=[]
+    # A zero-length MoveL is still a valid checked hold. Run the usual
+    # endpoint/direction verification instead of dropping the only segment.
+    square=max(float(line@line),1e-18);out=[]
     samples=max(9,min(801,int(np.ceil(span/.0005))+1))
     def deviation(q0,q1):
         # Largest distance between the interpolated tool path and the line.
@@ -417,7 +421,21 @@ def plan_job(payload):
             target=np.array(step['position_mm'])/1000
             direction=step.get('direction')
             if step['kind']=='cartesian':
-                dest,err=inverse(r,target,q,direction);targets=[dest];residuals.append(err)
+                if step.get('q_deg') is not None:
+                    # Preserve the selected trial pose, but independently verify
+                    # its limits, TCP and direction before checking the path.
+                    dest=np.radians(step['q_deg'])
+                    if not r.within(dest):raise Rejected('选定姿态超出关节限制')
+                    tcp=r.fk(dest)[1];error=float(np.linalg.norm(tcp[:3,3]-target))
+                    angle=0.
+                    if direction is not None:
+                        d=np.asarray(direction,dtype=float)
+                        if not np.isfinite(d).all() or np.linalg.norm(d)<1e-8:raise Rejected('工具方向非法')
+                        angle=float(np.arccos(np.clip(tcp[:3,2]@(d/np.linalg.norm(d)),-1,1)))
+                    if error>.0005 or angle>np.radians(.5):raise Rejected('选定姿态与末端目标不一致，请重新试摆')
+                    err={'position_mm':error*1000,'direction_deg':float(np.degrees(angle))}
+                else:dest,err=inverse(r,target,q,direction)
+                targets=[dest];residuals.append(err)
             else:
                 for dest,err in straight_waypoints(r,r.fk(q)[1][:3,3],target,q,direction):
                     targets.append(dest);residuals.append(err)

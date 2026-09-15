@@ -13,6 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .model import Robot, ROOT
 from .planner import plan_job, warm_worker, workspace_job
+from .reachability import reachability_job
 
 class Strict(BaseModel):
     model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
@@ -46,6 +47,17 @@ class Control(Strict):
     action:Literal['pause','stop','reset']
 class Pose(Strict):
     q_deg:list[float]=Field(min_length=6,max_length=6)
+class Reachability(Strict):
+    position_mm:list[float]=Field(min_length=3,max_length=3)
+    seed_deg:list[float]=Field(min_length=6,max_length=6)
+    direction:list[float]|None=Field(default=None,min_length=3,max_length=3)
+    refine:bool=True
+    seq:int
+    revision:int
+    @model_validator(mode='after')
+    def nonzero_direction(self):
+        if self.direction is not None and np.linalg.norm(self.direction)<1e-8:raise ValueError('工具方向不能为零')
+        return self
 class Project(Strict):
     schema_version:Literal[1]
     model_version:str
@@ -104,7 +116,7 @@ class Controller:
                 'seq':self.seq,'revision':self.revision,'time':self.t,'duration':self.active['duration'] if self.active else 0,
                 'events':self.events[-12:],'planning':self.busy,'error':self.last_error,'obstacles':self.obstacles}
 
-c=None;pool=None;token=secrets.token_urlsafe(32)
+c=None;pool=None;trial_busy=False;token=secrets.token_urlsafe(32)
 async def ticker():
     previous=time.monotonic();accumulator=0.
     while True:
@@ -155,6 +167,21 @@ async def pose(body:Pose):
     return {'matrices':matrices,'tcp':tcp}
 @app.post('/api/validate-project')
 async def validate_project(body:Project):return body.model_dump(exclude_none=True)
+@app.post('/api/reachability')
+async def reachability(body:Reachability):
+    global trial_busy
+    if c.mode not in ('READY','PAUSED') or c.busy:raise HTTPException(409,'请等待当前运动或规划结束')
+    if (body.seq,body.revision)!=(c.seq,c.revision):raise HTTPException(409,'执行状态或场景已改变，请重新求解')
+    if trial_busy:raise HTTPException(429,'试摆求解忙，请稍后重试')
+    trial_busy=True;generation=c.generation
+    try:
+        result=await asyncio.get_running_loop().run_in_executor(pool,reachability_job,
+                    {**body.model_dump(),'obstacles':c.obstacles})
+        if generation!=c.generation or (body.seq,body.revision)!=(c.seq,c.revision):
+            raise HTTPException(409,'求解期间状态已改变，请重新求解')
+        return {**result,'seq':body.seq,'revision':body.revision}
+    except ValueError as exc:raise HTTPException(422,str(exc))
+    finally:trial_busy=False
 @app.post('/api/heartbeat')
 async def heartbeat(request:Request):
     c.clients[request.headers.get('x-client','sdk')]=time.monotonic();return {'ok':True}

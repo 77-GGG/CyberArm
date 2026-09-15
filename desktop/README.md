@@ -1,5 +1,13 @@
 # CyberArm Electron 桌面应用
 
+## 0.2.0 末端实时试摆版
+
+默认显示末端操作轴，拖动或输入坐标即可实时求解并联动模型。目标姿态通过检查后，仍需“预览路径 → 执行”。无解或姿态干涉时保留最后有效试摆姿态并显示偏差。
+
+使用 `npm run build:tcp` 构建到独立目录 `desktop/dist/live-tcp/win-unpacked`，保留旧程序 `desktop/dist/win-unpacked`。新版入口是 `desktop/dist/live-tcp/win-unpacked/CyberArm Studio.exe`。
+
+旧版源码标签：`backup/pre-live-tcp-20260915`（提交 `c9d2371`）。详细设计、限制与验证见 [末端实时试摆记录](../docs/末端实时试摆_20260915.md)。
+
 桌面版直接加载 simulator/frontend 的生产构建，所有模拟 API、WebSocket、运动学、碰撞检查、动作编排和模型均复用 simulator。没有复制或另写桌面专用控制页面。
 
 ## 直接运行 Windows 独立版
