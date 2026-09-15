@@ -1,9 +1,0 @@
-{
-  "name": "cyberarm-windows-release",
-  "version": "0.1.0",
-  "private": true,
-  "main": "electron/main.cjs",
-  "scripts": {"build": "electron-builder --win nsis", "dist:dir": "electron-builder --win dir", "dist:portable": "electron-builder --win portable"},
-  "dependencies": {"electron-updater": "^6.6.2"},
-  "devDependencies": {"electron": "^38.1.0", "electron-builder": "^26.0.12"}
-}

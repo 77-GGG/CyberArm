@@ -12,3 +12,10 @@ simulator/core/build/
 simulator/**/__pycache__/
 simulator/.pytest_cache/
 simulator/workspace/
+desktop/node_modules/
+desktop/stage/
+desktop/build/
+desktop/dist/
+desktop/test-results/
+desktop/playwright-report/
+desktop/__pycache__/

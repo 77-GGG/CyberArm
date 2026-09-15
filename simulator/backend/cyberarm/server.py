@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .model import Robot, ROOT
-from .planner import plan_job, workspace_job
+from .planner import plan_job, warm_worker, workspace_job
 
 class Strict(BaseModel):
     model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
@@ -119,6 +119,15 @@ async def ticker():
 async def lifespan(app):
     global c,pool
     c=Controller();pool=ProcessPoolExecutor(max_workers=2);c.log('RevC 模拟器就绪；临时关节限制，未连接实机')
+    # Every worker pays about a second of import and collision-archive
+    # decompression on its first job. Both are cached for the life of the
+    # process, so warming each worker now moves that cost into startup instead
+    # of leaving it on the first preview. The pool starts its workers eagerly,
+    # so two queued warm-ups land on two distinct processes.
+    def report(future):
+        if not future.cancelled() and future.exception():c.log('规划进程预热失败：'+repr(future.exception()))
+    loop=asyncio.get_running_loop()
+    for _ in range(2):loop.run_in_executor(pool,warm_worker).add_done_callback(report)
     task=asyncio.create_task(ticker())
     yield
     task.cancel();pool.shutdown(wait=False,cancel_futures=True)

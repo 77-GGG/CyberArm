@@ -1,0 +1,32 @@
+{
+  "name": "cyberarm-desktop",
+  "productName": "CyberArm Studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CyberArm 机械臂模拟工作台",
+  "author": "CyberArm contributors",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "prepare:app": "node scripts/prepare.cjs",
+    "build:dir": "npm run prepare:app && electron-builder --dir --publish never",
+    "build:win": "npm run prepare:app && electron-builder --win nsis --x64 --publish never",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "electron": "44.3.0",
+    "electron-builder": "26.15.3",
+    "@playwright/test": "1.63.0"
+  },
+  "build": {
+    "appId": "org.cyberarm.studio",
+    "productName": "CyberArm Studio",
+    "directories": {"output": "dist"},
+    "files": ["main.cjs", "package.json"],
+    "extraResources": [{"from": "stage", "to": "runtime"}],
+    "win": {"target": [{"target": "nsis", "arch": ["x64"]}], "signAndEditExecutable": false},
+    "nsis": {"oneClick": false, "perMachine": false, "allowToChangeInstallationDirectory": true, "deleteAppDataOnUninstall": false},
+    "mac": {"target": ["dmg", "zip"]},
+    "linux": {"target": ["AppImage"]}
+  }
+}

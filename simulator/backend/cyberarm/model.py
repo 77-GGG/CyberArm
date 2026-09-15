@@ -3,19 +3,23 @@ import ctypes as C
 import hashlib
 import json
 import os
+import sys
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[2]
-RESOURCE_ROOT = Path(os.environ.get('CYBERARM_RESOURCE_DIR', ROOT))
+ROOT = Path(os.environ.get('CYBERARM_RESOURCE_DIR', Path(__file__).resolve().parents[2]))
 PTR = C.POINTER(C.c_double)
 def pointer(a): return a.ctypes.data_as(PTR)
 
 class Robot:
     def __init__(self):
-        path=RESOURCE_ROOT/'assets/revc/robot.json'
+        path=ROOT/'assets/revc/robot.json'
         self.data=json.loads(path.read_text(encoding='utf-8'))
         self.version=hashlib.sha256(path.read_bytes()).hexdigest()[:16]
-        library = RESOURCE_ROOT/'core/libcyberarm_core.dll' if (RESOURCE_ROOT/'core/libcyberarm_core.dll').exists() else ROOT/'core/build/libcyberarm_core.dll'
+        names = {'win32': ['libcyberarm_core.dll', 'cyberarm_core.dll'],
+                 'darwin': ['libcyberarm_core.dylib']}.get(sys.platform, ['libcyberarm_core.so'])
+        candidates = [ROOT/'core'/name for name in names] + [ROOT/'core/build'/name for name in names]
+        library = next((p for p in candidates if p.is_file()), None)
+        if library is None: raise FileNotFoundError('找不到目标平台的 CyberArm 核心库：'+str(ROOT/'core'))
         self.lib=C.CDLL(str(library))
         self.lib.ca_fk.argtypes=[PTR]*6;self.lib.ca_fk.restype=C.c_int
         self.lib.ca_curve.argtypes=[C.c_double,C.c_double,PTR];self.lib.ca_curve.restype=C.c_int
