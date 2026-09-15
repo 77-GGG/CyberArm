@@ -50,7 +50,7 @@ test('桌面复用工作台：模型、控制、规划子进程、执行、文�
     await page.getByRole('button',{name:'取当前值'}).click();
     await page.getByRole('button',{name:'预览路径',exact:true}).click();
     await expect(page.locator('.feedback')).toContainText('预览通过',{timeout:90000});
-    await page.locator('summary').click();
+    await page.getByText('方向与运动选项',{exact:true}).click();
     await page.getByLabel('末端直线运动 MoveL').check();
     await page.getByRole('button',{name:'预览路径',exact:true}).click();
     await expect(page.locator('.feedback')).toContainText('预览通过',{timeout:90000});

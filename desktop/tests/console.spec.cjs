@@ -50,7 +50,7 @@ test('命令控制台：查询、校验、运动、历史与小窗口',async()=>
   const small=await panel.boundingBox(),smallStage=await page.locator('.scene-stage').boundingBox();
   expect(small.x+small.width).toBeLessThanOrEqual(smallStage.x+smallStage.width);
   expect(small.y+small.height).toBeLessThanOrEqual(smallStage.y+smallStage.height);
-  // Extreme drag stays reachable; keyboard sizing remains available.
+  // Keyboard movement and sizing remain available after the window shrinks.
   await page.getByRole('button',{name:'移动控制台'}).focus();
   await page.keyboard.press('ArrowUp');
   await page.getByRole('button',{name:'调整控制台大小'}).focus();
