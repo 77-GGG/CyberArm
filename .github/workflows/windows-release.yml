@@ -1,0 +1,86 @@
+name: Windows Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            desktop/package-lock.json
+            simulator/frontend/package-lock.json
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: desktop/requirements-build.txt
+
+      - name: Verify release tag
+        working-directory: desktop
+        run: |
+          $packageVersion = node -p "require('./package.json').version"
+          if ("v$packageVersion" -ne "${{ github.ref_name }}") {
+            throw "标签 ${{ github.ref_name }} 与 desktop/package.json 版本 $packageVersion 不一致"
+          }
+
+      - name: Install Python dependencies
+        run: |
+          python -m venv simulator/.venv
+          simulator/.venv/Scripts/python.exe -m pip install -r desktop/requirements-build.txt
+
+      - name: Configure C++ core
+        run: cmake -S simulator/core -B simulator/core/build -A x64
+
+      - name: Install desktop dependencies
+        working-directory: desktop
+        run: npm ci
+
+      - name: Build Windows installer
+        working-directory: desktop
+        run: npm run build:win
+
+      - name: Test packaged application
+        working-directory: desktop
+        run: |
+          $env:CYBERARM_TEST_EXECUTABLE = (Resolve-Path 'dist/win-unpacked/CyberArm Studio.exe').Path
+          npm test
+
+      - name: Publish GitHub Release assets
+        working-directory: desktop
+        run: npm run publish:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Archive installer metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: CyberArm-Studio-Windows-${{ github.ref_name }}
+          if-no-files-found: error
+          path: |
+            desktop/dist/CyberArm-Studio-Setup-*.exe
+            desktop/dist/CyberArm-Studio-Setup-*.exe.blockmap
+            desktop/dist/latest.yml

@@ -3,8 +3,10 @@ const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const readline = require('node:readline');
+const { autoUpdater } = require('electron-updater');
+const { createUpdateManager } = require('./updater.cjs');
 
-let window, backend, origin, session, quitting = false, closing = false;
+let window, backend, origin, session, updateManager, quitting = false, closing = false;
 const root = path.resolve(__dirname, '..');
 if (process.env.CYBERARM_TEST_USER_DATA && !app.isPackaged) app.setPath('userData', process.env.CYBERARM_TEST_USER_DATA);
 const logPath = path.join(app.getPath('userData'), 'desktop.log');
@@ -98,15 +100,24 @@ async function start() {
   window.webContents.session.setPermissionRequestHandler((_,__,callback)=>callback(false));
   configureDownloads();
   window.on('close', e => {if(!quitting){e.preventDefault();app.quit();}});
+  updateManager = createUpdateManager({
+    app,
+    autoUpdater,
+    dialog,
+    getWindow: () => window,
+    requestQuitForInstall: () => app.quit(),
+    log,
+  });
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     ...(process.platform==='darwin'?[{role:'appMenu'}]:[]),
     {label:'应用',submenu:[{label:'重新连接',click:async()=>{await post('pause').catch(()=>{});window.reload();}}, {label:'退出',click:()=>app.quit()}]},
     {label:'编辑',submenu:[{role:'undo'},{role:'redo'},{type:'separator'},{role:'cut'},{role:'copy'},{role:'paste'},{role:'selectAll'}]},
     {label:'视图',submenu:[{role:'resetZoom'},{role:'zoomIn'},{role:'zoomOut'},{role:'togglefullscreen'}]},
-    {label:'帮助',submenu:[{label:'关于',click:()=>dialog.showMessageBox(window,{message:`CyberArm Studio ${app.getVersion()}`,detail:`本地仿真与实机控制\n日志：${logPath}`})}]}
+    {label:'帮助',submenu:[{label:'检查更新',click:()=>void updateManager.check(true)},{type:'separator'},{label:'关于',click:()=>dialog.showMessageBox(window,{message:`CyberArm Studio ${app.getVersion()}`,detail:`本地仿真与实机控制\n日志：${logPath}`})}]}
   ]));
   await window.loadURL(origin);
   window.show();
+  updateManager.scheduleAutomaticCheck();
 }
 if(!app.requestSingleInstanceLock()) app.quit();
 else {
@@ -116,7 +127,10 @@ else {
     e.preventDefault();
     if(closing)return;
     closing=true;
-    stopBackend().catch(e=>log(e.stack)).finally(()=>{quitting=true;app.quit();});
+    stopBackend().catch(e=>log(e.stack)).finally(()=>{
+      quitting=true;
+      if (!updateManager?.installDownloadedUpdate()) app.quit();
+    });
   });
   app.on('window-all-closed',()=>app.quit());
   app.whenReady().then(start).catch(async e=>{log(e.stack);dialog.showErrorBox('CyberArm 启动失败',`${e.message}\n日志：${logPath}`);app.quit();});

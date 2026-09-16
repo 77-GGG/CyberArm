@@ -1,5 +1,11 @@
 # CyberArm Electron 桌面应用
 
+## 0.6.0 Windows 安装与自动更新
+
+执行 `npm run build:win` 会生成 NSIS 安装程序 `dist/CyberArm-Studio-Setup-0.6.0-x64.exe`、差分更新文件和 `latest.yml`。Windows 安装版启动后检查 GitHub Releases，也可通过“帮助 → 检查更新”手动检查；下载完成后，安装流程会先停止运动、断开实机串口并关闭本地后端。完整构建、发布和双版本升级验收流程见 [Windows 安装与自动更新](../docs/Windows安装与自动更新_20260916.md)。
+
+开发模式和自动化测试不启用自动更新。当前安装程序未使用受信任的代码签名，Windows 可能显示“未知发布者”。
+
 ## 0.5.0 实机同步控制
 
 工具栏 → 实机可以连接 ESP32-S3 的 USB CDC 串口，逐路保存脉宽/方向校准、测试单路中位并显式使能实机跟随。使能后，手动目标和经过碰撞检查的规划轨迹会同时发送到实体机械臂；计划动作先完整上传，再由上位机和 ESP32-S3 按共同启动时刻及 20 ms 周期运行。连接本身不会输出 PWM，六路未全部校准时不能使能。
@@ -35,9 +41,9 @@ simulator/.venv/Scripts/python.exe simulator/sdk/cyberarm_cli.py --url http://12
 
 桌面版直接加载 simulator/frontend 的生产构建，所有模拟 API、WebSocket、运动学、碰撞检查、动作编排和模型均复用 simulator。没有复制或另写桌面专用控制页面。
 
-## 直接运行 Windows 独立版
+## 运行 Windows 版本
 
-构建完成后打开 `desktop/dist/win-unpacked/CyberArm Studio.exe`。必须保留整个 win-unpacked 目录；不能只复制这个 EXE。用户机器无需另外安装 Python、Node.js 或 C++ 开发工具。当前产物是独立应用目录，不是安装程序。
+正式使用时运行 `desktop/dist/CyberArm-Studio-Setup-0.6.0-x64.exe` 完成安装。开发验收也可以打开 `desktop/dist/win-unpacked/CyberArm Studio.exe`；免安装目录必须整体保留，仅作为开发测试产物，不作为自动更新交付方式。用户机器无需另外安装 Python、Node.js 或 C++ 开发工具。
 
 ## 开发运行
 
@@ -72,7 +78,7 @@ Remove-Item Env:CYBERARM_TEST_EXECUTABLE
 
 `build:dir` 构建前端、编译并检查 C++ 核心，打包完整 Python 后端目录，复制模型及碰撞数据，再生成 Electron 应用。任一步失败会停止。npm 依赖使用 package-lock.json；Python 直接依赖版本见 requirements-build.txt，完整跨平台依赖锁及 CI 尚待后续发布阶段补齐。
 
-自动测试会打开并关闭专用 Electron 窗口。导出测试用指定文件路径替代原生保存对话框，不测试系统对话框本身。测试截图和日志位于 test-results。`npm run build:win` 留作后续生成 NSIS 安装包的入口，本轮以独立应用功能一致性为验收目标。
+自动测试会打开并关闭专用 Electron 窗口。导出测试用指定文件路径替代原生保存对话框，不测试系统对话框本身。测试截图和日志位于 test-results。自动更新测试覆盖安装版限制、检查、下载确认、任务栏进度和退出安装调用；真实覆盖升级仍需要两个已发布版本验收。
 
 ## 使用行为
 
@@ -83,4 +89,4 @@ Remove-Item Env:CYBERARM_TEST_EXECUTABLE
 - 重复启动聚焦已有窗口。关闭时停止模拟并清理本应用创建的后端/规划进程；异常退出由后端父进程监控清理。
 - 日志在 Electron userData 目录的 desktop.log，“帮助 → 关于”显示绝对路径。
 
-当前是模拟模式。应用内自动更新、签名、公证和安装升级验收不属于本轮已实现功能。macOS/Linux 配置与资源路径已预留，但尚未在对应系统构建和验证。
+Windows NSIS 安装和应用内更新已实现。Windows 代码签名、两个真实 Release 之间的覆盖升级验收，以及 macOS/Linux 的签名、构建和更新仍需后续完成。

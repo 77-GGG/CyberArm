@@ -1,10 +1,14 @@
 {
   "name": "cyberarm-desktop",
   "productName": "CyberArm Studio",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "CyberArm 机械臂模拟工作台",
   "author": "CyberArm contributors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/77-GGG/CyberArm.git"
+  },
   "main": "main.cjs",
   "scripts": {
     "start": "electron .",
@@ -14,22 +18,74 @@
     "build:console": "npm run prepare:app && electron-builder --dir --publish never --config.directories.output=dist/console",
     "build:tcp": "npm run prepare:app && electron-builder --dir --publish never --config.directories.output=dist/live-tcp",
     "build:win": "npm run prepare:app && electron-builder --win nsis --x64 --publish never",
+    "publish:win": "electron-builder --win nsis --x64 --publish always",
     "test": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "electron": "44.3.0",
-    "electron-builder": "26.15.3",
-    "@playwright/test": "1.63.0"
+    "electron-builder": "26.15.3"
   },
   "build": {
     "appId": "org.cyberarm.studio",
     "productName": "CyberArm Studio",
-    "directories": {"output": "dist"},
-    "files": ["main.cjs", "package.json"],
-    "extraResources": [{"from": "stage", "to": "runtime"}],
-    "win": {"target": [{"target": "nsis", "arch": ["x64"]}], "signAndEditExecutable": false},
-    "nsis": {"oneClick": false, "perMachine": false, "allowToChangeInstallationDirectory": true, "deleteAppDataOnUninstall": false},
-    "mac": {"target": ["dmg", "zip"]},
-    "linux": {"target": ["AppImage"]}
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.cjs",
+      "updater.cjs",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "stage",
+        "to": "runtime"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "signExecutable": false,
+      "artifactName": "CyberArm-Studio-Setup-${version}-${arch}.${ext}",
+      "publish": [
+        {
+          "provider": "github",
+          "owner": "77-GGG",
+          "repo": "CyberArm",
+          "channel": "latest",
+          "releaseType": "release"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "CyberArm Studio"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ]
+    }
+  },
+  "dependencies": {
+    "electron-updater": "6.8.9"
   }
 }
