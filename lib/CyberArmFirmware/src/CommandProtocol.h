@@ -1,0 +1,38 @@
+#pragma once
+
+#include <Arduino.h>
+#include <ArduinoJson.h>
+
+#include "MotionController.h"
+#include "ServoSubsystem.h"
+
+namespace cyberarm {
+namespace firmware {
+
+class CommandProtocol {
+ public:
+  CommandProtocol(Stream& serial, MotionController& motion,
+                  ServoSubsystem& servos)
+      : serial_(serial), motion_(motion), servos_(servos) {}
+
+  void begin(uint32_t now) { lastContactMs_ = now; }
+  void service();
+  uint32_t lastContactMs() const { return lastContactMs_; }
+
+ private:
+  static bool readJointArray(JsonVariantConst value,
+                             float output[kAxisCount]);
+  void handleCommand(const char* line);
+  void addState(JsonObject state) const;
+  void reply(uint32_t id, bool ok, const char* error = nullptr);
+
+  Stream& serial_;
+  MotionController& motion_;
+  ServoSubsystem& servos_;
+  uint32_t lastContactMs_ = 0;
+  char inputLine_[2048];
+  size_t inputLength_ = 0;
+};
+
+}  // namespace firmware
+}  // namespace cyberarm

@@ -1,0 +1,11 @@
+{
+  "name": "CyberArmFirmware",
+  "version": "0.1.0",
+  "description": "CyberArm ESP32-S3 firmware application modules",
+  "frameworks": "arduino",
+  "platforms": "espressif32",
+  "dependencies": {
+    "PCA9685Servo": "*",
+    "ArduinoJson": "^7.0.0"
+  }
+}
