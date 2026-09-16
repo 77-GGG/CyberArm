@@ -35,6 +35,7 @@
     "files": [
       "main.cjs",
       "updater.cjs",
+      "assets/**/*",
       "package.json"
     ],
     "extraResources": [
@@ -44,6 +45,7 @@
       }
     ],
     "win": {
+      "icon": "assets/icon.ico",
       "target": [
         {
           "target": "nsis",

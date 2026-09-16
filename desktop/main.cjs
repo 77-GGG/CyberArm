@@ -94,6 +94,7 @@ async function start() {
   const bootstrap = await fetch(origin+'/api/bootstrap', {signal:AbortSignal.timeout(10000)}).then(r=>{if(!r.ok)throw new Error('初始化失败');return r.json();});
   session = bootstrap.session;
   window = new BrowserWindow({width:1440,height:960,minWidth:960,minHeight:720,backgroundColor:'#111e2a',show:false,
+    icon:path.join(__dirname,'assets','icon.png'),
     webPreferences:{nodeIntegration:false,contextIsolation:true,sandbox:true,backgroundThrottling:false}});
   window.webContents.setWindowOpenHandler(()=>({action:'deny'}));
   window.webContents.on('will-navigate',(e,url)=>{if(new URL(url).origin!==origin)e.preventDefault();});
