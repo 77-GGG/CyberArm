@@ -18,7 +18,6 @@
     "build:console": "npm run prepare:app && electron-builder --dir --publish never --config.directories.output=dist/console",
     "build:tcp": "npm run prepare:app && electron-builder --dir --publish never --config.directories.output=dist/live-tcp",
     "build:win": "npm run prepare:app && electron-builder --win nsis --x64 --publish never",
-    "publish:win": "electron-builder --win nsis --x64 --publish always",
     "test": "playwright test"
   },
   "devDependencies": {

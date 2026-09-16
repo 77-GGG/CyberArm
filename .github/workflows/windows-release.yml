@@ -99,7 +99,40 @@ jobs:
 
       - name: Publish GitHub Release assets
         working-directory: desktop
-        run: npm run publish:win
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $repository = "${{ github.repository }}"
+          $installers = @(Get-ChildItem dist -Filter 'CyberArm-Studio-Setup-*.exe' |
+            Where-Object Name -NotLike '*.__uninstaller.exe')
+          if ($installers.Count -ne 1) {
+            throw "预期生成一个安装器，实际找到 $($installers.Count) 个。"
+          }
+          $installer = $installers[0]
+          $blockmap = Get-Item "$($installer.FullName).blockmap"
+          $metadata = Get-Item 'dist/latest.yml'
+
+          gh release view $tag --repo $repository *> $null
+          if ($LASTEXITCODE -ne 0) {
+            $version = node -p "require('./package.json').version"
+            gh release create $tag --repo $repository --verify-tag `
+              --title "CyberArm Studio $version" --generate-notes
+            if ($LASTEXITCODE -ne 0) {
+              throw "无法创建 GitHub Release $tag。"
+            }
+          }
+
+          gh release upload $tag $installer.FullName $blockmap.FullName $metadata.FullName `
+            --repo $repository --clobber
+          if ($LASTEXITCODE -ne 0) {
+            throw "无法上传 GitHub Release $tag 的安装文件。"
+          }
+
+          $remoteAssets = @(gh release view $tag --repo $repository --json assets --jq '.assets[].name')
+          foreach ($required in @($installer.Name, $blockmap.Name, $metadata.Name)) {
+            if ($required -notin $remoteAssets) {
+              throw "GitHub Release $tag 缺少附件：$required"
+            }
+          }
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
