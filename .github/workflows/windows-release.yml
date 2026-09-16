@@ -63,11 +63,39 @@ jobs:
         working-directory: desktop
         run: npm run build:win
 
-      - name: Test packaged application
+      - name: Test updater and smoke-test packaged application
         working-directory: desktop
         run: |
-          $env:CYBERARM_TEST_EXECUTABLE = (Resolve-Path 'dist/win-unpacked/CyberArm Studio.exe').Path
-          npm test
+          npx playwright test tests/updater.spec.cjs
+
+          $env:CYBERARM_TEST_USER_DATA = Join-Path $env:RUNNER_TEMP 'cyberarm-release-smoke'
+          $executable = (Resolve-Path 'dist/win-unpacked/CyberArm Studio.exe').Path
+          $application = Start-Process -FilePath $executable -PassThru -WindowStyle Hidden
+          try {
+            $deadline = (Get-Date).AddSeconds(90)
+            $backend = $null
+            do {
+              Start-Sleep -Seconds 2
+              $application.Refresh()
+              if ($application.HasExited) {
+                throw "打包版应用在启动检查期间退出，退出码：$($application.ExitCode)"
+              }
+              $backend = Get-CimInstance Win32_Process -Filter "ParentProcessId = $($application.Id)" |
+                Where-Object Name -eq 'cyberarm-backend.exe'
+            } while (-not $backend -and (Get-Date) -lt $deadline)
+
+            if (-not $backend) {
+              throw '打包版应用启动后未能运行内置后端。'
+            }
+            Start-Sleep -Seconds 10
+            $application.Refresh()
+            if ($application.HasExited) {
+              throw "打包版应用未能稳定运行，退出码：$($application.ExitCode)"
+            }
+          }
+          finally {
+            taskkill.exe /PID $application.Id /T /F | Out-Null
+          }
 
       - name: Publish GitHub Release assets
         working-directory: desktop
