@@ -11,7 +11,8 @@ test('末端实时试摆、无解保留、过期响应和选定姿态执行',asy
   const page=await app.firstWindow();const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await expect(page.locator('.connection')).toContainText('本地已连接',{timeout:60000});
   await expect(page.locator('.scene-stage')).toHaveAttribute('data-model-status',/已载入/,{timeout:60000});
-  await page.getByRole('button',{name:'示教模式',exact:true}).click();
+  await page.getByRole('button',{name:'模式',exact:true}).click();
+  await page.getByRole('button',{name:'自动运行',exact:true}).click();
   await page.getByRole('button',{name:'关闭面板'}).click();
   const status=page.getByTestId('reachability-status');
   await expect(status).toContainText('目标可达',{timeout:60000});

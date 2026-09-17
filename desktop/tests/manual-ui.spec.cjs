@@ -3,7 +3,7 @@ const path=require('node:path');
 const fs=require('node:fs');
 const {pathToFileURL}=require('node:url');
 
-test('浅色工作台：手动实时位置、预览开关、模式切换及小窗口布局',async()=>{
+test('工作台菜单：手动实时控制、实机调试、自动运行及小窗口布局',async()=>{
  const output=path.resolve(__dirname,'../test-results/manual-ui');fs.mkdirSync(output,{recursive:true});
  const env={...process.env,CYBERARM_TEST_USER_DATA:path.join(output,'user')};delete env.ELECTRON_RUN_AS_NODE;
  const packaged=process.env.CYBERARM_TEST_EXECUTABLE;
@@ -13,10 +13,14 @@ test('浅色工作台：手动实时位置、预览开关、模式切换及小�
   let plans=0;page.on('request',r=>{if(r.url().endsWith('/api/plan'))plans++;});
   await expect(page.locator('.connection')).toContainText('本地已连接',{timeout:60000});
   await expect(page.locator('.scene-stage')).toHaveAttribute('data-model-status',/已载入/,{timeout:60000});
-  await page.getByRole('button',{name:'实机',exact:true}).click();
-  await expect(page.getByRole('dialog',{name:'实机连接与校准'})).toContainText('未连接控制器');
+  await expect(page.locator('.app-tools')).toHaveCount(0);
+  for(const label of ['项目','模式','工作区','调试','设置','帮助'])await expect(page.getByRole('button',{name:label,exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'调试',exact:true}).click();
+  await page.getByRole('button',{name:'实机调试',exact:true}).click();
+  await expect(page.getByRole('dialog',{name:'实机调试'})).toContainText('未连接控制器');
   await expect(page.getByLabel('ESP32-S3 串口')).toBeVisible();
   await expect(page.getByRole('button',{name:'连接',exact:true})).toBeVisible();
+  for(const label of ['连接与安全','回中与限位','运动测试','通信','视觉'])await expect(page.getByRole('tab',{name:label,exact:true})).toBeVisible();
   expect(await page.evaluate(()=>fetch('/api/hardware/ports').then(async r=>({status:r.status,data:await r.json()})))).toMatchObject({status:200,data:{ports:expect.any(Array)}});
   await page.screenshot({path:path.join(output,'hardware-panel.png')});
   await page.getByRole('button',{name:'关闭面板'}).click();
@@ -62,10 +66,12 @@ test('浅色工作台：手动实时位置、预览开关、模式切换及小�
   await page.getByRole('button',{name:'记录当前姿态'}).click();
   await expect(page.locator('.step-list .step')).toHaveCount(1);
   await page.getByRole('button',{name:'关闭面板'}).click();
-  await page.getByRole('button',{name:'示教模式',exact:true}).click();
+  await expect(page.getByRole('button',{name:'示教模式',exact:true})).toHaveCount(0);
+  await page.getByRole('button',{name:'模式',exact:true}).click();
+  await page.getByRole('button',{name:'自动运行',exact:true}).click();
   await expect(page.getByLabel('显示路径预览')).toBeChecked();
-  await page.getByRole('button',{name:'自动控制',exact:true}).click();
   await expect(page.locator('.step-list .step')).toHaveCount(1);
+  await page.getByRole('button',{name:'模式',exact:true}).click();
   await page.getByRole('button',{name:'手动控制',exact:true}).click();
   await expect(page.getByLabel('显示路径预览')).not.toBeChecked();
   await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].setSize(960,720));

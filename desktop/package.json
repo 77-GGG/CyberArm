@@ -1,7 +1,7 @@
 {
   "name": "cyberarm-desktop",
   "productName": "CyberArm Studio",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "description": "CyberArm 机械臂模拟工作台",
   "author": "CyberArm contributors",

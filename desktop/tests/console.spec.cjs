@@ -12,7 +12,11 @@ test('命令控制台：查询、校验、运动、历史与小窗口',async()=>
   await expect(page.locator('.connection')).toContainText('本地已连接',{timeout:60000});
   await expect(page.locator('.scene-stage')).toHaveAttribute('data-model-status',/已载入/,{timeout:60000});
   await page.getByRole('button',{name:'关节',exact:true}).click();
-  await page.getByRole('button',{name:'控制台',exact:true}).click();
+  const openConsole=async()=>{
+   await page.getByRole('button',{name:'调试',exact:true}).click();
+   await page.getByRole('button',{name:'命令控制台',exact:true}).click();
+  };
+  await openConsole();
   const panel=page.getByRole('dialog',{name:'命令控制台'}),stage=await page.locator('.scene-stage').boundingBox();
   const initial=await panel.boundingBox();
   expect(initial.width*initial.height).toBeLessThan(stage.width*stage.height*.45);
@@ -42,7 +46,7 @@ test('命令控制台：查询、校验、运动、历史与小窗口',async()=>
   await expect.poll(()=>page.evaluate(()=>fetch('/api/state').then(r=>r.json()).then(s=>s.execution?.status))).toBe('completed');
   await expect(page.getByLabel('显示路径预览')).not.toBeChecked();
   await page.getByRole('button',{name:'关闭控制台'}).click();
-  await page.getByRole('button',{name:'控制台',exact:true}).click();
+  await openConsole();
   expect(await panel.boundingBox()).toEqual(resized);
   await expect(page.getByRole('log')).toContainText('joint 1 90');
   await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].setSize(960,720));

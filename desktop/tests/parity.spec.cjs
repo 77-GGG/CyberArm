@@ -19,7 +19,8 @@ test('桌面复用工作台：模型、控制、规划子进程、执行、文�
     },output);
     await expect(page.locator('.connection')).toContainText('本地已连接',{timeout:60000});
     await expect(page.locator('.scene-stage')).toHaveAttribute('data-model-status',/已载入/,{timeout:60000});
-    await page.getByRole('button',{name:'自动控制',exact:true}).click();
+    await page.getByRole('button',{name:'模式',exact:true}).click();
+    await page.getByRole('button',{name:'自动运行',exact:true}).click();
     await page.getByRole('button',{name:'关闭面板'}).click();
     url=page.url();
     const api=async(route,body)=>page.evaluate(async({route,body})=>{
@@ -27,6 +28,11 @@ test('桌面复用工作台：模型、控制、规划子进程、执行、文�
       const response=await fetch('/api/'+route,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json','X-Session':boot.session,'X-Client':'test'},body:body===undefined?undefined:JSON.stringify(body)});
       return {status:response.status,data:await response.json()};
     },{route,body});
+    const openWorkspace=async()=>{
+      const menu=page.getByRole('button',{name:'工作区',exact:true});
+      if(await menu.getAttribute('aria-expanded')!=='true')await menu.click();
+      await expect(menu).toHaveAttribute('aria-expanded','true');
+    };
     await page.getByRole('button',{name:'关节',exact:true}).click();
     await page.getByTitle('目标增大 1 度').first().click();
     await page.getByRole('button',{name:'预览路径',exact:true}).click();
@@ -34,7 +40,9 @@ test('桌面复用工作台：模型、控制、规划子进程、执行、文�
     await page.getByRole('button',{name:'执行',exact:true}).click();
     await expect.poll(async()=> (await api('state')).data.q_deg[0],{timeout:20000}).toBeCloseTo(1,1);
     await page.getByTitle('停止 Esc').click();
-    await page.getByRole('button',{name:'动作序列'}).click();
+    await expect(page.locator('.status')).toHaveText('就绪');
+    await openWorkspace();
+    await page.getByRole('button',{name:/^动作序列/}).click();
     await page.getByRole('button',{name:'保存当前目标'}).click();
     await page.getByRole('button',{name:'等待 1 秒'}).click();
     await page.getByRole('button',{name:'预览整组'}).click();
@@ -54,7 +62,8 @@ test('桌面复用工作台：模型、控制、规划子进程、执行、文�
     await page.getByLabel('末端直线运动 MoveL').check();
     await page.getByRole('button',{name:'预览路径',exact:true}).click();
     await expect(page.locator('.feedback')).toContainText('预览通过',{timeout:90000});
-    await page.getByRole('button',{name:'场景',exact:true}).click();
+    await openWorkspace();
+    await page.getByRole('button',{name:'场景编辑',exact:true}).click();
     await page.getByRole('button',{name:'添加障碍物'}).click();
     await expect.poll(async()=> (await api('state')).data.obstacles.length).toBe(1);
     await page.locator('.drawer .step button').click();
@@ -64,7 +73,8 @@ test('桌面复用工作台：模型、控制、规划子进程、执行、文�
     const waiting=path.join(output,'waiting.json');fs.writeFileSync(waiting,JSON.stringify(pausedProject));
     await page.locator('input[type=file]').setInputFiles(waiting);
     await expect(page.locator('.feedback')).toContainText('项目已载入');
-    await page.getByRole('button',{name:'动作序列'}).click();
+    await openWorkspace();
+    await page.getByRole('button',{name:/^动作序列/}).click();
     await page.getByRole('button',{name:'预览整组'}).click();
     await expect(page.locator('.feedback')).toContainText('预览通过',{timeout:90000});
     await page.getByRole('button',{name:'执行',exact:true}).click();
