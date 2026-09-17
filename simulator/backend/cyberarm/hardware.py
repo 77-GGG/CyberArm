@@ -214,6 +214,10 @@ class HardwareBridge:
 
     async def target(self, q_deg: list[float], duration_ms: int = 120) -> dict[str, Any]:
         self._validate_q(q_deg)
+        state=self.snapshot()
+        if state.get('mode') != 'ARMED':
+            raise HardwareError('请等待使能过渡完成，或先退出单轴调试')
+        self._validate_q(q_deg)
         if duration_ms < 20 or duration_ms > 5_000:
             raise HardwareError('手动跟随时间必须是 20..5000 ms')
         response = await asyncio.to_thread(
@@ -222,6 +226,12 @@ class HardwareBridge:
         return self.snapshot()
 
     async def prepare_plan(self, plan: dict[str, Any], start_delay_ms: int = 250) -> float:
+        segments = plan.get('segments', [])
+        if not segments or len(segments) > MAX_SEGMENTS:
+            raise HardwareError(f'实机轨迹段数必须是 1..{MAX_SEGMENTS}')
+        state=self.snapshot()
+        if state.get('motion_busy') or state.get('mode') not in ('ARMED','PAUSED'):
+            raise HardwareError('实机尚未停止或使能过渡未完成')
         segments = plan.get('segments', [])
         if not segments or len(segments) > MAX_SEGMENTS:
             raise HardwareError(f'实机轨迹段数必须是 1..{MAX_SEGMENTS}')
@@ -256,10 +266,24 @@ class HardwareBridge:
         self._merge_response(response)
         return self.snapshot()
 
+    async def calibration_command(self, command: str, **payload):
+        if self.snapshot().get('capabilities', {}).get('axis_calibration') != 1:
+            raise HardwareError('请烧录支持单轴标定的 0.3.0 或更新固件')
+        response = await asyncio.to_thread(self._request_sync, command, **payload)
+        self._merge_response(response)
+        return self.snapshot()
+
+    def effective_limits(self):
+        state=self.snapshot(); limits=[list(v) for v in self.limits_deg]
+        for i,m in enumerate(state.get('mappings', [])[:6]):
+            if m.get('confirmed'):
+                limits[i]=[max(limits[i][0],m['low_deg']),min(limits[i][1],m['high_deg'])]
+        return limits
+
     def _validate_q(self, q_deg: list[float]) -> None:
         if len(q_deg) != 6 or any(not math.isfinite(float(v)) for v in q_deg):
             raise HardwareError('关节角度必须是 6 个有限数值')
-        for index, (value, limits) in enumerate(zip(q_deg, self.limits_deg)):
+        for index, (value, limits) in enumerate(zip(q_deg, self.effective_limits())):
             if value < limits[0] - 1e-6 or value > limits[1] + 1e-6:
                 raise HardwareError(f'J{index + 1} 角度 {value:g}° 超出模型限位 {limits}')
 
@@ -303,7 +327,7 @@ class HardwareBridge:
                 line = device.readline()
                 if not line:
                     raise HardwareError(f'ESP32-S3 命令 {command} 响应超时')
-                if len(line) > 4096:
+                if len(line) > 16384:
                     raise HardwareError('ESP32-S3 响应过长')
                 try:
                     response = json.loads(line.decode('utf-8'))
@@ -322,7 +346,8 @@ class HardwareBridge:
         remote = response.get('state', response)
         allowed = ('armed', 'mode', 'firmware_version', 'model_id', 'driver_ready',
                    'outputs_enabled', 'calibrated', 'calibration', 'commanded_q_deg',
-                   'measured_q_deg', 'measured_feedback')
+                   'measured_q_deg', 'measured_feedback', 'capabilities', 'device_id', 'wiring',
+                   'wiring_hash', 'tick_us', 'test', 'mappings', 'motion_busy')
         with self._lock:
             for key in allowed:
                 if key in remote:

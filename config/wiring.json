@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "board": "esp32-s3-devkitc-1",
+  "i2c": {"sda_gpio": 8, "scl_gpio": 9, "clock_hz": 400000},
+  "pca9685": {"address": 64, "pwm_hz": 50, "oscillator_hz": 25000000},
+  "axes": [
+    {"name": "J1", "channel": 0},
+    {"name": "J2", "channel": 1},
+    {"name": "J3", "channel": 2},
+    {"name": "J4", "channel": 3},
+    {"name": "J5", "channel": 4},
+    {"name": "G", "channel": 5}
+  ]
+}

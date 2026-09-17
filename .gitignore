@@ -1,6 +1,7 @@
 .pio
 .vscode/
 .codex
+__pycache__/
 simulator/.venv/
 simulator/.cache/
 simulator/frontend/node_modules/

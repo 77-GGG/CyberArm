@@ -14,6 +14,8 @@ const char* MotionController::modeName() const {
   switch (mode_) {
     case MotionMode::kDisarmed:
       return "DISARMED";
+    case MotionMode::kArming:
+      return "ARMING";
     case MotionMode::kArmed:
       return "ARMED";
     case MotionMode::kService:
@@ -35,7 +37,7 @@ const char* MotionController::modeName() const {
 }
 
 bool MotionController::isArmed() const {
-  return mode_ == MotionMode::kArmed || mode_ == MotionMode::kPrepared ||
+  return mode_ == MotionMode::kArming || mode_ == MotionMode::kArmed || mode_ == MotionMode::kPrepared ||
          mode_ == MotionMode::kWaiting || mode_ == MotionMode::kRunning ||
          mode_ == MotionMode::kStopping || mode_ == MotionMode::kPaused;
 }
@@ -47,14 +49,20 @@ void MotionController::disarm() {
 }
 
 void MotionController::enterService(uint8_t axis) {
-  servos_.centerAxis(axis);
+  clearPlan();
   mode_ = MotionMode::kService;
 }
 
-void MotionController::arm(const float target[kAxisCount]) {
+void MotionController::arm(const float target[kAxisCount], uint32_t now) {
   clearPlan();
-  memcpy(commandedDeg_, target, sizeof(commandedDeg_));
-  mode_ = MotionMode::kArmed;
+  // Last commanded pose is not measured position. First output remains explicit.
+  memcpy(manualStartDeg_, commandedDeg_, sizeof(manualStartDeg_));
+  memcpy(manualEndDeg_, target, sizeof(manualEndDeg_));
+  manualStartedMs_ = now;
+  manualDurationMs_ = max(kArmRampMs, minimumDuration(commandedDeg_, target));
+  manualMoving_ = true;
+  memcpy(commandedDeg_, manualStartDeg_, sizeof(commandedDeg_));
+  mode_ = MotionMode::kArming;
   servos_.enableAt(commandedDeg_);
 }
 
@@ -63,7 +71,7 @@ void MotionController::startManualMove(const float target[kAxisCount],
   memcpy(manualStartDeg_, commandedDeg_, sizeof(commandedDeg_));
   memcpy(manualEndDeg_, target, sizeof(manualEndDeg_));
   manualStartedMs_ = now;
-  manualDurationMs_ = durationMs;
+  manualDurationMs_ = max(durationMs, minimumDuration(commandedDeg_, target));
   manualMoving_ = true;
 }
 
@@ -140,8 +148,13 @@ void MotionController::tick(uint32_t now) {
     }
   }
 
-  if (manualMoving_ && mode_ == MotionMode::kArmed) {
-    const uint32_t elapsed = now - manualStartedMs_;
+  if (manualMoving_ && (mode_ == MotionMode::kArmed || mode_ == MotionMode::kArming)) {
+    // A control tick can be stamped just before the command that started this
+    // move, so clamp the signed difference instead of letting an unsigned
+    // subtraction wrap into a full-strength step.
+    const int32_t signedElapsed = static_cast<int32_t>(now - manualStartedMs_);
+    const uint32_t elapsed =
+        signedElapsed > 0 ? static_cast<uint32_t>(signedElapsed) : 0;
     const float u =
         quintic(static_cast<float>(min(elapsed, manualDurationMs_)) /
                 manualDurationMs_);
@@ -151,7 +164,7 @@ void MotionController::tick(uint32_t now) {
           (manualEndDeg_[axis] - manualStartDeg_[axis]) * u;
     }
     servos_.write(commandedDeg_);
-    if (elapsed >= manualDurationMs_) manualMoving_ = false;
+    if (elapsed >= manualDurationMs_) { manualMoving_ = false; mode_ = MotionMode::kArmed; }
   }
 }
 
@@ -165,6 +178,16 @@ void MotionController::handleWatchdog() {
     // after reconnect; the physical power switch remains the emergency stop.
     mode_ = MotionMode::kFault;
   }
+}
+
+uint32_t MotionController::minimumDuration(const float* start, const float* end) const {
+  uint32_t result=20;
+  for(uint8_t i=0;i<kAxisCount;++i) result=max(result,moveDuration(end[i]-start[i],kMaxVelocityDegS[i],kMaxAccelerationDegS2[i]));
+  return result;
+}
+bool MotionController::segmentDurationValid(const float* end,uint32_t duration) const {
+  const float* start=receivedSegments_ ? segments_[receivedSegments_-1].endDeg : planStartDeg_;
+  return duration >= minimumDuration(start,end);
 }
 
 float MotionController::quintic(float t) {
@@ -205,6 +228,7 @@ void MotionController::evaluateTrajectory(float trajectoryMs) {
 }
 
 void MotionController::beginStop(bool pause) {
+  if (!isArmed()) return;
   manualMoving_ = false;
   if (mode_ != MotionMode::kRunning && mode_ != MotionMode::kStopping) {
     clearPlan();

@@ -35,6 +35,15 @@ class Robot:
         self.vmax=np.radians(self.data['max_velocity_deg_s'])
         self.amax=np.radians(self.data['max_acceleration_deg_s2'])
 
+    def apply_limits(self, limits):
+        if limits is None:return
+        value=np.asarray(limits,dtype=float)
+        if value.shape!=(6,2) or not np.isfinite(value).all() or np.any(value[:,0]>=value[:,1]):
+            raise ValueError('实机有效范围无效')
+        self.limits=np.column_stack((np.maximum(self.limits[:,0],np.radians(value[:,0])),
+                                    np.minimum(self.limits[:,1],np.radians(value[:,1]))))
+        if np.any(self.limits[:,0]>=self.limits[:,1]):raise ValueError('模型与实机范围没有交集')
+
     def fk(self,q):
         q=np.ascontiguousarray(q,dtype=np.float64)
         if q.shape!=(6,) or not np.isfinite(q).all():raise ValueError('关节数组必须含六个有限值')

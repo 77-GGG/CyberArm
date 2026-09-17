@@ -16,6 +16,7 @@ void CyberArmFirmware::begin() {
 void CyberArmFirmware::update() {
   protocol_.service();
   const uint32_t now = millis();
+  protocol_.tick(now);
   while (now - lastControlMs_ >= kControlPeriodMs) {
     lastControlMs_ += kControlPeriodMs;
     motion_.tick(lastControlMs_);

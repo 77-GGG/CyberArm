@@ -111,6 +111,7 @@ class Spec:
 
 def registry():
     from .server import PlanRequest
+    from .calibration_api import TestCommand, Mapping, Draft
     return {
         'help': Spec(Help, 'help [命令]', '查看命令及参数'),
         'status': Spec(Empty, 'status', '当前状态、关节、TCP、规划与错误'),
@@ -119,6 +120,10 @@ def registry():
         'limits': Spec(Empty, 'limits', '查询模型限位与六路实机校准状态'),
         'events': Spec(Empty, 'events', '最近运行记录'),
         'device': Spec(Empty, 'device', '通信能力、状态来源与已连接设备'),
+        'hwtest': Spec(TestCommand, 'hwtest {"action":"begin","axis":1,"confirmation":"SUPPORTED"}', '单轴调试：begin/target/angle/hold/renew/end；测试时每 0.3 秒续约', True),
+        'hwmapping': Spec(Mapping, 'hwmapping <JSON>', '确认保存实测角度映射并读回', True),
+        'hwdraft': Spec(Draft, 'hwdraft <JSON>', '保存当前设备单轴测量草稿', True),
+        'hwrecords': Spec(Empty, 'hwrecords', '读取测量记录和固件标定'),
         'hwstatus': Spec(Empty, 'hwstatus', '查询 ESP32-S3、PWM、校准和实机跟随状态'),
         'hwports': Spec(Empty, 'hwports', '列出可用串口'),
         'hwconnect': Spec(HardwareConnect, 'hwconnect <串口> [波特率]', '连接 ESP32-S3；连接不会使舵机动作', True),
@@ -217,6 +222,12 @@ async def dispatch(name, args, request):
         return catalogue(args.name)
     if name == 'device':
         return device_info()
+    if name in ('hwtest','hwmapping','hwdraft','hwrecords'):
+        from . import calibration_api as cal
+        if name=='hwtest':return await cal.test(args,request)
+        if name=='hwmapping':return await cal.save(args)
+        if name=='hwdraft':return await cal.draft(args)
+        return await cal.records()
     if name == 'hwstatus':
         return s.hardware.snapshot()
     if name == 'hwports':

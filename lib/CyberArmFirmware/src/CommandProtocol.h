@@ -17,6 +17,7 @@ class CommandProtocol {
 
   void begin(uint32_t now) { lastContactMs_ = now; }
   void service();
+  void tick(uint32_t now);
   uint32_t lastContactMs() const { return lastContactMs_; }
 
  private:
@@ -25,6 +26,9 @@ class CommandProtocol {
   void handleCommand(const char* line);
   void addState(JsonObject state) const;
   void reply(uint32_t id, bool ok, const char* error = nullptr);
+  bool debugCommand(const char* command, JsonDocument& request, uint32_t id);
+  AxisTest test_;
+  bool droppingLine_ = false;
 
   Stream& serial_;
   MotionController& motion_;

@@ -8,13 +8,14 @@ from .planner import Geometry, inverse, Rejected
 
 
 @lru_cache(maxsize=1)
-def geometry_for_scene(scene):
-    return Geometry(Robot(),json.loads(scene))
+def geometry_for_scene(scene,limits='null'):
+    robot=Robot();robot.apply_limits(json.loads(limits))
+    return Geometry(robot,json.loads(scene))
 
 
 def reachability_job(payload):
     began=time.monotonic()
-    geometry=geometry_for_scene(json.dumps(payload['obstacles'],sort_keys=True))
+    geometry=geometry_for_scene(json.dumps(payload['obstacles'],sort_keys=True),json.dumps(payload.get('limits_deg')))
     robot=geometry.r
     seed=np.radians(payload['seed_deg'])
     if not robot.within(seed):raise Rejected('试摆初始角度超出关节限制')
@@ -46,7 +47,7 @@ def reachability_job(payload):
 
 def manual_job(payload):
     """Validate a manual simulation update, including the connecting segment."""
-    geometry=geometry_for_scene(json.dumps(payload['obstacles'],sort_keys=True))
+    geometry=geometry_for_scene(json.dumps(payload['obstacles'],sort_keys=True),json.dumps(payload.get('limits_deg')))
     robot=geometry.r;start=np.radians(payload['seed_deg'])
     if payload['kind']=='cartesian':
         result=reachability_job(payload)

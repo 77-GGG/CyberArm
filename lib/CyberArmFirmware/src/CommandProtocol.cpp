@@ -7,17 +7,20 @@ namespace cyberarm {
 namespace firmware {
 
 void CommandProtocol::service() {
-  while (serial_.available()) {
+  unsigned budget=2048;
+  while (serial_.available() && budget--) {
     const char value = static_cast<char>(serial_.read());
     if (value == '\n') {
       inputLine_[inputLength_] = '\0';
-      if (inputLength_) handleCommand(inputLine_);
+      if (inputLength_ && !droppingLine_) handleCommand(inputLine_);
       inputLength_ = 0;
+      droppingLine_ = false;
     } else if (value != '\r') {
       if (inputLength_ + 1 < sizeof(inputLine_)) {
         inputLine_[inputLength_++] = value;
       } else {
         inputLength_ = 0;
+        droppingLine_ = true;
       }
     }
   }
@@ -56,49 +59,24 @@ void CommandProtocol::handleCommand(const char* line) {
     return;
   }
   if (!strcmp(command, "disarm")) {
+    test_.active=false;
     motion_.disarm();
     reply(id, true);
     return;
   }
-  if (!strcmp(command, "set_calibration")) {
-    if (servos_.outputsEnabled()) {
-      reply(id, false, "disarm before changing calibration");
-      return;
-    }
-    const int axis = request["axis"] | -1;
-    const int minUs = request["min_us"] | 0;
-    const int centerUs = request["center_us"] | 0;
-    const int maxUs = request["max_us"] | 0;
-    if (axis < 0 || axis >= kAxisCount || minUs < 500 || maxUs > 2500 ||
-        minUs >= centerUs || centerUs >= maxUs || centerUs - minUs < 100 ||
-        maxUs - centerUs < 100) {
-      reply(id, false, "invalid calibration");
-      return;
-    }
-    servos_.setCalibration(axis, minUs, centerUs, maxUs,
-                           request["reversed"] | false);
-    reply(id, true);
-    return;
-  }
-  if (!strcmp(command, "center_axis")) {
-    const int axis = request["axis"] | -1;
-    if (!servos_.driverReady() || axis < 0 || axis >= kAxisCount ||
-        !servos_.calibrations()[axis].confirmed || motion_.isArmed()) {
-      reply(id, false, "axis is not calibrated or controller is armed");
-      return;
-    }
-    motion_.enterService(axis);
-    reply(id, true);
-    return;
+  if (debugCommand(command,request,id)) return;
+  if (!strcmp(command, "set_calibration") || !strcmp(command, "center_axis")) {
+    reply(id,false,"use axis calibration workbench (firmware 0.3)");return;
   }
   if (!strcmp(command, "arm")) {
     float target[kAxisCount];
-    if (!servos_.driverReady() || !servos_.allCalibrated() ||
-        !readJointArray(request["q_deg"], target)) {
+    if (motion_.mode()!=MotionMode::kDisarmed || test_.active || !servos_.driverReady() || !servos_.allCalibrated() ||
+        !readJointArray(request["q_deg"], target) || !servos_.validTarget(target) ||
+        !servos_.validTarget(motion_.commandedDeg())) {
       reply(id, false, "driver/calibration/joint target is not ready");
       return;
     }
-    motion_.arm(target);
+    motion_.arm(target, millis());
     reply(id, true);
     return;
   }
@@ -110,7 +88,7 @@ void CommandProtocol::handleCommand(const char* line) {
     float target[kAxisCount];
     const uint32_t duration = request["duration_ms"] | 0;
     if (motion_.mode() != MotionMode::kArmed || duration < 20 ||
-        duration > 5000 || !readJointArray(request["q_deg"], target)) {
+        duration > 5000 || !readJointArray(request["q_deg"], target) || !servos_.validTarget(target)) {
       reply(id, false, "invalid manual target or controller mode");
       return;
     }
@@ -122,10 +100,10 @@ void CommandProtocol::handleCommand(const char* line) {
     const int count = request["count"] | 0;
     float start[kAxisCount];
     const char* modelId = request["model_id"] | "";
-    if ((motion_.mode() != MotionMode::kArmed &&
+    if (motion_.manualMoving() || (motion_.mode() != MotionMode::kArmed &&
          motion_.mode() != MotionMode::kPaused) ||
         count < 1 || count > kMaxSegments || strcmp(modelId, kModelId) ||
-        !readJointArray(request["start_deg"], start)) {
+        !readJointArray(request["start_deg"], start) || !servos_.validTarget(start)) {
       reply(id, false, "invalid trajectory header");
       return;
     }
@@ -147,7 +125,7 @@ void CommandProtocol::handleCommand(const char* line) {
         index != motion_.receivedSegments() ||
         motion_.receivedSegments() >= motion_.expectedSegments() ||
         duration < 20 || duration > 60000 ||
-        !readJointArray(request["end_deg"], end)) {
+        !readJointArray(request["end_deg"], end) || !servos_.validTarget(end) || !motion_.segmentDurationValid(end,duration)) {
       reply(id, false, "invalid trajectory segment");
       return;
     }
@@ -181,8 +159,90 @@ void CommandProtocol::handleCommand(const char* line) {
   reply(id, false, "unknown command");
 }
 
+void CommandProtocol::tick(uint32_t now) {
+  if(!test_.active) return;
+  if(!test_.tick(now) || !servos_.testPulse(test_.axis,test_.pulse)) {
+    test_.active=false;motion_.disarm();
+  }
+}
+
+bool CommandProtocol::debugCommand(const char* command,JsonDocument& r,uint32_t id) {
+  if(!strcmp(command,"save_mapping")) {
+    const int axis=r["axis"] | -1;
+    JointMapping m{};
+    JsonArrayConst points=r["points"].as<JsonArrayConst>();
+    m.low=r["low_deg"] | NAN;m.high=r["high_deg"] | NAN;
+    bool valid=points.size()>=3 && points.size()<=kMappingPoints;
+    m.count=valid ? points.size() : 0;
+    for(unsigned i=0;i<m.count;++i) {
+      m.points[i].deg=points[i]["deg"] | NAN;m.points[i].us=points[i]["us"] | NAN;
+    }
+    if(axis<0 || axis>=kAxisCount || motion_.mode()!=MotionMode::kDisarmed ||
+       strcmp(r["wiring_hash"] | "",wiring::kHash) || strcmp(r["model_id"] | "",kModelId) ||
+       (axis>=0 && axis<kAxisCount && (r["expected_revision"] | UINT32_MAX)!=servos_.mapping(axis).revision) ||
+       !r["confirmed"].is<bool>() || !r["confirmed"].as<bool>() || !valid ||
+       !servos_.saveMapping(axis,m)) reply(id,false,"invalid mapping, output active or save failed");
+    else reply(id,true);
+    return true;
+  }
+  if(strncmp(command,"test_",5)) return false;
+  const uint32_t session=r["test_session"] | 0;
+  const uint32_t now=millis();
+  // Check expiry before processing renewals, even if the main loop was stalled.
+  if(test_.active && now-test_.renewed>=1200) { test_.active=false;motion_.disarm(); }
+  if(!strcmp(command,"test_begin")) {
+    int axis=r["axis"] | -1;
+    float pulse=r["pulse_us"] | NAN,low=r["low_us"] | NAN,high=r["high_us"] | NAN,rate=r["rate_us_s"] | NAN;
+    if(motion_.mode()!=MotionMode::kDisarmed || test_.active || !servos_.driverReady() ||
+       !session || axis<0 || axis>=kAxisCount || !isfinite(pulse) || !isfinite(low) || !isfinite(high) ||
+       !isfinite(rate) || low<500 || high>2500 || low>=high || pulse<low || pulse>high || rate<5 || rate>200 ||
+       strcmp(r["confirmation"] | "","SUPPORTED")) {
+      reply(id,false,"invalid test start or controller busy");return true;
+    }
+    servos_.disableAll();motion_.enterService(axis);
+    test_.begin(axis,session,pulse,low,high,rate,now);
+    if(!servos_.testPulse(axis,pulse)) { test_.active=false;motion_.disarm();reply(id,false,"PWM write failed"); }
+    else reply(id,true);
+    return true;
+  }
+  if(!test_.owns(session)) { reply(id,false,"test session expired or not owner");return true; }
+  if(!strcmp(command,"test_target")) {
+    float pulse=r["pulse_us"] | NAN;
+    if(!isfinite(pulse) || pulse<test_.low || pulse>test_.high || fabsf(pulse-test_.pulse)>100) {
+      reply(id,false,"test target outside window or step exceeds 100 us");return true;
+    }
+    test_.target=pulse;
+  } else if(!strcmp(command,"test_hold")) test_.hold();
+  else if(!strcmp(command,"test_end")) { test_.active=false;motion_.disarm(); }
+  else if(strcmp(command,"test_renew")) { reply(id,false,"unknown test command");return true; }
+  test_.renewed=now;reply(id,true);return true;
+}
+
 void CommandProtocol::addState(JsonObject state) const {
   state["firmware_version"] = kFirmwareVersion;
+  state["capabilities"]["axis_calibration"] = 1;
+  char deviceId[17];snprintf(deviceId,sizeof(deviceId),"%016llx",static_cast<unsigned long long>(ESP.getEfuseMac()));
+  state["device_id"] = deviceId;
+  state["wiring_hash"] = wiring::kHash;
+  JsonDocument wiringDoc;deserializeJson(wiringDoc,wiring::kJson);state["wiring"]=wiringDoc;
+  state["tick_us"] = servos_.tickUs();
+  state["motion_busy"] = motion_.manualMoving();
+  JsonObject test=state["test"].to<JsonObject>();
+  test["active"]=test_.active;test["axis"]=test_.active ? test_.axis+1 : 0;
+  test["pulse_us"]=test_.pulse;test["target_us"]=test_.target;
+  test["ticks"]=servos_.pulseTicks(test_.pulse);
+  test["nominal_us"]=servos_.pulseTicks(test_.pulse)*servos_.tickUs();
+  test["moving"]=test_.active && fabsf(test_.pulse-test_.target)>.01f;
+  JsonArray mappings=state["mappings"].to<JsonArray>();
+  for(uint8_t i=0;i<kAxisCount;++i) {
+    const auto& m=servos_.mapping(i);JsonObject row=mappings.add<JsonObject>();
+    row["revision"]=m.revision;row["confirmed"]=validMapping(m);
+    row["low_deg"]=max(kMinDeg[i],m.low);row["high_deg"]=min(kMaxDeg[i],m.high);
+    row["work_low_deg"]=m.low;row["work_high_deg"]=m.high;
+    JsonArray points=row["points"].to<JsonArray>();
+    for(unsigned j=0;j<m.count;++j) { JsonObject p=points.add<JsonObject>();p["deg"]=m.points[j].deg;p["us"]=m.points[j].us; }
+  }
+
   state["model_id"] = kModelId;
   state["driver_ready"] = servos_.driverReady();
   state["armed"] = motion_.isArmed();

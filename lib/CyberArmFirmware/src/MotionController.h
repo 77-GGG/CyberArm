@@ -19,9 +19,12 @@ class MotionController {
   uint16_t expectedSegments() const { return expectedSegments_; }
   uint16_t receivedSegments() const { return receivedSegments_; }
 
+  bool manualMoving() const { return manualMoving_; }
+  uint32_t minimumDuration(const float* start, const float* end) const;
+  bool segmentDurationValid(const float* end, uint32_t duration) const;
   void disarm();
   void enterService(uint8_t axis);
-  void arm(const float target[kAxisCount]);
+  void arm(const float target[kAxisCount], uint32_t now);
   void startManualMove(const float target[kAxisCount], uint32_t durationMs,
                        uint32_t now);
   void prepare(uint16_t count, const float start[kAxisCount]);

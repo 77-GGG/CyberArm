@@ -1,14 +1,9 @@
 #pragma once
 
 #include <Arduino.h>
+#include <WiringConfig.h>
+#include "CalibrationCore.h"
 
-#ifndef CYBERARM_I2C_SDA
-#define CYBERARM_I2C_SDA 8
-#endif
-
-#ifndef CYBERARM_I2C_SCL
-#define CYBERARM_I2C_SCL 9
-#endif
 
 namespace cyberarm {
 namespace firmware {
@@ -17,15 +12,20 @@ constexpr uint8_t kAxisCount = 6;
 constexpr uint16_t kMaxSegments = 512;
 constexpr uint32_t kControlPeriodMs = 20;
 constexpr uint32_t kWatchdogMs = 1500;
-constexpr char kFirmwareVersion[] = "0.1.0";
+// Arm ramp: how long the six outputs take to travel from the last commanded
+// pose to the requested pose when the controller is enabled. Must stay > 0.
+constexpr uint32_t kArmRampMs = 600;
+constexpr char kFirmwareVersion[] = "0.3.0";
 constexpr char kModelId[] = "revc-sim-1";
 constexpr float kMinDeg[kAxisCount] = {-30, -30, -30, -30, -30, -8};
 constexpr float kMaxDeg[kAxisCount] = {30, 30, 30, 30, 30, 8};
 constexpr float kMaxAccelerationDegS2[kAxisCount] = {50, 40, 50, 70, 70, 24};
+constexpr float kMaxVelocityDegS[kAxisCount] = {25, 20, 25, 35, 35, 12};
 
 enum class MotionMode : uint8_t {
   kDisarmed,
   kArmed,
+  kArming,
   kService,
   kPrepared,
   kWaiting,

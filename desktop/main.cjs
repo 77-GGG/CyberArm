@@ -20,7 +20,7 @@ function launchBackend() {
   const args = staged ? [] : [path.join(__dirname, 'backend_entry.py')];
   return new Promise((resolve, reject) => {
     backend = spawn(command, args, { windowsHide: true, detached:process.platform!=='win32', cwd: app.getPath('userData'),
-      env: {...process.env, CYBERARM_PARENT_PID:String(process.pid), PYTHONPATH: path.join(root, 'simulator/backend'), PYTHONIOENCODING: 'utf-8',
+      env: {...process.env, CYBERARM_USER_DATA_DIR:app.getPath('userData'), CYBERARM_PARENT_PID:String(process.pid), PYTHONPATH: path.join(root, 'simulator/backend'), PYTHONIOENCODING: 'utf-8',
         CYBERARM_RESOURCE_DIR: staged ? path.join(runtime, 'simulator') : path.join(root, 'simulator')},
       stdio: ['pipe', 'pipe', 'pipe'] });
     const timeout = setTimeout(() => reject(new Error('后端启动超过 60 秒，请查看日志。')), 60000);

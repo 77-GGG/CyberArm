@@ -8,4 +8,6 @@ ESP32-S3 上位机通信固件的应用层库。入口文件只负责调用库�
 - `CommandProtocol`：USB CDC JSONL 协议解析及状态应答。
 - `CyberArmFirmware`：初始化和主循环调度。
 
-模块拆分不改变串口协议、运动参数、标定存储键或安全行为。
+0.3.0 增加独立单轴测试租约、多点角度映射与 ARMING 过渡互斥。旧三脉宽标定不自动认证为实测映射。
+
+接线配置唯一入口为 [config/wiring.json](../../config/wiring.json)，PlatformIO 编译前校验并生成 WiringConfig.h。使用流程及兼容性见 [单轴标定与 JSON 接线说明](../../docs/单轴标定与JSON接线使用说明_20260917.md)。

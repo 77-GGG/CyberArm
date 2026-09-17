@@ -1,5 +1,11 @@
 # CyberArm Electron 桌面应用
 
+## 0.8.0 单轴标定与 JSON 接线
+
+“调试 → 实机调试 → 回中与限位”是四步单轴工作台：单路试转与零位、角度采样、范围与保存、角度验证。测试只开启选中通道，点动按 PCA9685 计数步进并同时显示名义脉宽，测量草稿保存在用户数据目录，正式标定写入 ESP32 并在读回一致后才生效，旧的三脉宽校准不再被当作实测角度。
+
+接线配置集中在 [config/wiring.json](../config/wiring.json)（SDA/SCL、PCA9685 地址与频率、六轴通道映射），PlatformIO 编译前读取并校验，生成的头文件不手工维护。操作流程、兼容性和故障排查见 [单轴标定与 JSON 接线使用说明](../docs/单轴标定与JSON接线使用说明_20260917.md)。
+
 ## 0.7.0 界面与实机调试
 
 顶栏按“项目、模式、工作区、调试、设置、帮助”组织。操作模式只保留手动控制和自动运行：手动控制负责实时试摆和记录姿态，自动运行动作序列的预览与执行。原示教模式已经合并到手动控制。`调试 → 实机调试` 按连接与安全、回中与限位、运动测试、通信、视觉五步组织；命令控制台仍是可拖动、可拉伸的小浮窗。
@@ -8,7 +14,7 @@
 
 ## Windows 安装与自动更新
 
-执行 `npm run build:win` 会生成当前版本的 NSIS 安装程序（本版为 `dist/CyberArm-Studio-Setup-0.7.0-x64.exe`）、差分更新文件和 `latest.yml`。Windows 安装版启动后检查 GitHub Releases，也可通过“帮助 → 检查更新”手动检查；下载完成后，安装流程会先停止运动、断开实机串口并关闭本地后端。完整构建、发布和双版本升级验收流程见 [Windows 安装与自动更新](../docs/Windows安装与自动更新_20260916.md)。
+执行 `npm run build:win` 会生成当前版本的 NSIS 安装程序（本版为 `dist/CyberArm-Studio-Setup-0.8.0-x64.exe`）、差分更新文件和 `latest.yml`。Windows 安装版启动后检查 GitHub Releases，也可通过“帮助 → 检查更新”手动检查；下载完成后，安装流程会先停止运动、断开实机串口并关闭本地后端。完整构建、发布和双版本升级验收流程见 [Windows 安装与自动更新](../docs/Windows安装与自动更新_20260916.md)。
 
 开发模式和自动化测试不启用自动更新。当前安装程序未使用受信任的代码签名，Windows 可能显示“未知发布者”。
 
@@ -49,7 +55,7 @@ simulator/.venv/Scripts/python.exe simulator/sdk/cyberarm_cli.py --url http://12
 
 ## 运行 Windows 版本
 
-正式使用时运行 `desktop/dist/CyberArm-Studio-Setup-0.7.0-x64.exe` 完成安装。开发验收也可以打开 `desktop/dist/win-unpacked/CyberArm Studio.exe`；免安装目录必须整体保留，仅作为开发测试产物，不作为自动更新交付方式。用户机器无需另外安装 Python、Node.js 或 C++ 开发工具。
+正式使用时运行 `desktop/dist/CyberArm-Studio-Setup-0.8.0-x64.exe` 完成安装。开发验收也可以打开 `desktop/dist/win-unpacked/CyberArm Studio.exe`；免安装目录必须整体保留，仅作为开发测试产物，不作为自动更新交付方式。用户机器无需另外安装 Python、Node.js 或 C++ 开发工具。
 
 ## 开发运行
 

@@ -406,7 +406,7 @@ def straight_waypoints(robot,origin,target,start,direction,max_depth=6,min_span=
     return out
 
 def plan_job(payload):
-    r=Robot();start=np.array(payload['start']);obstacles=payload['obstacles']
+    r=Robot();r.apply_limits(payload.get('limits_deg'));start=np.array(payload['start']);obstacles=payload['obstacles']
     geo=Geometry(r,obstacles);deadline=time.monotonic()+45
     steps=payload['steps'];q=start.copy();segments=[];path=[];checks=0;elapsed=0.;residuals=[]
     if not r.within(q):raise Rejected('当前状态超出模拟限制')
@@ -454,7 +454,7 @@ def plan_job(payload):
     return {'segments':segments,'duration':elapsed,'end':q.tolist(),'path':path,'checks':checks,'residuals':residuals}
 
 def workspace_job(payload):
-    r=Robot();rng=np.random.default_rng(14)
+    r=Robot();r.apply_limits(payload.get('limits_deg'));rng=np.random.default_rng(14)
     direction=payload.get('direction')
     direction=None if direction is None else np.array(direction)/np.linalg.norm(direction)
     samples=np.empty((3500,6))
