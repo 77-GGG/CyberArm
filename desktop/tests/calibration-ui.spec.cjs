@@ -4,7 +4,11 @@ const path=require('node:path');
 // firmware and serial/server behavior are executed by test_calibration.py.
 test('单轴工作台：开启、计数点动、记录、关闭、保存与接线显示',async()=>{
  const env={...process.env,CYBERARM_TEST_USER_DATA:path.resolve(__dirname,'../test-results/calibration-user')};delete env.ELECTRON_RUN_AS_NODE;
- const app=await electron.launch({args:[path.resolve(__dirname,'..')],env});
+ const packaged=process.env.CYBERARM_TEST_EXECUTABLE;
+ // A packaged build ignores CYBERARM_TEST_USER_DATA, so give it an isolated
+ // profile instead of sharing the developer's real one with later tests.
+ const profile=path.resolve(__dirname,'../test-results/calibration-user/packaged-profile');
+ const app=await electron.launch({...(packaged?{executablePath:packaged,args:['--user-data-dir='+profile]}:{args:[path.resolve(__dirname,'..')]}),env});
  try{
   const page=await app.firstWindow();await expect(page.locator('.connection')).toContainText('本地已连接',{timeout:60000});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
