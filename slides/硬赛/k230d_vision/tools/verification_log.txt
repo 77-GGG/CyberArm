@@ -1,0 +1,28 @@
+T1 RESULT 帧与 protocol.md 示例一致性
+  [PASS] 字节级一致（含校验和 0x4E） got=AA 55 01 0A 03 5C 40 01 B4 00 78 00 78 00 4E
+  [PASS] 解析出 1 帧 
+  [PASS] 类型 RESULT / 字段还原 {'id': 3, 'score': 92, 'cx': 320, 'cy': 180, 'w': 120, 'h': 120, 'valid': True}
+  [PASS] 无脸帧 id=0xFF 解析为 invalid 
+T2 HEARTBEAT / STATUS / QUERY
+  [PASS] 3 帧全部解析 ['HEARTBEAT', 'STATUS', 'UNKNOWN']
+  [PASS] 心跳 alive=1 
+  [PASS] 状态 db_persons=2 
+T3 粘包（背靠背）
+  [PASS] 解析出 2 帧且顺序正确 
+T4 逐字节喂入
+  [PASS] 逐字节喂入解析正确 
+T5 噪声字节插入后恢复
+  [PASS] 噪声帧被拒收且不产生误解析 
+  [PASS] 恢复后完整帧正常解析 
+T6 校验和损坏
+  [PASS] 坏帧拒收 + 好帧解析 
+T7 随机化鲁棒性 fuzz（注入 500 完整帧 + 帧内/帧间噪声 + 随机丢字节）
+  [PASS] 0 幽灵帧（没有凭空产生的合法帧） 
+  [PASS] 干净帧 100% 解析、0 丢失 clean_ok=442 lost=0
+  [PASS] 帧内噪声 ≥90% 被拦截（校验和+格式检查） 57/58 rejected (errs=50)
+  [PASS] 校验巧合漏过 ≤5%（8位校验和固有概率，已记录为已知限制） slipped=1
+       统计: clean=442 lost=0 rejected=57 slipped=1 ghost=0 errs=50
+
+========================================
+协议交叉验证结果: 16 passed, 0 failed
+========================================

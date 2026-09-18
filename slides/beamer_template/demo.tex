@@ -1,0 +1,85 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\usetheme{CaseStudy}
+
+\graphicspath{{assets/}}
+
+\begin{document}
+
+% -----------------------------------------------------------------------------
+% COVER
+% -----------------------------------------------------------------------------
+\CaseTitleSlide
+  {CaseStudy Layout}
+  {Architecture / Museum Studies}
+  {Studio / Course 2026}
+  {School of Architecture}
+  {Prof. Your Name}
+  {TA: Your Name}
+  {202609}
+
+% -----------------------------------------------------------------------------
+% RECIPE 01 — dominant right image + supporting image on the left
+% -----------------------------------------------------------------------------
+\begin{caseframe}
+  {案例标题 / Case Title}
+  {Architect Name}
+  { Project Name 2026}
+  \CaseLayoutHeroRight{aerial.jpg}{hero_atrium.jpg}
+\end{caseframe}
+
+% -----------------------------------------------------------------------------
+% RECIPE 02 — plan / drawing on the left + one strong photograph on the right
+% -----------------------------------------------------------------------------
+\begin{caseframe}
+  {平面与空间 / Plan + Space}
+  {Studio Name}
+  { Museum Project 2026}
+  \CaseImage{0.48cm}{2.00cm}{4.65cm}{plan.png}
+  \CaseImage{5.90cm}{1.42cm}{9.35cm}{facade.jpg}
+\end{caseframe}
+
+% -----------------------------------------------------------------------------
+% RECIPE 03 — technical line drawing + a restrained image pair
+% -----------------------------------------------------------------------------
+\begin{caseframe}
+  {剖面与路径 / Section + Circulation}
+  {Architect Name}
+  { Extension Study}
+  \CaseImage{5.20cm}{1.20cm}{9.65cm}{section.png}
+  \CaseImage{0.48cm}{4.10cm}{4.70cm}{facade.jpg}
+  \CaseImage{5.88cm}{4.32cm}{7.00cm}{aerial.jpg}
+\end{caseframe}
+
+% -----------------------------------------------------------------------------
+% RECIPE 04 — asymmetrical collage, more like the varied pages in the source PDF
+% -----------------------------------------------------------------------------
+\begin{caseframe}
+  {城市关系 / Urban Context}
+  {Design Team}
+  { Art District Study}
+  \CaseImage{0.52cm}{1.70cm}{4.15cm}{plan.png}
+  \CaseImage{5.75cm}{1.42cm}{9.20cm}{aerial.jpg}
+  \CaseImage{0.52cm}{5.80cm}{3.45cm}{facade.jpg}
+  \CaseNote{5.75cm}{7.95cm}{7.6cm}{Keep captions rare and small. Let image size, alignment and whitespace establish hierarchy.}
+\end{caseframe}
+
+% -----------------------------------------------------------------------------
+% RECIPE 05 — same visual language, with a small amount of analysis text
+% -----------------------------------------------------------------------------
+\begin{caseframe}
+  {分析页 / Analytical Note}
+  {Case Study}
+  { Spatial Strategy}
+  \CaseImage{5.95cm}{1.40cm}{9.15cm}{hero_atrium.jpg}
+  \CaseTextBlock{0.52cm}{2.10cm}{4.25cm}{%
+    \textbf{01 / Main idea}\\[0.12cm]
+    Keep the statement short. The source deck relies on visual evidence rather than dense explanatory text.\\[0.28cm]
+    \textbf{02 / Graphic rule}\\[0.12cm]
+    Use one dominant visual and one secondary drawing or photograph. Avoid boxes, shadows and decorative bands.
+  }
+  \CaseKeyword{0.52cm}{6.95cm}{WHITE SPACE / ALIGNMENT / SCALE}
+\end{caseframe}
+
+\CaseSectionSlide{END}{Replace the placeholders with your own project images and drawings.}
+
+\end{document}

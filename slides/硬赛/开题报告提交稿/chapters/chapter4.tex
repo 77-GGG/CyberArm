@@ -1,0 +1,150 @@
+\section{预期工作流程}
+
+\subsection{总体方法：先定边界，再做实现}
+
+本项目参考《帮助文档1——如何构建硬件系统》中的自顶向下方法推进，依次处理需求冻结、架构设计、详细设计与单模块验证、增量集成和系统验收。每一阶段都有明确的出口，包括设计文档、接口表或测试记录。当前阶段通过后再继续向下实施；供电、引脚或结构测试一旦发现问题，就回到相应设计环节修正，并同步更新相关文件。
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+  node distance=2.6mm,
+  stage/.style={
+    draw=primary,
+    rounded corners=2pt,
+    fill=lightblue,
+    minimum height=8.5mm,
+    text width=0.84\linewidth,
+    align=left,
+    inner xsep=8pt
+  },
+  flow/.style={-{Latex[length=2.2mm]},thick,primary}
+]
+  \node[stage] (w0) {\textbf{W0 需求冻结}\quad 明确输入、输出、状态、时序、通信和安全约束};
+  \node[stage,below=of w0] (w1) {\textbf{W1 架构设计}\quad 完成系统框图、接口映射、GPIO 规划、电源树和软件分层};
+  \node[stage,below=of w1] (w2) {\textbf{W2 详细设计与单模块验证}\quad 完成原理图、PCB、结构参数及最小驱动测试};
+  \node[stage,below=of w2] (w3) {\textbf{W3 增量集成}\quad 每次只接入一个已验证模块，并执行接口与回归测试};
+  \node[stage,below=of w3] (w4) {\textbf{W4 系统验收}\quad 按需求表逐项测量功能、性能、鲁棒性和安全边界};
+  \draw[flow] (w0) -- (w1);
+  \draw[flow] (w1) -- (w2);
+  \draw[flow] (w2) -- (w3);
+  \draw[flow] (w3) -- (w4);
+\end{tikzpicture}
+\caption{CyberArm 自顶向下开发流程}
+\label{fig:development-flow}
+\end{figure}
+
+机械结构、摄像头标定和舵机负载会互相牵连。臂长变化会影响工作空间、逆运动学参数和肩关节静力矩，摄像头支架移动后则需重新计算桌面单应性矩阵。项目推进过程中会定期回查这些参数，改动同时落实到原理图、GPIO 表、结构尺寸和标定文件中。
+
+\subsection{W0：把功能和约束写清楚}
+
+画板和编写驱动前，先按“输入、输出、状态、时序、通信”五类整理需求。CyberArm 的输入包括 OV2640 图像、MPU6050 姿态数据和上位机 JSON 指令；输出包括五路 MG90S 动作、OLED 显示和 USB 串口事件。软件状态暂定为上电自检、待机、关节控制、视觉跟踪、动作播放、故障和急停，每次状态转换都要写明触发条件和退出路径。
+
+时序要求单列记录。首版舵机目标更新频率为 50\,Hz，视觉处理目标为 12--15\,FPS；指令超时、目标丢失、动作完成和急停也分别规定响应方式。W0 结束时需要得到需求规格表和验收追踪表。表中每项功能都应对应输入、处理模块、输出和测试方法，暂时无法确定的参数保留为待测项。
+
+\subsection{W1：把需求落实到硬件和软件}
+
+需求确定后，将各项功能映射到处理器资源和外设接口。硬件系统框图中标出 OV2640 的 DVP/SCCB、OLED 的 SPI、PCA9685 与 MPU6050 共用的 I²C、原生 USB、3.3\,V/5\,V 电源域以及信号方向。GPIO 分配先处理摄像头并行总线、原生 USB、启动配置脚和模组内部 Flash/PSRAM 占用，再安排可通过 GPIO Matrix 路由的信号。接口表同时记录工作电压、信号方向、最高频率以及上拉和电平转换要求。
+
+软件分为驱动层、设备服务层、算法层、任务调度层和应用接口层。PCA9685 与 MPU6050 共用的 I²C 交由单一服务任务访问，视觉结果、运动目标和异步事件通过带时间戳的队列传递。状态机拟采用
+\[
+  \texttt{SELF\_TEST}\rightarrow\texttt{IDLE}
+  \rightarrow\{\texttt{MANUAL},\texttt{VISION},\texttt{ACTION}\},
+\]
+任一运行状态都可以转入 \texttt{FAULT} 或 \texttt{E\_STOP}。故障解除后，系统先回到 \texttt{IDLE}，原有轨迹作废。主流程图描述初始化、任务启动、事件分发和故障处理，视觉检测、逆运动学及协议解析各自绘制子流程。
+
+W1 的输出包括系统框图、GPIO 分配表、电源树、软件分层图、状态转换图和模块接口说明。进入原理图设计前，需确认 GPIO 没有复用冲突，供电与逻辑电平匹配，各软件任务的数据来源、输出位置和超时行为也已确定。
+
+\subsection{W2：分块调通硬件和结构}
+
+自配置控制板打样回板后，先保持外设和舵机断开，按以下顺序上电调试：
+
+\begin{enumerate}
+  \item 断开五路 MG90S，检查电源与地之间是否短路；使用限流电源分别验证 3.3\,V 和 5\,V 电源轨；
+  \item 检查 ESP32-S3 的 \texttt{EN}、启动配置脚和时钟条件，通过原生 USB 下载最小固件并确认枚举、复位和日志输出正常；
+  \item 依次验证 SPI OLED、I²C 总线、PCA9685 和 MPU6050，每次只保留当前外设及必要的调试输出；
+  \item OV2640 调试从 SCCB 寄存器读写开始，随后检查帧同步、像素时钟和最小分辨率图像采集；
+  \item 使用 PCA9685 驱动一路 MG90S，测量脉宽、启动电流和电源压降。系统供电稳定后，再接入其余四路。
+\end{enumerate}
+
+机械结构与电子模块同步验证。3D 打印前，根据质量、质心和力臂计算肩、肘静力矩；装配后逐轴标定机械零点、方向、脉宽范围和安全角度，并检查底座轴承的受力情况。此时测试程序以驱动和边界检查为主，视觉跟踪等上层功能留到集成阶段。每个模块保留最小测试工程、接口说明、正常波形和失败记录，作为后续集成的基线。
+
+\subsection{W3：沿数据链逐步集成}
+
+各模块调通后，沿“上位机指令/视觉输入 $\rightarrow$ 状态与目标 $\rightarrow$ 运动规划 $\rightarrow$ 舵机输出 $\rightarrow$ 状态回传”的数据链逐项接入：
+
+\begin{enumerate}
+  \item 接入 JSON 收发和状态机，舵机保持禁用，验证合法指令、异常字段、超时和断开重连；
+  \item 接入单轴控制与安全限位，再扩展到五路 MG90S 的关节角控制和动作播放；
+  \item 加入逆运动学和轨迹插值，先在空载、中部工作区验证可达性、解支选择和重复误差；
+  \item 视觉模块输出带时间戳的目标结果，分别测试人脸、指尖、颜色物体和手势；本步骤中机械臂保持静止；
+  \item 完成桌面标定后，将最新视觉目标送入运动队列，逐步提高控制增益和动作范围；
+  \item 接入 Python SDK 和演示脚本，核对命令、事件、日志和错误码与固件接口。
+\end{enumerate}
+
+每接入一个模块，都重复检查电源稳定性、USB 通信、急停和关节限位。集成后若出现故障，先撤回最近的改动并复测原基线，再从接口定义、资源竞争、电源和信号完整性几个方向定位。调试记录中保留每次改动及对应结果。
+
+\subsection{W4：按需求表逐项验收}
+
+系统验收从 W0 的需求追踪表开始，功能、性能、鲁棒性和安全性分别测试。演示成功一次只能说明数据链已经贯通，重复性和连续运行能力仍需单独测量。表~\ref{tab:acceptance-targets}列出的数值是后续样机测试目标，当前并无实测结论。测试记录包括原始数据、固件版本、结构参数和环境条件。
+
+\begin{table}[h]
+\centering
+\caption{量化交付目标}
+\label{tab:acceptance-targets}
+\small
+\begin{tabularx}{\linewidth}{l l l}
+\toprule
+\textbf{指标} & \textbf{目标} & \textbf{怎么测}\\
+\midrule
+工作空间 & 水平半径 $\geq15$\,cm，垂直 0--20\,cm & 在多个方位采样末端可达边界\\
+定位精度 & 中部工作区重复误差 $\leq10$\,mm & 空载对同一点执行 10 次并测量离散程度\\
+人脸追踪 & 0.4--1.0\,m 内有效帧比例 $\geq85\%$ & 在室内稳定光照下按距离和角度统计\\
+指尖追踪 & 帧率 $\geq12$\,FPS，指令延迟 $<200$\,ms & 记录图像时间戳至目标指令更新时间\\
+手势识别 & 4 种手势正确率 $\geq85\%$ & 每种手势至少重复 20 次并记录混淆情况\\
+指令响应 & 收包至舵机更新 $<50$\,ms & 记录串口收包与 I²C 写入时间戳\\
+连续运行 & 多模式循环 $\geq30$\,min & 循环切换模式并记录复位、丢包和异常次数\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{问题闭环与备选路径}
+
+\begin{itemize}
+  \item \textbf{平面标定误差较大}：检查摄像头固定刚度和标定点覆盖范围；若棋盘格自动提取不稳定，则改为人工选取桌面已知点并拟合单应性矩阵。
+  \item \textbf{肤色分割受光照影响}：增加启动时采样和阈值调整；若现场条件仍不稳定，则在指尖贴彩色标记，复用 HSV 颜色物体检测管线完成演示。
+  \item \textbf{肩关节扭矩不足}：在保持五路均为 MG90S 的前提下，优先缩短前臂、减轻夹爪并增加弹性配重，同时限制最大臂展负载。
+  \Needspace{4\baselineskip}
+  \item \textbf{舵机干扰通信或导致复位}：缩短大电流回路，增加电源去耦并检查共地路径；I²C 不稳定时补充合适的上拉电阻，并将总线频率降至 100\,kHz 后复测。
+  \item \textbf{控制板首次上电异常}：逻辑电源与舵机电源分开调试，先检查 3.3\,V、EN 和启动配置脚，再连接 ESP32-S3 模组；USB-C、摄像头和大电流回路分别完成短路与波形检查。
+  \item \textbf{GPIO 或库移植冲突}：原理图冻结前确定 GPIO 分配表，并用最小工程分别验证摄像头、OLED 和 I²C 总线。若 ESP-WHO 的板级代码无法直接适配，则保留 ESP-DL 人脸模型和 esp32-camera 驱动，自行实现最小采集与推理流程。
+  \item \textbf{IMU 偏航漂移}：首版主要使用由重力约束的横滚角和俯仰角；需要偏航输入时采用短时相对角，并提供一键回中。长期绝对航向不列入验收指标。
+  \item \textbf{视觉处理占用过高}：降低输入分辨率或检测频率，优先保证控制任务周期。各模式分别运行验收所需的检测器，控制同时运行的算法数量。
+\end{itemize}
+
+\subsection{预期交付物}
+
+\begin{itemize}
+  \item 一台包含四个运动关节和一路夹爪执行轴的视觉交互桌面机械臂；
+  \item 一套由自配置 ESP32-S3 控制板、OV2640、MPU6050、OLED 和五路 MG90S 构成的可运行原型；
+  \item 一套包含逆运动学、视觉模式、JSON 协议、动作库和安全约束的嵌入式固件；
+  \item 一个通过 ESP32-S3 原生 USB 串口调用机械臂功能的 PC 端 Python SDK；
+  \item 至少三套可重复运行的演示脚本，以及相应的测试记录；
+  \item 控制板原理图与 PCB 文件、GPIO 分配表、3D 打印文件、固件与 SDK 源码、标定说明、测试记录和演示视频。
+\end{itemize}
+
+流程中的设计结论都要能追溯到需求条目或测试记录。几何逆运动学、ESP-IDF、FreeRTOS 和摄像头驱动已有可参考的实现，舵机负载、视觉帧率和任务周期则需要在自制样机上实测。扩展功能即使未达到目标，关节控制、急停、状态查询和 USB 指令链仍需具备独立验收条件。
+
+% \subsection{主要技术资料}
+
+% \begingroup
+% \small
+% \begin{enumerate}[leftmargin=2em,itemsep=0.08em,topsep=0.2em,parsep=0pt]
+%   \item 《电子系统专题设计与制作》课程组：《帮助文档1——如何构建硬件系统》，2026年6月30日。
+%   \item Espressif Systems：\href{https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_en.pdf}{ESP32-S3-WROOM-1/1U Datasheet}。
+%   \item Espressif Systems：《ESP32-S3 Hardware Design Guidelines》，电源、复位、USB 与射频布局说明。
+%   \item Espressif Systems：\href{https://github.com/espressif/esp32-camera}{esp32-camera}，摄像头驱动与 PSRAM 使用说明。
+%   \item Espressif Systems：\href{https://github.com/espressif/esp-who}{ESP-WHO} 与 ESP-DL，人脸检测示例及支持平台说明。
+%   \item NXP Semiconductors：\href{https://www.nxp.com/docs/en/data-sheet/PCA9685.pdf}{PCA9685 16-channel, 12-bit PWM controller data sheet}。
+%   \item TDK InvenSense：《MPU-6000/MPU-6050 Product Specification》，Revision 3.4。
+% \end{enumerate}
+% \endgroup

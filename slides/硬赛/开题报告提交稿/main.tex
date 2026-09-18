@@ -1,0 +1,117 @@
+% !TEX program = xelatex
+\documentclass[UTF8,fontset=fandol,a4paper,11pt]{ctexart}
+
+% ---- 基础版式 ----
+\usepackage{geometry}
+\geometry{left=2.35cm,right=2.35cm,top=2.35cm,bottom=2.35cm}
+\usepackage{setspace}
+\setstretch{1.25}
+\usepackage{microtype}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{lastpage}
+\usepackage{indentfirst}
+\usepackage{needspace}
+
+% ---- 数学、表格与绘图 ----
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,shapes.geometric,calc,backgrounds}
+
+% ---- 颜色与链接 ----
+\usepackage{xcolor}
+\usepackage{hyperref}
+\definecolor{primary}{RGB}{19,69,111}
+\definecolor{secondary}{RGB}{31,113,137}
+\definecolor{accent}{RGB}{205,103,43}
+\definecolor{safegreen}{RGB}{44,127,89}
+\definecolor{lightblue}{RGB}{236,244,249}
+\definecolor{lightgreen}{RGB}{236,247,241}
+\definecolor{lightorange}{RGB}{252,242,233}
+\definecolor{midgray}{RGB}{102,109,115}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=primary,
+  urlcolor=secondary,
+  citecolor=primary,
+  pdfauthor={CyberArm 项目组},
+  pdftitle={CyberArm 视觉追踪桌面机械臂开题报告}
+}
+
+\titleformat{\section}{\Large\bfseries\color{primary}}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\large\bfseries\color{primary}}{\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.6em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{midgray}CyberArm }
+\fancyhead[R]{\small\color{midgray}}
+\fancyfoot[C]{\small 第\thepage 页}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\captionsetup{font=small,labelfont=bf,labelsep=quad}
+\setlist[itemize]{leftmargin=2em,itemsep=0.28em,topsep=0.4em}
+\setlist[enumerate]{leftmargin=2.2em,itemsep=0.28em,topsep=0.4em}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\targetmark}{\textcolor{accent}{\textbf{设计目标}}}
+
+\begin{document}
+\hypersetup{pageanchor=false}
+
+% ============================================================
+% 封面
+% ============================================================
+\begin{titlepage}
+  \centering
+  \vspace*{1.2cm}
+  {\Large\bfseries 清华大学电子工程系\par}
+  \vspace{0.3cm}
+  {\Large\bfseries 第29届硬件设计大赛\par}
+  \vspace{0.6cm}
+  {\LARGE\bfseries 开题报告\par}
+  \vspace{2.4cm}
+  {\Huge\bfseries\color{primary} CyberArm\par}
+  \vspace{0.5cm}
+  {\LARGE\bfseries 视觉追踪桌面机械臂\par}
+
+  \vspace{6.0cm}
+  \renewcommand{\arraystretch}{1.6}
+  \begin{tabular}{L{1cm}L{5.0cm}}
+    队名：& 马+7队\\
+    队长：& 祁果\quad \quad 建41\quad 2024010012\\
+    队员：& 许宇旋\quad 无55\quad 2024010050\\
+  \end{tabular}
+
+  \vfill
+  {\large 2026年7月\par}
+\end{titlepage}
+
+% ---- 目录与前言 ----
+\hypersetup{pageanchor=true}
+\pagenumbering{Roman}
+\tableofcontents
+\clearpage
+\input{chapters/preface}
+\clearpage
+
+% ---- 正文 ----
+\pagenumbering{arabic}
+\input{chapters/chapter1}
+\input{chapters/chapter2}
+\input{chapters/chapter3}
+\input{chapters/chapter4}
+
+\end{document}
