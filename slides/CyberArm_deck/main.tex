@@ -53,7 +53,6 @@
        \vspace{0.12cm}
        2026.09}
     \end{minipage}}
-  \CaseNote{11.55cm}{8.16cm}{3.9cm}{RevL final mechanical CAD}
 \end{frame}
 
 % -----------------------------------------------------------------------------
@@ -69,7 +68,7 @@
       \vspace{0.08cm}
       \Body{五个运动关节与一路夹爪\par
       3 × MG996R，3 × MG90S\par
-      RevL 3D 打印结构}
+      3D 打印结构}
 
       \vspace{0.42cm}
       \RedLabel{控制系统}\par
@@ -80,35 +79,38 @@
     \end{minipage}}
   \CaseImage{5.62cm}{1.28cm}{9.80cm}{0b8ecd9638317f569a953c7d0b11c092.jpg}
   \CaseKeyword{0.55cm}{7.55cm}{SIMULATION / CALIBRATION / CONTROL}
-  \CaseNote{5.62cm}{8.68cm}{9.2cm}{实体样机、控制板与上位机联调现场}
 \end{caseframe}
 
 % -----------------------------------------------------------------------------
 % 03 MECHANICAL EVOLUTION
 % -----------------------------------------------------------------------------
-\begin{caseframe}{机械结构与方案演化}{RevL}{ Five-axis + Gripper}
-  \CasePlace{0.55cm}{1.28cm}{%
-    \begin{minipage}{4.65cm}
-      \Lead{承载、装配与调试需求推动机械臂演化到 RevL。}
-      \vspace{0.40cm}
-
-      \begin{tabular}{@{}>{\color{CaseGray}}p{1.62cm}p{2.80cm}@{}}
-      \Small{开题阶段} & \Small{当前 RevL} \\[0.10cm]
-      \Small{四关节 + 夹爪} & \Body{五关节 + 夹爪} \\[0.12cm]
-      \Small{五路 MG90S} & \Body{3 × MG996R + 3 × MG90S} \\[0.12cm]
-      \Small{简化夹爪} & \Body{两片式夹爪与连杆机构} \\[0.12cm]
-      \Small{功能优先} & \Body{运动、标定与安全链路优先} \\
-      \end{tabular}
-
-      \vspace{0.42cm}
-      \RedLabel{关节定义}\par
-      \vspace{0.08cm}
-      \Small{J1 底座回转\quad J2 肩俯仰\par
-      J3 肘俯仰\quad J4 腕旋转\par
-      J5 腕俯仰\quad G 夹爪开合}
+\begin{caseframe}{机械结构与方案演化}{CyberArm}{ Five-axis + Gripper}
+  \CasePlace{0.85cm}{1.45cm}{%
+    \begin{minipage}{14.2cm}
+      \Lead{根据承载、装配与调试需求，逐步完善关节配置与机械结构。}
     \end{minipage}}
-  \CaseImage{5.72cm}{1.18cm}{9.70cm}{CyberArm_RevL_rear.png}
-  \CaseNote{11.55cm}{8.35cm}{3.65cm}{RevL 后侧结构视角}
+  \CasePlace{0.85cm}{2.65cm}{%
+    \begin{minipage}{9.0cm}
+      \setlength{\tabcolsep}{0pt}
+      \begin{tabular}{@{}p{3.8cm}p{5.2cm}@{}}
+      \RedLabel{开题阶段} & \RedLabel{当前方案} \\[0.55cm]
+      \Lead{四关节 + 夹爪} & \Lead{五关节 + 夹爪} \\[0.60cm]
+      \Body{五路 MG90S} & \Body{3 × MG996R + 3 × MG90S} \\[0.60cm]
+      \Body{简化夹爪} & \Body{两片式夹爪与连杆机构} \\[0.60cm]
+      \Body{功能优先} & \Body{运动、标定与安全链路优先} \\
+      \end{tabular}
+    \end{minipage}}
+  \CasePlace{11.15cm}{2.65cm}{%
+    \begin{minipage}{4.0cm}
+      \RedLabel{关节定义}\par
+      \vspace{0.55cm}
+      \Body{J1\quad 底座回转\par\vspace{0.30cm}
+      J2\quad 肩俯仰\par\vspace{0.30cm}
+      J3\quad 肘俯仰\par\vspace{0.30cm}
+      J4\quad 腕旋转\par\vspace{0.30cm}
+      J5\quad 腕俯仰\par\vspace{0.30cm}
+      G\quad 夹爪开合}
+    \end{minipage}}
 \end{caseframe}
 
 % -----------------------------------------------------------------------------
@@ -200,7 +202,6 @@
       }
     \end{tikzpicture}}
   \CaseKeyword{6.25cm}{7.73cm}{ONE CONTROL PATH}
-  \CaseNote{9.15cm}{7.70cm}{5.3cm}{前端不能绕过规划层直接写 PWM}
 \end{caseframe}
 
 % -----------------------------------------------------------------------------
@@ -307,66 +308,96 @@
     \end{minipage}}
 
   \CaseImage{6.05cm}{1.24cm}{9.36cm}{calibration-zero-reference.png}
-  \CaseNote{6.05cm}{7.42cm}{9.15cm}{零位参考只做运动学计算，不改变仿真姿态，也不发送舵机指令。}
   \CaseKeyword{6.05cm}{7.88cm}{TARGET ANGLE / MAPPING / PWM}
 \end{caseframe}
 
 % -----------------------------------------------------------------------------
 % 08 DEMO
 % -----------------------------------------------------------------------------
-\begin{caseframe}{现场演示}{CyberArm}{ Live Control}
-  \CasePlace{0.55cm}{1.20cm}{%
-    \begin{minipage}{4.75cm}
-      \Lead{先验证软件状态，再连接实机并使用小角度动作。}
-      \vspace{0.46cm}
-
-      \Num{1}\hspace{0.12cm}\Body{启动上位机，检查模型与当前姿态}\par
-      \vspace{0.34cm}
-      \Num{2}\hspace{0.12cm}\Body{拖动末端，展示实时 IK 与边界反馈}\par
-      \vspace{0.34cm}
-      \Num{3}\hspace{0.12cm}\Body{连接 ESP32-S3，驱动已标定关节}\par
-      \vspace{0.34cm}
-      \Num{4}\hspace{0.12cm}\Body{触发停止，确认旧动作失效}\par
-
-      \vspace{0.54cm}
-      \RedLabel{备用展示}\par
-      \vspace{0.08cm}
-      \Small{不可达目标与碰撞拒绝\par
-      自动模式的预览、暂停与继续\par
-      提前录制的实机联动视频}
-    \end{minipage}}
-
-  \CaseImage{5.72cm}{1.18cm}{9.72cm}{calibration-workbench.png}
-  \CaseNote{5.72cm}{8.46cm}{9.4cm}{演示中不临时扩大模型限位或舵机脉宽范围。}
-\end{caseframe}
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=center,inner sep=0pt,text=CaseText]
+      at (current page.center) {\fontsize{25}{30}\selectfont 现场演示};
+  \end{tikzpicture}
+\end{frame}
 
 % -----------------------------------------------------------------------------
 % 09 LIMITATIONS
 % -----------------------------------------------------------------------------
-\begin{caseframe}{机械臂的当前局限}{RevL}{ Open-loop Prototype}
-  \CaseImage{0.38cm}{1.22cm}{9.42cm}{CyberArm_RevL_side.png}
-  \CasePlace{10.18cm}{1.22cm}{%
-    \begin{minipage}{5.15cm}
+\begin{caseframe}{机械臂的当前局限}{CyberArm}{ Open-loop Prototype}
+  \CasePlace{0.85cm}{1.45cm}{%
+    \begin{minipage}{14.2cm}
       \Lead{结构刚度、舵机性能和角度反馈共同限制实际精度。}
-      \vspace{0.38cm}
-
-      \RedLabel{3D 打印结构}\par
-      \Small{PLA 强度与刚度有限；打印误差、孔轴间隙和负载变形会改变理论关节中心。}
-      \vspace{0.30cm}
-
-      \RedLabel{舵机性能}\par
-      \Small{MG996R 与 MG90S 存在齿隙、死区和批次差异；小角度低速动作容易抖动。}
-      \vspace{0.30cm}
-
-      \RedLabel{角度感知}\par
-      \Small{三线 PWM 舵机没有位置回读。系统知道发送了什么指令，无法精确得知负载下的真实角度。}
-      \vspace{0.30cm}
-
-      \RedLabel{模型与实物}\par
-      \Small{碰撞模型不包含线缆摆动、打印件变形与未知障碍；数学可达不等于实物能够稳定到达。}
-
     \end{minipage}}
-  \CaseNote{0.55cm}{8.22cm}{8.8cm}{RevL 舵机侧视角：远端质量、关节间隙与开环执行误差会沿运动链累积。}
+  \CasePlace{0.85cm}{2.75cm}{%
+    \begin{minipage}{6.35cm}
+      \RedLabel{3D 打印结构}\par
+      \vspace{0.20cm}
+      \Lead{PLA 强度与刚度有限}\par
+      \vspace{0.20cm}
+      \Body{打印误差、孔轴间隙和负载变形会改变理论关节中心。}
+    \end{minipage}}
+  \CasePlace{8.65cm}{2.75cm}{%
+    \begin{minipage}{6.35cm}
+      \RedLabel{舵机性能}\par
+      \vspace{0.20cm}
+      \Lead{小角度低速动作容易抖动}\par
+      \vspace{0.20cm}
+      \Body{MG996R 与 MG90S 存在齿隙、死区和批次差异，影响动作稳定性。}
+    \end{minipage}}
+  \CasePlace{0.85cm}{5.55cm}{%
+    \begin{minipage}{6.35cm}
+      \RedLabel{角度感知}\par
+      \vspace{0.20cm}
+      \Lead{无法精确得知当前真实角度}\par
+      \vspace{0.20cm}
+      \Body{三线 PWM 舵机没有位置回读。系统只知道指令角，无法测得负载下的实际偏差。}
+    \end{minipage}}
+  \CasePlace{8.65cm}{5.55cm}{%
+    \begin{minipage}{6.35cm}
+      \RedLabel{模型与实物}\par
+      \vspace{0.20cm}
+      \Lead{理论可达仍需实机验证}\par
+      \vspace{0.20cm}
+      \Body{碰撞模型不包含线缆摆动、打印件变形与未知障碍，实际动作还受结构与执行误差影响。}
+    \end{minipage}}
+\end{caseframe}
+
+% -----------------------------------------------------------------------------
+% 10 OPEN SOURCE
+% -----------------------------------------------------------------------------
+\begin{caseframe}{项目开源情况}{CyberArm}{ GitHub Repository}
+  \CasePlace{0.85cm}{1.45cm}{%
+    \begin{minipage}{14.2cm}
+      {\fontsize{18}{22}\selectfont\color{CaseRed}
+       \href{https://github.com/77-GGG/CyberArm}{github.com/77-GGG/CyberArm}\par}
+      \vspace{0.35cm}
+      \Lead{项目仓库已公开，代码与已上传的设计资料可在线查看和下载。}
+    \end{minipage}}
+  \CasePlace{0.85cm}{3.25cm}{%
+    \begin{minipage}{6.35cm}
+      \RedLabel{上位机与运动学}\par
+      \vspace{0.20cm}
+      \Body{桌面控制界面、三维仿真、正逆运动学求解、路径规划与碰撞检查。}
+      \vspace{0.75cm}\par
+      \RedLabel{机械设计资料}\par
+      \vspace{0.20cm}
+      \Body{仓库内已上传的机械模型、STL 打印文件、装配说明与结构分析资料。}
+    \end{minipage}}
+  \CasePlace{8.65cm}{3.25cm}{%
+    \begin{minipage}{6.35cm}
+      \RedLabel{嵌入式固件}\par
+      \vspace{0.20cm}
+      \Body{ESP32-S3 固件、PCA9685 舵机驱动、通信协议、轨迹执行与接线配置。}
+      \vspace{0.75cm}\par
+      \RedLabel{开发与展示文档}\par
+      \vspace{0.20cm}
+      \Body{开发记录、标定与调试说明、性能优化记录，以及项目展示幻灯片。}
+    \end{minipage}}
+  \CasePlace{0.85cm}{7.65cm}{%
+    \begin{minipage}{14.2cm}
+      \Body{当前发布状态：公开仓库，尚未配置开源许可证。}
+    \end{minipage}}
 \end{caseframe}
 
 \end{document}
