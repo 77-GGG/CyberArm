@@ -329,37 +329,32 @@
     \begin{minipage}{14.2cm}
       \Lead{结构刚度、舵机性能和角度反馈共同限制实际精度。}
     \end{minipage}}
-  \CasePlace{0.85cm}{2.75cm}{%
-    \begin{minipage}{6.35cm}
+  \CasePlace{0.85cm}{3.10cm}{%
+    \begin{minipage}{4.25cm}
+      \RaggedRight
       \RedLabel{3D 打印结构}\par
-      \vspace{0.20cm}
+      \vspace{0.35cm}
       \Lead{PLA 强度与刚度有限}\par
-      \vspace{0.20cm}
+      \vspace{0.35cm}
       \Body{打印误差、孔轴间隙和负载变形会改变理论关节中心。}
     \end{minipage}}
-  \CasePlace{8.65cm}{2.75cm}{%
-    \begin{minipage}{6.35cm}
+  \CasePlace{5.90cm}{3.10cm}{%
+    \begin{minipage}{4.25cm}
+      \RaggedRight
       \RedLabel{舵机性能}\par
-      \vspace{0.20cm}
+      \vspace{0.35cm}
       \Lead{小角度低速动作容易抖动}\par
-      \vspace{0.20cm}
+      \vspace{0.35cm}
       \Body{MG996R 与 MG90S 存在齿隙、死区和批次差异，影响动作稳定性。}
     \end{minipage}}
-  \CasePlace{0.85cm}{5.55cm}{%
-    \begin{minipage}{6.35cm}
+  \CasePlace{10.95cm}{3.10cm}{%
+    \begin{minipage}{4.25cm}
+      \RaggedRight
       \RedLabel{角度感知}\par
-      \vspace{0.20cm}
+      \vspace{0.35cm}
       \Lead{无法精确得知当前真实角度}\par
-      \vspace{0.20cm}
+      \vspace{0.35cm}
       \Body{三线 PWM 舵机没有位置回读。系统只知道指令角，无法测得负载下的实际偏差。}
-    \end{minipage}}
-  \CasePlace{8.65cm}{5.55cm}{%
-    \begin{minipage}{6.35cm}
-      \RedLabel{模型与实物}\par
-      \vspace{0.20cm}
-      \Lead{理论可达仍需实机验证}\par
-      \vspace{0.20cm}
-      \Body{碰撞模型不包含线缆摆动、打印件变形与未知障碍，实际动作还受结构与执行误差影响。}
     \end{minipage}}
 \end{caseframe}
 
@@ -393,10 +388,6 @@
       \RedLabel{开发与展示文档}\par
       \vspace{0.20cm}
       \Body{开发记录、标定与调试说明、性能优化记录，以及项目展示幻灯片。}
-    \end{minipage}}
-  \CasePlace{0.85cm}{7.65cm}{%
-    \begin{minipage}{14.2cm}
-      \Body{当前发布状态：公开仓库，尚未配置开源许可证。}
     \end{minipage}}
 \end{caseframe}
 
