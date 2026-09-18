@@ -63,6 +63,26 @@ int main(){
   assert(!command("\"command\":\"target\",\"duration_ms\":120,\"q_deg\":[0,0,0,0,0,0]")["ok"].as<bool>());
   assert(!command("\"command\":\"prepare\",\"model_id\":\"revc-sim-1\",\"count\":1,\"start_deg\":[3,0,0,0,0,0]")["ok"].as<bool>());
   command("\"command\":\"disarm\"");
+  // Editable model limits are independent of the angle mapping and survive reboot.
+  const std::string limitFields=std::string("\"command\":\"save_limits\",\"axis\":0,\"low_deg\":-75,\"high_deg\":80,\"confirmed\":true,\"expected_revision\":0,\"model_id\":\"revc-sim-1\",\"wiring_hash\":\"")+cyberarm::wiring::kHash+"\"";
+  Preferences::failWrite=true;assert(!command(limitFields)["ok"].as<bool>());Preferences::failWrite=false;
+  assert(reboot.limits(0).revision==0);
+  reply=command(limitFields);assert(reply["ok"].as<bool>());
+  assert(reply["state"]["model_limits_deg"][0][1].as<float>()==80);
+  assert(reply["state"]["limits_revisions"][0].as<int>()==1);
+  assert(!command(limitFields)["ok"].as<bool>()); // stale revision
+  assert(!command("\"command\":\"arm\",\"q_deg\":[60,0,0,0,0,0]")["ok"].as<bool>()); // mapping still ±5
+  JointMapping wide=m;wide.low=-90;wide.high=90;wide.points[0]={-90,1000};wide.points[2]={90,2000};
+  assert(reboot.saveMapping(0,wide));
+  assert(command("\"command\":\"arm\",\"q_deg\":[60,0,0,0,0,0]")["ok"].as<bool>());
+  JointLimits narrow{};narrow.low=-20;narrow.high=20;
+  assert(!reboot.saveLimits(0,narrow)); // active outputs
+  command("\"command\":\"disarm\"");
+  assert(!command("\"command\":\"arm\",\"q_deg\":[85,0,0,0,0,0]")["ok"].as<bool>());
+  ServoSubsystem limitsReboot;assert(limitsReboot.begin());
+  assert(limitsReboot.limits(0).low==-75&&limitsReboot.limits(0).high==80&&limitsReboot.limits(0).revision==1);
+  assert(limitsReboot.anglePulse(0,60,pulse)&&!limitsReboot.anglePulse(0,85,pulse));
+  narrow.low=0;assert(!limitsReboot.saveLimits(0,narrow));
   // Oversized line must not execute a valid JSON suffix.
   serial.input=std::string(2048,'x')+"{\"protocol_version\":1,\"command\":\"arm\",\"q_deg\":[0,0,0,0,0,0]}\n";
   protocol.service();protocol.service();assert(!reboot.outputsEnabled());

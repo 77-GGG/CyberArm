@@ -273,8 +273,15 @@ class HardwareBridge:
         self._merge_response(response)
         return self.snapshot()
 
+    def model_limits(self):
+        state=self.snapshot()
+        limits=state.get('model_limits_deg') if state.get('connected') and state.get('capabilities',{}).get('editable_limits')==1 else self.limits_deg
+        if not isinstance(limits,list) or len(limits)!=6 or any(not isinstance(p,list) or len(p)!=2 or any(type(v) not in (int,float) or not math.isfinite(v) for v in p) or not -180<=p[0]<0<p[1]<=180 for p in limits):
+            raise HardwareError('设备模型软限位无效，请重新连接并核对固件')
+        return [list(v) for v in limits]
+
     def effective_limits(self):
-        state=self.snapshot(); limits=[list(v) for v in self.limits_deg]
+        state=self.snapshot(); limits=self.model_limits()
         for i,m in enumerate(state.get('mappings', [])[:6]):
             if m.get('confirmed'):
                 limits[i]=[max(limits[i][0],m['low_deg']),min(limits[i][1],m['high_deg'])]
@@ -347,7 +354,7 @@ class HardwareBridge:
         allowed = ('armed', 'mode', 'firmware_version', 'model_id', 'driver_ready',
                    'outputs_enabled', 'calibrated', 'calibration', 'commanded_q_deg',
                    'measured_q_deg', 'measured_feedback', 'capabilities', 'device_id', 'wiring',
-                   'wiring_hash', 'tick_us', 'test', 'mappings', 'motion_busy')
+                   'wiring_hash', 'tick_us', 'test', 'mappings', 'motion_busy', 'model_limits_deg', 'limits_revisions')
         with self._lock:
             for key in allowed:
                 if key in remote:

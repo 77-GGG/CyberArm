@@ -7,8 +7,26 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
 from .calibration import CalibrationStore, validate_mapping, angle_pulse
 from .hardware import HardwareError
+from .model import validate_gripper_range
 
 router=APIRouter(prefix='/api/hardware/calibration-workbench')
+
+
+@router.get('/reference')
+async def zero_reference(axis:int=1):
+    """Pure FK reference; never changes simulator state or sends serial commands."""
+    if not 1<=axis<=6:raise HTTPException(422,'关节编号必须是 1–6')
+    import numpy as np
+    r=server().c.r
+    zero=np.zeros(6);positive=zero.copy();positive[axis-1]=np.radians(5)
+    frames,_=r.fk(zero)
+    frame=frames[axis-1] if axis<6 else frames[6]
+    direction=frame[:3,2] if axis<6 else frames[5,:3,1]
+    def pose(q):
+        matrices,tcp=r.transforms(q)
+        return {'matrices':matrices,'tcp':tcp}
+    return {'zero':pose(zero),'positive':pose(positive),'origin':frame[:3,3].tolist(),
+            'direction':direction.tolist(),'model_id':r.data['model_id']}
 
 
 class Strict(BaseModel):
@@ -45,6 +63,16 @@ class Mapping(Strict):
 class Draft(Strict):
     axis:int=Field(ge=1,le=6)
     data:dict
+
+
+class Limits(Strict):
+    axis:int=Field(ge=1,le=6)
+    low_deg:float=Field(ge=-180,lt=0)
+    high_deg:float=Field(gt=0,le=180)
+    device_id:str
+    wiring_hash:str
+    expected_revision:int=Field(ge=0)
+    confirmed:Literal[True]
 
 
 def server():
@@ -114,6 +142,36 @@ async def records():
         result['backup_matches']=result.get('saved_mappings')==result['current_mappings']
         return result
     except (ValueError,OSError,json.JSONDecodeError) as exc:raise HTTPException(422,str(exc))
+
+
+@router.post('/limits')
+async def save_limits(body:Limits):
+    s=require_idle()
+    async with s.calibration_lock:
+        s=require_idle()
+        try:
+            state=s.hardware.snapshot();index=body.axis-1
+            if state.get('capabilities',{}).get('editable_limits')!=1:raise ValueError('请烧录支持可调软限位的 0.4.0 或更新固件')
+            if state.get('outputs_enabled') or state.get('test',{}).get('active'):raise ValueError('修改模型软限位前请关闭所有输出')
+            if (body.device_id,body.wiring_hash)!=(state.get('device_id'),state.get('wiring_hash')):raise ValueError('设备或接线已变化，请重新加载')
+            if state['limits_revisions'][index]!=body.expected_revision:raise ValueError('软限位版本已变化，请重新加载设备值')
+            q=s.c.snapshot()['q_deg'][index]
+            if not body.low_deg<=q<=body.high_deg:raise ValueError('当前仿真姿态在新范围之外，请先在仅仿真模式移回范围内')
+            if index==5:validate_gripper_range(body.low_deg,body.high_deg)
+            state=await s.hardware.calibration_command('save_limits',axis=index,low_deg=body.low_deg,high_deg=body.high_deg,
+                expected_revision=body.expected_revision,confirmed=True,model_id=state['model_id'],wiring_hash=body.wiring_hash)
+            invalidate(s)
+            actual=state['model_limits_deg'][index]
+            if state['limits_revisions'][index]!=body.expected_revision+1 or any(abs(a-b)>.001 for a,b in zip(actual,[body.low_deg,body.high_deg])):
+                await s.hardware.disconnect()
+                raise ValueError('软限位读回不一致，已断开连接，请重新核对设备')
+            warning=''
+            try:
+                data=s.calibration_store.read(state);data['model_limits_deg']=state['model_limits_deg'];data['limits_revisions']=state['limits_revisions']
+                data['saved_mappings']=state['mappings'];s.calibration_store.write(state,data)
+            except (OSError,ValueError,json.JSONDecodeError) as exc:warning='设备已保存，但电脑备份失败：'+str(exc)
+            return {'state':state,'warning':warning}
+        except (ValueError,KeyError,HardwareError) as exc:raise HTTPException(422,str(exc))
 
 
 @router.post('/draft')

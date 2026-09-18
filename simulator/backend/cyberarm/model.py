@@ -8,6 +8,23 @@ import numpy as np
 
 ROOT = Path(os.environ.get('CYBERARM_RESOURCE_DIR', Path(__file__).resolve().parents[2]))
 PTR = C.POINTER(C.c_double)
+
+def validate_gripper_range(low, high):
+    """Reject linkage singularities anywhere in the requested continuous interval.
+
+    These are the same two circle constraints as ca_fk, evaluated analytically
+    at endpoints and every interior extremum, not just at a few sample poses.
+    """
+    for sign, ax, gx, offset, dx, dz in [(1,.013,.005,-155,.03075,0),(-1,.023,.0319,147.5,-.030486231,.00401368)]:
+        a=(ax-gx)**2+.02**2+dx**2+dz**2
+        b=-2*(ax-gx)*dx-2*.02*dz
+        c=-2*(ax-gx)*dz+2*.02*dx
+        lo,hi=sorted(np.radians([offset+sign*low,offset+sign*high]))
+        critical=np.arctan2(c,b)+np.arange(-5,6)*np.pi
+        angles=np.r_[lo,hi,critical[(critical>lo)&(critical<hi)]]
+        squared=a+b*np.cos(angles)+c*np.sin(angles)
+        if np.min(squared)<=(.009+1e-6)**2 or np.max(squared)>=(.053-1e-6)**2:
+            raise ValueError('夹爪范围经过当前连杆模型的无解或奇异位置，请缩小 G 范围；舵机行程不等于夹爪机构行程')
 def pointer(a): return a.ctypes.data_as(PTR)
 
 class Robot:
@@ -38,11 +55,12 @@ class Robot:
     def apply_limits(self, limits):
         if limits is None:return
         value=np.asarray(limits,dtype=float)
-        if value.shape!=(6,2) or not np.isfinite(value).all() or np.any(value[:,0]>=value[:,1]):
+        if value.shape!=(6,2) or not np.isfinite(value).all() or np.any(value[:,0]>=value[:,1]) or np.any(np.abs(value)>180):
             raise ValueError('实机有效范围无效')
-        self.limits=np.column_stack((np.maximum(self.limits[:,0],np.radians(value[:,0])),
-                                    np.minimum(self.limits[:,1],np.radians(value[:,1]))))
-        if np.any(self.limits[:,0]>=self.limits[:,1]):raise ValueError('模型与实机范围没有交集')
+        validate_gripper_range(*value[5])
+        # The server supplies authoritative, already intersected runtime limits.
+        # Intersecting again with robot.json would silently restore the old cap.
+        self.limits=np.radians(value)
 
     def fk(self,q):
         q=np.ascontiguousarray(q,dtype=np.float64)

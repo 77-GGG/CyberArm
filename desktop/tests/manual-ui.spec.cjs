@@ -20,7 +20,7 @@ test('工作台菜单：手动实时控制、实机调试、自动运行及小�
   await expect(page.getByRole('dialog',{name:'实机调试'})).toContainText('未连接控制器');
   await expect(page.getByLabel('ESP32-S3 串口')).toBeVisible();
   await expect(page.getByRole('button',{name:'连接',exact:true})).toBeVisible();
-  for(const label of ['连接与安全','回中与限位','运动测试','通信','视觉'])await expect(page.getByRole('tab',{name:label,exact:true})).toBeVisible();
+  for(const label of ['连接与安全','单轴标定','运动测试','通信','视觉'])await expect(page.getByRole('tab',{name:label,exact:true})).toBeVisible();
   expect(await page.evaluate(()=>fetch('/api/hardware/ports').then(async r=>({status:r.status,data:await r.json()})))).toMatchObject({status:200,data:{ports:expect.any(Array)}});
   await page.screenshot({path:path.join(output,'hardware-panel.png')});
   await page.getByRole('button',{name:'关闭面板'}).click();

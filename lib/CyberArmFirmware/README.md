@@ -10,4 +10,10 @@ ESP32-S3 上位机通信固件的应用层库。入口文件只负责调用库�
 
 0.3.0 增加独立单轴测试租约、多点角度映射与 ARMING 过渡互斥。旧三脉宽标定不自动认证为实测映射。
 
+0.4.0 增加可编辑模型软限位，能力字段 `capabilities.editable_limits=1`。`model_limits_deg` 和 `limits_revisions` 回报六轴设备参数。`FirmwareConfig.h` 的范围仅作为 NVS 尚无有效配置时的默认值。
+
+`save_limits` 参数：`axis`（0–5）、`low_deg`、`high_deg`、`expected_revision`、`confirmed:true`、`model_id`、`wiring_hash`。仅 DISARMED 且输出关闭时可保存，要求 −180 ≤ low < 0 < high ≤ 180。每轴以单个 NVS blob 保存，绑定模型及接线摘要，递增版本并读回核对；无效值、版本冲突或存储失败拒绝。模型软限位不会替代实测工作限位，arm/target/trajectory 均使用运行时范围。
+
+操作与零位参考见 [单轴调试操作手册](../../docs/单轴调试操作手册_20260918.md)。软件可以编辑范围，但不能检测舵机物理端点或回传三线舵机真实位置。
+
 接线配置唯一入口为 [config/wiring.json](../../config/wiring.json)，PlatformIO 编译前校验并生成 WiringConfig.h。使用流程及兼容性见 [单轴标定与 JSON 接线说明](../../docs/单轴标定与JSON接线使用说明_20260917.md)。

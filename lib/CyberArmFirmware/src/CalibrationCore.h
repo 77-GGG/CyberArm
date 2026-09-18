@@ -6,6 +6,15 @@
 namespace cyberarm { namespace firmware {
 constexpr unsigned kMappingPoints = 7;
 struct CalibrationPoint { float deg = 0; float us = 0; };
+struct JointLimits {
+  uint32_t schema=1, revision=0;
+  float low=0, high=0;
+  char wiringHash[17]={}, modelId[24]={};
+};
+inline bool validLimits(const JointLimits& limits) {
+  return limits.schema==1 && std::isfinite(limits.low) && std::isfinite(limits.high) &&
+      limits.low>=-180 && limits.low<0 && limits.high>0 && limits.high<=180;
+}
 struct JointMapping {
   uint32_t schema = 1;
   uint32_t revision = 0;

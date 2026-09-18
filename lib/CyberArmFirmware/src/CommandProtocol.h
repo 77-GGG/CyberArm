@@ -21,7 +21,7 @@ class CommandProtocol {
   uint32_t lastContactMs() const { return lastContactMs_; }
 
  private:
-  static bool readJointArray(JsonVariantConst value,
+  bool readJointArray(JsonVariantConst value,
                              float output[kAxisCount]);
   void handleCommand(const char* line);
   void addState(JsonObject state) const;

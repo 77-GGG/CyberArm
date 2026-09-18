@@ -15,8 +15,9 @@ constexpr uint32_t kWatchdogMs = 1500;
 // Arm ramp: how long the six outputs take to travel from the last commanded
 // pose to the requested pose when the controller is enabled. Must stay > 0.
 constexpr uint32_t kArmRampMs = 600;
-constexpr char kFirmwareVersion[] = "0.3.0";
+constexpr char kFirmwareVersion[] = "0.4.0";
 constexpr char kModelId[] = "revc-sim-1";
+// Factory defaults only. Device-bound NVS limits can be edited from the host.
 constexpr float kMinDeg[kAxisCount] = {-30, -30, -30, -30, -30, -8};
 constexpr float kMaxDeg[kAxisCount] = {30, 30, 30, 30, 30, 8};
 constexpr float kMaxAccelerationDegS2[kAxisCount] = {50, 40, 50, 70, 70, 24};

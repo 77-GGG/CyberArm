@@ -67,6 +67,13 @@ void ServoSubsystem::disableAll() {
 
 void ServoSubsystem::loadCalibrations() {
   for (uint8_t axis=0; axis<kAxisCount; ++axis) {
+    limits_[axis].low=kMinDeg[axis];limits_[axis].high=kMaxDeg[axis];
+    char limitKey[12];snprintf(limitKey,sizeof(limitKey),"limit%u",axis);
+    JointLimits savedLimits{};
+    if(preferences_.getBytesLength(limitKey)==sizeof(savedLimits) &&
+       preferences_.getBytes(limitKey,&savedLimits,sizeof(savedLimits))==sizeof(savedLimits) &&
+       validLimits(savedLimits) && !strncmp(savedLimits.wiringHash,wiring::kHash,sizeof(savedLimits.wiringHash)) &&
+       !strncmp(savedLimits.modelId,kModelId,sizeof(savedLimits.modelId))) limits_[axis]=savedLimits;
     char key[12]; snprintf(key,sizeof(key),"map%u",axis);
     JointMapping candidate{};
     if (preferences_.getBytesLength(key)==sizeof(candidate) &&
@@ -93,12 +100,25 @@ bool ServoSubsystem::testPulse(uint8_t axis,float us) {
   outputsEnabled_=true;return true;
 }
 bool ServoSubsystem::anglePulse(uint8_t axis,float q,float& pulse) const {
-  return axis<kAxisCount && mapAngle(mappings_[axis],q,pulse);
+  return axis<kAxisCount && q>=limits_[axis].low && q<=limits_[axis].high && mapAngle(mappings_[axis],q,pulse);
 }
 bool ServoSubsystem::validTarget(const float q[kAxisCount]) const {
   float pulse;
   for(uint8_t i=0;i<kAxisCount;++i) if(!anglePulse(i,q[i],pulse)) return false;
   return true;
+}
+bool ServoSubsystem::saveLimits(uint8_t axis,JointLimits candidate) {
+  if(axis>=kAxisCount || outputsEnabled_ || !validLimits(candidate)) return false;
+  candidate.revision=limits_[axis].revision+1;
+  snprintf(candidate.modelId,sizeof(candidate.modelId),"%s",kModelId);
+  snprintf(candidate.wiringHash,sizeof(candidate.wiringHash),"%s",wiring::kHash);
+  char key[12];snprintf(key,sizeof(key),"limit%u",axis);
+  if(preferences_.putBytes(key,&candidate,sizeof(candidate))!=sizeof(candidate)) return false;
+  JointLimits check{};
+  if(preferences_.getBytes(key,&check,sizeof(check))!=sizeof(check) || memcmp(&check,&candidate,sizeof(check))) {
+    driverReady_=false;return false;
+  }
+  limits_[axis]=candidate;return true;
 }
 bool ServoSubsystem::saveMapping(uint8_t axis,JointMapping candidate) {
   if(axis>=kAxisCount || outputsEnabled_ || !validMapping(candidate)) return false;

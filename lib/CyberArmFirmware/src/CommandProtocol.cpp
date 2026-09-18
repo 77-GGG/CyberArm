@@ -33,8 +33,8 @@ bool CommandProtocol::readJointArray(JsonVariantConst value,
   for (uint8_t i = 0; i < kAxisCount; ++i) {
     if (!array[i].is<float>() && !array[i].is<int>()) return false;
     const float angle = array[i].as<float>();
-    if (!isfinite(angle) || angle < kMinDeg[i] - 0.001F ||
-        angle > kMaxDeg[i] + 0.001F) {
+    if (!isfinite(angle) || angle < servos_.limits(i).low - 0.001F ||
+        angle > servos_.limits(i).high + 0.001F) {
       return false;
     }
     output[i] = angle;
@@ -167,6 +167,17 @@ void CommandProtocol::tick(uint32_t now) {
 }
 
 bool CommandProtocol::debugCommand(const char* command,JsonDocument& r,uint32_t id) {
+  if(!strcmp(command,"save_limits")) {
+    const int axis=r["axis"] | -1;
+    JointLimits limits{};limits.low=r["low_deg"] | NAN;limits.high=r["high_deg"] | NAN;
+    if(axis<0 || axis>=kAxisCount || motion_.mode()!=MotionMode::kDisarmed || test_.active ||
+       strcmp(r["wiring_hash"] | "",wiring::kHash) || strcmp(r["model_id"] | "",kModelId) ||
+       (r["expected_revision"] | UINT32_MAX)!=servos_.limits(axis).revision ||
+       !r["confirmed"].is<bool>() || !r["confirmed"].as<bool>() || !servos_.saveLimits(axis,limits))
+      reply(id,false,"invalid limits, output active, stale revision or save failed");
+    else reply(id,true);
+    return true;
+  }
   if(!strcmp(command,"save_mapping")) {
     const int axis=r["axis"] | -1;
     JointMapping m{};
@@ -221,6 +232,13 @@ bool CommandProtocol::debugCommand(const char* command,JsonDocument& r,uint32_t 
 void CommandProtocol::addState(JsonObject state) const {
   state["firmware_version"] = kFirmwareVersion;
   state["capabilities"]["axis_calibration"] = 1;
+  state["capabilities"]["editable_limits"] = 1;
+  JsonArray limits=state["model_limits_deg"].to<JsonArray>();
+  JsonArray revisions=state["limits_revisions"].to<JsonArray>();
+  for(uint8_t i=0;i<kAxisCount;++i) {
+    JsonArray row=limits.add<JsonArray>();row.add(servos_.limits(i).low);row.add(servos_.limits(i).high);
+    revisions.add(servos_.limits(i).revision);
+  }
   char deviceId[17];snprintf(deviceId,sizeof(deviceId),"%016llx",static_cast<unsigned long long>(ESP.getEfuseMac()));
   state["device_id"] = deviceId;
   state["wiring_hash"] = wiring::kHash;
@@ -237,7 +255,7 @@ void CommandProtocol::addState(JsonObject state) const {
   for(uint8_t i=0;i<kAxisCount;++i) {
     const auto& m=servos_.mapping(i);JsonObject row=mappings.add<JsonObject>();
     row["revision"]=m.revision;row["confirmed"]=validMapping(m);
-    row["low_deg"]=max(kMinDeg[i],m.low);row["high_deg"]=min(kMaxDeg[i],m.high);
+    row["low_deg"]=max(servos_.limits(i).low,m.low);row["high_deg"]=min(servos_.limits(i).high,m.high);
     row["work_low_deg"]=m.low;row["work_high_deg"]=m.high;
     JsonArray points=row["points"].to<JsonArray>();
     for(unsigned j=0;j<m.count;++j) { JsonObject p=points.add<JsonObject>();p["deg"]=m.points[j].deg;p["us"]=m.points[j].us; }

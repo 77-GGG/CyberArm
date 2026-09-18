@@ -5,7 +5,7 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {TransformControls} from 'three/addons/controls/TransformControls.js';
 import {api} from './api';
 import type {State,Model,Plan} from './types';
-export function SceneView({state,model,plan,points,drag,target,onTarget,onDragging,trialStatus,view,onLoad}:{state:State;model:Model;plan:Plan|null;points:number[][];drag:boolean;target:number[];onTarget:(p:number[])=>void;onDragging:(v:boolean)=>void;trialStatus:string;view:string;onLoad:(message:string)=>void}){
+export function SceneView({state,model,plan,points,drag,target,onTarget,onDragging,trialStatus,view,onLoad,referenceAxis}:{state:State;model:Model;plan:Plan|null;points:number[][];drag:boolean;target:number[];onTarget:(p:number[])=>void;onDragging:(v:boolean)=>void;trialStatus:string;view:string;onLoad:(message:string)=>void;referenceAxis?:{origin:number[];direction:number[]}}){
  const host=useRef<HTMLDivElement>(null);const live=useRef({state,plan,points,drag,target,onTarget,onDragging,trialStatus});live.current={state,plan,points,drag,target,onTarget,onDragging,trialStatus};
  const system=useRef<{camera:THREE.PerspectiveCamera;controls:OrbitControls}|null>(null);
  useEffect(()=>{
@@ -19,6 +19,12 @@ export function SceneView({state,model,plan,points,drag,target,onTarget,onDraggi
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(4,4),new THREE.MeshStandardMaterial({color:'#e4e9ef',roughness:.95}));ground.position.z=floor;ground.receiveShadow=true;scene.add(ground);
   const grid=new THREE.GridHelper(2,80,'#bac6d3','#d2dbe4');grid.rotation.x=Math.PI/2;grid.position.z=floor+.0001;scene.add(grid);
   const baseAxes=new THREE.AxesHelper(.065);baseAxes.position.z=floor+.001;scene.add(baseAxes);
+  if(referenceAxis){
+   const arrow=new THREE.ArrowHelper(new THREE.Vector3(...referenceAxis.direction as [number,number,number]).normalize(),new THREE.Vector3(...referenceAxis.origin as [number,number,number]),.075,0x2563eb,.015,.009);
+   // Reference axes must remain visible even when the shaft is inside a housing.
+   arrow.traverse(o=>{if(o instanceof THREE.Line||o instanceof THREE.Mesh){o.renderOrder=100;const materials=Array.isArray(o.material)?o.material:[o.material];materials.forEach(m=>{m.depthTest=false;m.depthWrite=false;});}});
+   scene.add(arrow);
+  }
   let robot:THREE.Group|undefined,ghost:THREE.Group|undefined;let disposed=false;
   const loader=new GLTFLoader();loader.load('/models/robot.glb',g=>{
    if(disposed)return;robot=g.scene;robot.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}if(typeof o.userData.frame_index==='number')o.matrixAutoUpdate=false;});scene.add(robot);

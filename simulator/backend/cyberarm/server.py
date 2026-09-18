@@ -162,6 +162,8 @@ def effective_limits():
     state=hardware.snapshot() if hardware else {}
     if state.get('armed') and hasattr(hardware,'effective_limits'):
         return hardware.effective_limits()
+    if state.get('connected') and hasattr(hardware,'model_limits'):
+        return hardware.model_limits()
     return c.r.data['limits_deg']
 
 def guard_debug():
@@ -172,7 +174,7 @@ def guard_debug():
 def configuration_key():
     state=hardware.snapshot() if hardware else {}
     return (state.get('device_id'),state.get('wiring_hash'),state.get('armed'),
-            tuple(m.get('revision') for m in state.get('mappings',[])))
+            tuple(m.get('revision') for m in state.get('mappings',[])),tuple(state.get('limits_revisions',[])))
 
 async def pause_hardware(reason):
     state=hardware.snapshot() if hardware else {}
@@ -301,7 +303,8 @@ async def command(body:CommandRequest,request:Request):return await run_command(
 @app.post('/api/pose')
 async def pose(body:Pose):
     q=np.radians(body.q_deg)
-    if not c.r.within(q):raise HTTPException(422,'姿态超出模拟限制')
+    limits=np.radians(effective_limits())
+    if np.any(q<limits[:,0]) or np.any(q>limits[:,1]):raise HTTPException(422,'姿态超出模拟限制')
     matrices,tcp=c.r.transforms(q)
     return {'matrices':matrices,'tcp':tcp}
 @app.post('/api/validate-project')

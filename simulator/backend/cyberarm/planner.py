@@ -60,8 +60,8 @@ def collision_arrays():
     with np.load(ROOT/"assets/revc/collision.npz",allow_pickle=False) as data:
         return {key:np.ascontiguousarray(data[key]) for key in data.files}
 
-@lru_cache(maxsize=1)
-def gripper_sweep_radii():
+@lru_cache(maxsize=16)
+def gripper_sweep_radii(low=-8.0, high=8.0):
     """Per-mesh travel per radian of the gripper joint, measured not assumed.
 
     The jaws, links and gears of the gripper form a closed chain which the
@@ -76,7 +76,11 @@ def gripper_sweep_radii():
     larger here, and a narrow phase query is billed per millimetre of ceiling.
     """
     robot=Robot()
-    positions=np.linspace(robot.limits[5,0],robot.limits[5,1],GRIPPER_SWEEP_SAMPLES)
+    from .model import validate_gripper_range
+    validate_gripper_range(low,high)
+    # Preserve at least the original 0.125-degree sampling resolution when widened.
+    count=max(GRIPPER_SWEEP_SAMPLES,int(np.ceil((high-low)/.125))+1)
+    positions=np.linspace(np.radians(low),np.radians(high),count)
     frames=np.stack([robot.fk(np.r_[np.zeros(5),angle])[0] for angle in positions])
     step=float(positions[1]-positions[0])
     meshes=robot.data['meshes']
@@ -152,7 +156,7 @@ class Geometry:
         # Every joint except the gripper joint uses the generic estimate; the
         # gripper joint carries the closed chain, whose speed is measured, and
         # a pair whose two bodies both move with it is padded with both.
-        gripper=gripper_sweep_radii()
+        gripper=gripper_sweep_radii(*np.degrees(robot.limits[5]))
         self.sweep=self.relative*SWEEP_PER_RADIAN
         self.sweep[:,5]=gripper[self.pi]+gripper[self.pj]
         self.floor_sweep=self.floor_influence*SWEEP_PER_RADIAN

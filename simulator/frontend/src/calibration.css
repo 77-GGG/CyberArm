@@ -1,0 +1,70 @@
+.calibration-workbench { color:#40566f; font-size:12px; }
+.calibration-workbench p { line-height:1.7; }
+.calibration-toolbar { position:sticky; top:0; z-index:3; padding:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; border:1px solid #d5dfed; border-radius:8px; background:#f5f8fc; box-shadow:0 3px 8px #24426b0a; }
+.calibration-toolbar label { display:flex; gap:6px; align-items:center; margin-right:auto; }
+.calibration-toolbar button { font-size:12px; background:#fff; border:1px solid #d5dfed; }
+.output-on,.output-off { font-size:11px; border-radius:5px; padding:5px 7px; background:#edf1f5; color:#64768c; }
+.output-on { background:#fff3df; color:#8e611c; }
+.calibration-steps { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:4px; margin:14px 0; }
+.calibration-steps button { flex-direction:column; gap:6px; min-width:0; padding:10px 3px; font-size:12px; border-radius:7px; background:#f5f7fa; }
+.calibration-steps button>span { display:grid; place-items:center; width:22px; height:22px; border:1px solid #cdd7e5; border-radius:50%; font-variant-numeric:tabular-nums; }
+.calibration-steps .selected { background:#eaf1ff; color:#205dda; font-weight:600; }
+.calibration-steps .selected>span { background:#2563eb; border-color:#2563eb; color:#fff; }
+.calibration-notices:empty { display:none; }
+.calibration-notices [role=status] { padding:10px 12px; margin:10px 0; background:#edf8f3; border:1px solid #d2eadd; border-radius:7px; color:#33735e; }
+.calibration-stage { padding:16px; border:1px solid #dce4ee; background:#fff; border-radius:8px; }
+.calibration-stage>header { padding-bottom:12px; margin-bottom:14px; border-bottom:1px solid #e7edf4; }
+.calibration-stage>header>span { color:#7d90a8; font-size:11px; }
+.calibration-stage>header h3 { margin:5px 0 8px; font-size:17px; color:#253d5b; }
+.calibration-stage>header p { color:#647991; }
+.calibration-workbench fieldset { border:1px solid #dce3ed; border-radius:7px; padding:12px; margin:12px 0; min-width:0; }
+.calibration-workbench legend { padding:0 5px; }
+.calibration-workbench fieldset p { margin-top:10px; }
+.calibration-workbench input,.calibration-workbench select { max-width:100%; border:1px solid #ced8e6; border-radius:5px; padding:6px; }
+.calibration-workbench .pulse-fields { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.calibration-measure .pulse-fields { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.calibration-workbench .pulse-fields select { display:block; width:100%; height:33px; margin-top:5px; }
+.calibration-start,.calibration-task,.calibration-measure,.calibration-save { padding:12px; margin:14px 0; border-radius:7px; background:#f7f9fc; border:1px solid #e2e8f0; }
+.calibration-workbench .check { display:flex; align-items:flex-start; gap:8px; line-height:1.7; }
+.calibration-workbench .check input { flex-shrink:0; margin-top:3px; }
+.calibration-start>button,.calibration-task>button,.calibration-measure>button,.calibration-save>button { margin:10px 0 4px; }
+.calibration-live { display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:8px; padding:12px; background:#f2f6fc; border-radius:7px; }
+.calibration-live>div,.calibration-facts>div { display:flex; flex-direction:column; gap:7px; }
+.calibration-live span,.calibration-facts span { color:#788ba0; font-size:11px; }
+.calibration-live b { font-size:18px; color:#315e99; font-variant-numeric:tabular-nums; }
+.calibration-live small { font-size:11px; font-weight:400; }
+.calibration-motion-state { color:#71869f; margin:7px 0; }
+.calibration-jog { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin:12px 0; }
+.calibration-jog button { border:1px solid #c9d9ee; background:#f5f9ff; color:#245fb2; min-height:40px; }
+.calibration-workbench .hint { margin:9px 0; font-size:12px; }
+.calibration-workbench table { width:100%; border-collapse:collapse; margin:8px 0; }
+.calibration-workbench th,.calibration-workbench td { text-align:left; padding:8px 6px; border-bottom:1px solid #e4e9f0; }
+.calibration-workbench th { color:#7a8da3; font-weight:500; font-size:11px; background:#f8fafc; }
+.calibration-workbench td { font-variant-numeric:tabular-nums; }
+.calibration-workbench td button { min-height:27px; padding:3px 7px; }
+.calibration-check { color:#8c6533; padding:10px 12px; background:#fff9ed; border:1px solid #eee0c4; border-radius:6px; margin:12px 0; line-height:1.8; }
+ul.calibration-check { padding-left:29px; }
+.calibration-facts { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.calibration-ranges { margin:14px 0; border:1px solid #dfe6ef; border-radius:6px; overflow:hidden; }
+.calibration-ranges>div { display:flex; justify-content:space-between; gap:10px; padding:10px 12px; border-bottom:1px solid #edf1f6; }
+.calibration-ranges .effective { background:#edf4ff; color:#235ba8; border:0; }
+.calibration-save ol { padding-left:20px; line-height:1.9; margin:0 0 10px; }
+.calibration-navigation { display:flex; align-items:center; gap:8px; border-top:1px solid #e4eaf2; padding-top:14px; margin-top:16px; }
+.calibration-navigation>span { flex:1; font-size:11px; line-height:1.6; color:#7b8b9f; }
+.calibration-navigation button { border:1px solid #d9e3f0; font-size:12px; }
+.calibration-help,.calibration-records { margin-top:12px; padding:12px; border:1px solid #e0e6ef; border-radius:7px; background:#fafbfd; }
+.calibration-workbench summary { cursor:pointer; color:#526f93; padding:4px 0; }
+.calibration-help ol { padding-left:20px; line-height:1.9; }
+.calibration-workbench pre { max-height:220px; overflow:auto; white-space:pre-wrap; background:#f1f4f8; padding:10px; }
+.calibration-workbench .hardware-actions { flex-wrap:wrap; align-items:end; }
+.calibration-workbench .hardware-actions label { flex:1; }
+.calibration-workbench .hardware-actions label>input { display:block; width:100%; margin-top:5px; }
+.calibration-import { display:flex; flex-direction:column; gap:6px; margin:12px 0; }
+.calibration-import input { width:100%; }
+.calibration-limit-editor,.zero-reference { padding:12px; margin:14px 0; border:1px solid #dce5f1; border-radius:7px; background:#f8faff; }
+.calibration-limit-editor p,.zero-reference p { margin:8px 0; }
+.calibration-limit-editor .check { margin-top:12px; }
+.zero-reference-scene { height:270px; position:relative; overflow:hidden; border:1px solid #dbe4ef; border-radius:6px; }
+.zero-reference-scene .viewport { inset:0; }
+.zero-reference-controls { display:flex; gap:6px; margin:10px 0; flex-wrap:wrap; }
+.zero-reference-controls .selected { background:#e5eeff; color:#235bc0; }

@@ -18,6 +18,8 @@ class ServoSubsystem {
   const AxisCalibration* calibrations() const { return calibrations_; }
   const JointMapping& mapping(uint8_t axis) const { return mappings_[axis]; }
   bool saveMapping(uint8_t axis, JointMapping candidate);
+  const JointLimits& limits(uint8_t axis) const { return limits_[axis]; }
+  bool saveLimits(uint8_t axis, JointLimits candidate);
   bool validTarget(const float q[kAxisCount]) const;
   bool anglePulse(uint8_t axis, float q, float& pulse) const;
   bool testPulse(uint8_t axis, float us);
@@ -38,6 +40,7 @@ class ServoSubsystem {
   Preferences preferences_;
   AxisCalibration calibrations_[kAxisCount];
   JointMapping mappings_[kAxisCount];
+  JointLimits limits_[kAxisCount];
   float tickUs_ = 4.88f;
   bool outputsEnabled_ = false;
   bool driverReady_ = false;

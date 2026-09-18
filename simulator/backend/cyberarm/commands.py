@@ -260,7 +260,7 @@ async def dispatch(name, args, request):
                 'direction': [tcp[i][2] for i in range(3)], 'frame': 'base', 'state_source': 'simulation'}
     if name == 'limits':
         calibrated=(s.hardware.snapshot().get('calibrated') if s.hardware else [False]*6)
-        return {'limits_deg': s.c.r.data['limits_deg'], 'calibrated': calibrated,
+        return {'limits_deg': s.effective_limits(), 'calibrated': calibrated,
                 'all_calibrated': all(calibrated)}
     if name == 'events':
         return list(s.c.events)
