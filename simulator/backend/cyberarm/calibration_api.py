@@ -137,7 +137,7 @@ async def test(body:TestCommand,request:Request):
 async def records():
     s=server()
     try:
-        state=s.hardware.snapshot();result=s.calibration_store.read(state)
+        state=s.hardware.snapshot();result=await asyncio.to_thread(s.calibration_store.read,state)
         result['current_mappings']=state.get('mappings',[])
         result['backup_matches']=result.get('saved_mappings')==result['current_mappings']
         return result
@@ -167,8 +167,8 @@ async def save_limits(body:Limits):
                 raise ValueError('软限位读回不一致，已断开连接，请重新核对设备')
             warning=''
             try:
-                data=s.calibration_store.read(state);data['model_limits_deg']=state['model_limits_deg'];data['limits_revisions']=state['limits_revisions']
-                data['saved_mappings']=state['mappings'];s.calibration_store.write(state,data)
+                data=await asyncio.to_thread(s.calibration_store.read,state);data['model_limits_deg']=state['model_limits_deg'];data['limits_revisions']=state['limits_revisions']
+                data['saved_mappings']=state['mappings'];await asyncio.to_thread(s.calibration_store.write,state,data)
             except (OSError,ValueError,json.JSONDecodeError) as exc:warning='设备已保存，但电脑备份失败：'+str(exc)
             return {'state':state,'warning':warning}
         except (ValueError,KeyError,HardwareError) as exc:raise HTTPException(422,str(exc))
@@ -180,8 +180,8 @@ async def draft(body:Draft):
     if len(json.dumps(body.data,ensure_ascii=False,allow_nan=False))>64000:raise HTTPException(422,'单轴记录过长')
     async with s.calibration_lock:
         try:
-            state=s.hardware.snapshot();data=s.calibration_store.read(state)
-            data['axes'][str(body.axis)]=body.data;s.calibration_store.write(state,data)
+            state=s.hardware.snapshot();data=await asyncio.to_thread(s.calibration_store.read,state)
+            data['axes'][str(body.axis)]=body.data;await asyncio.to_thread(s.calibration_store.write,state,data)
             return {'ok':True}
         except (ValueError,OSError) as exc:raise HTTPException(422,str(exc))
 
@@ -205,8 +205,8 @@ async def save(body:Mapping):
             def close(a,b):return abs(a-b)<.001
             if not actual['confirmed'] or actual['revision']!=body.expected_revision+1 or not close(actual['work_low_deg'],m['low_deg']) or not close(actual['work_high_deg'],m['high_deg']) or len(actual['points'])!=len(m['points']) or any(not close(a[k],b[k]) for a,b in zip(actual['points'],m['points']) for k in ('deg','us')):
                 raise ValueError('固件标定读回不一致，禁止使能并请重新连接')
-            data=s.calibration_store.read(state);data['saved_mappings']=state['mappings']
-            try:s.calibration_store.write(state,data)
+            data=await asyncio.to_thread(s.calibration_store.read,state);data['saved_mappings']=state['mappings']
+            try:await asyncio.to_thread(s.calibration_store.write,state,data)
             except OSError as exc:
                 return {'state':state,'warning':'固件已保存，但电脑备份失败：'+str(exc)}
             return {'state':state,'warning':''}

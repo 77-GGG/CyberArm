@@ -54,8 +54,12 @@ void CommandProtocol::handleCommand(const char* line) {
   const char* command = request["command"] | "";
   lastContactMs_ = millis();
 
-  if (!strcmp(command, "hello") || !strcmp(command, "heartbeat")) {
+  if (!strcmp(command, "hello")) {
     reply(id, true);
+    return;
+  }
+  if (!strcmp(command, "heartbeat")) {
+    replyRuntime(id, true);
     return;
   }
   if (!strcmp(command, "disarm")) {
@@ -225,8 +229,26 @@ bool CommandProtocol::debugCommand(const char* command,JsonDocument& r,uint32_t 
     test_.target=pulse;
   } else if(!strcmp(command,"test_hold")) test_.hold();
   else if(!strcmp(command,"test_end")) { test_.active=false;motion_.disarm(); }
-  else if(strcmp(command,"test_renew")) { reply(id,false,"unknown test command");return true; }
+  else if(!strcmp(command,"test_renew")) { test_.renewed=now;replyRuntime(id,true);return true; }
+  else { reply(id,false,"unknown test command");return true; }
   test_.renewed=now;reply(id,true);return true;
+}
+
+void CommandProtocol::addRuntimeState(JsonObject state) const {
+  state["motion_busy"] = motion_.manualMoving();
+  JsonObject test=state["test"].to<JsonObject>();
+  test["active"]=test_.active;test["axis"]=test_.active ? test_.axis+1 : 0;
+  test["pulse_us"]=test_.pulse;test["target_us"]=test_.target;
+  test["ticks"]=servos_.pulseTicks(test_.pulse);
+  test["nominal_us"]=servos_.pulseTicks(test_.pulse)*servos_.tickUs();
+  test["moving"]=test_.active && fabsf(test_.pulse-test_.target)>.01f;
+  state["armed"] = motion_.isArmed();
+  state["outputs_enabled"] = servos_.outputsEnabled();
+  state["mode"] = motion_.modeName();
+  JsonArray q = state["commanded_q_deg"].to<JsonArray>();
+  for (uint8_t axis = 0; axis < kAxisCount; ++axis) {
+    q.add(motion_.commandedDeg()[axis]);
+  }
 }
 
 void CommandProtocol::addState(JsonObject state) const {
@@ -244,13 +266,7 @@ void CommandProtocol::addState(JsonObject state) const {
   state["wiring_hash"] = wiring::kHash;
   JsonDocument wiringDoc;deserializeJson(wiringDoc,wiring::kJson);state["wiring"]=wiringDoc;
   state["tick_us"] = servos_.tickUs();
-  state["motion_busy"] = motion_.manualMoving();
-  JsonObject test=state["test"].to<JsonObject>();
-  test["active"]=test_.active;test["axis"]=test_.active ? test_.axis+1 : 0;
-  test["pulse_us"]=test_.pulse;test["target_us"]=test_.target;
-  test["ticks"]=servos_.pulseTicks(test_.pulse);
-  test["nominal_us"]=servos_.pulseTicks(test_.pulse)*servos_.tickUs();
-  test["moving"]=test_.active && fabsf(test_.pulse-test_.target)>.01f;
+  addRuntimeState(state);
   JsonArray mappings=state["mappings"].to<JsonArray>();
   for(uint8_t i=0;i<kAxisCount;++i) {
     const auto& m=servos_.mapping(i);JsonObject row=mappings.add<JsonObject>();
@@ -263,15 +279,8 @@ void CommandProtocol::addState(JsonObject state) const {
 
   state["model_id"] = kModelId;
   state["driver_ready"] = servos_.driverReady();
-  state["armed"] = motion_.isArmed();
-  state["outputs_enabled"] = servos_.outputsEnabled();
-  state["mode"] = motion_.modeName();
   state["measured_feedback"] = false;
   state["measured_q_deg"] = nullptr;
-  JsonArray q = state["commanded_q_deg"].to<JsonArray>();
-  for (uint8_t axis = 0; axis < kAxisCount; ++axis) {
-    q.add(motion_.commandedDeg()[axis]);
-  }
   JsonArray calibrated = state["calibrated"].to<JsonArray>();
   JsonArray calibration = state["calibration"].to<JsonArray>();
   for (uint8_t axis = 0; axis < kAxisCount; ++axis) {
@@ -284,6 +293,18 @@ void CommandProtocol::addState(JsonObject state) const {
     row["reversed"] = item.reversed;
     row["confirmed"] = item.confirmed;
   }
+}
+
+void CommandProtocol::replyRuntime(uint32_t id, bool ok, const char* error) {
+  JsonDocument response;
+  response["protocol_version"] = 1;
+  response["reply_to"] = id;
+  response["ok"] = ok;
+  if (error) response["error"] = error;
+  JsonObject state = response["state"].to<JsonObject>();
+  addRuntimeState(state);
+  serializeJson(response, serial_);
+  serial_.write('\n');
 }
 
 void CommandProtocol::reply(uint32_t id, bool ok, const char* error) {

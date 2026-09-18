@@ -7,7 +7,10 @@ CyberArmFirmware::CyberArmFirmware()
     : motion_(servos_), protocol_(Serial, motion_, servos_) {}
 
 void CyberArmFirmware::begin() {
-  Serial.begin(921600);
+  // Size the receive queue before the port starts; the driver only honours
+  // setRxBufferSize() while the queue does not exist yet.
+  Serial.setRxBufferSize(kSerialRxBufferBytes);
+  Serial.begin(kSerialBaud);
   motion_.initialize(servos_.begin());
   protocol_.begin(millis());
   lastControlMs_ = millis();

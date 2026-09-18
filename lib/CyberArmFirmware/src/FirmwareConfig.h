@@ -12,10 +12,16 @@ constexpr uint8_t kAxisCount = 6;
 constexpr uint16_t kMaxSegments = 512;
 constexpr uint32_t kControlPeriodMs = 20;
 constexpr uint32_t kWatchdogMs = 1500;
+constexpr uint32_t kSerialBaud = 921600;
+// CommandProtocol accepts JSONL requests up to `inputLine_` bytes (2048). The
+// USB CDC receive queue defaults to 256 bytes and silently drops the overflow,
+// which truncated long requests such as save_mapping and left a half line in
+// the parser. Keep the queue comfortably above the protocol limit.
+constexpr size_t kSerialRxBufferBytes = 4096;
 // Arm ramp: how long the six outputs take to travel from the last commanded
 // pose to the requested pose when the controller is enabled. Must stay > 0.
 constexpr uint32_t kArmRampMs = 600;
-constexpr char kFirmwareVersion[] = "0.4.0";
+constexpr char kFirmwareVersion[] = "0.4.2";
 constexpr char kModelId[] = "revc-sim-1";
 // Factory defaults only. Device-bound NVS limits can be edited from the host.
 constexpr float kMinDeg[kAxisCount] = {-30, -30, -30, -30, -30, -8};

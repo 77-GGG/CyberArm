@@ -92,6 +92,41 @@ class FakeSerial:
         self.closed = True
 
 
+class DelayedHeartbeatSerial(FakeSerial):
+    """Drop selected heartbeat replies while keeping the fake port open."""
+
+    def __init__(self, dropped_heartbeats=1, **options):
+        super().__init__(**options)
+        self.dropped_heartbeats = dropped_heartbeats
+
+    def write(self, encoded):
+        command = json.loads(encoded)
+        if command['command'] == 'heartbeat' and self.dropped_heartbeats:
+            self.dropped_heartbeats -= 1
+            self.commands.append(command)
+            return len(encoded)
+        return super().write(encoded)
+
+
+def test_heartbeat_retries_one_transient_timeout_before_disconnect():
+    asyncio.run(_heartbeat_retries_one_transient_timeout_before_disconnect())
+
+
+async def _heartbeat_retries_one_transient_timeout_before_disconnect():
+    serial = DelayedHeartbeatSerial()
+    bridge = HardwareBridge('revc-sim-1', [[-30, 30]] * 5 + [[-8, 8]],
+                            serial_factory=lambda **_: serial)
+    await bridge.connect('COM42')
+    state = await bridge.heartbeat()
+    assert state['connected'] and not serial.closed
+    assert [item['command'] for item in serial.commands].count('heartbeat') == 2
+
+    serial.dropped_heartbeats = 2
+    with pytest.raises(HardwareError, match='heartbeat.*响应超时'):
+        await bridge.heartbeat()
+    assert serial.closed and not bridge.snapshot()['connected']
+
+
 def test_safe_connect_calibrate_center_arm_and_mirror_plan():
     asyncio.run(_safe_connect_calibrate_center_arm_and_mirror_plan())
 

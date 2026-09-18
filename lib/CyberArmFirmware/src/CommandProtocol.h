@@ -24,7 +24,9 @@ class CommandProtocol {
   bool readJointArray(JsonVariantConst value,
                              float output[kAxisCount]);
   void handleCommand(const char* line);
+  void addRuntimeState(JsonObject state) const;
   void addState(JsonObject state) const;
+  void replyRuntime(uint32_t id, bool ok, const char* error = nullptr);
   void reply(uint32_t id, bool ok, const char* error = nullptr);
   bool debugCommand(const char* command, JsonDocument& request, uint32_t id);
   AxisTest test_;

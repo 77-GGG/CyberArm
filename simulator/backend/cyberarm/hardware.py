@@ -28,6 +28,10 @@ class HardwareRejected(HardwareError):
     """The link is healthy but the firmware rejected this command."""
 
 
+class HardwareTimeout(HardwareError):
+    """A request timed out without proving that the serial link is gone."""
+
+
 def _serial_modules():
     try:
         import serial
@@ -172,7 +176,10 @@ class HardwareBridge:
             self._state['error'] = error
 
     async def heartbeat(self) -> dict[str, Any]:
-        response = await asyncio.to_thread(self._request_sync, 'heartbeat')
+        # A single delayed USB CDC response is not enough evidence to tear down
+        # the link. Correlation ids let a retry safely ignore a late first reply.
+        response = await asyncio.to_thread(
+            self._request_sync, 'heartbeat', transient_retries=1)
         self._merge_response(response)
         return self.snapshot()
 
@@ -294,28 +301,38 @@ class HardwareBridge:
             if value < limits[0] - 1e-6 or value > limits[1] + 1e-6:
                 raise HardwareError(f'J{index + 1} 角度 {value:g}° 超出模型限位 {limits}')
 
-    def _request_sync(self, command: str, **payload: Any) -> dict[str, Any]:
+    def _request_sync(self, command: str, *, transient_retries: int = 0,
+                      **payload: Any) -> dict[str, Any]:
         with self._lock:
             device = self._serial
         if device is None:
             raise HardwareError('ESP32-S3 未连接')
-        try:
-            response = self._request_on_device(device, command, **payload)
-            with self._lock:
-                self._state['last_seen'] = time.time()
-                self._state['error'] = ''
-            return response
-        except HardwareRejected as exc:
-            with self._lock:
-                self._state['last_seen'] = time.time()
-                self._state['error'] = str(exc)
-            raise
-        except Exception as exc:
-            message = str(exc)
-            self._disconnect_sync(message)
-            if isinstance(exc, HardwareError):
+        attempt = 0
+        while True:
+            try:
+                response = self._request_on_device(device, command, **payload)
+                with self._lock:
+                    self._state['last_seen'] = time.time()
+                    self._state['error'] = ''
+                return response
+            except HardwareRejected as exc:
+                with self._lock:
+                    self._state['last_seen'] = time.time()
+                    self._state['error'] = str(exc)
                 raise
-            raise HardwareError(f'ESP32-S3 通信失败：{message}') from exc
+            except HardwareTimeout as exc:
+                if attempt < transient_retries:
+                    attempt += 1
+                    continue
+                message = str(exc)
+                self._disconnect_sync(message)
+                raise
+            except Exception as exc:
+                message = str(exc)
+                self._disconnect_sync(message)
+                if isinstance(exc, HardwareError):
+                    raise
+                raise HardwareError(f'ESP32-S3 通信失败：{message}') from exc
 
     def _request_on_device(self, device: Any, command: str, **payload: Any) -> dict[str, Any]:
         with self._lock:
@@ -333,7 +350,7 @@ class HardwareBridge:
             for _ in range(8):
                 line = device.readline()
                 if not line:
-                    raise HardwareError(f'ESP32-S3 命令 {command} 响应超时')
+                    raise HardwareTimeout(f'ESP32-S3 命令 {command} 响应超时')
                 if len(line) > 16384:
                     raise HardwareError('ESP32-S3 响应过长')
                 try:
@@ -347,7 +364,7 @@ class HardwareBridge:
                 if not response.get('ok'):
                     raise HardwareRejected(str(response.get('error', 'ESP32-S3 拒绝命令')))
                 return response
-            raise HardwareError(f'ESP32-S3 命令 {command} 未收到匹配响应')
+            raise HardwareTimeout(f'ESP32-S3 命令 {command} 未收到匹配响应')
 
     def _merge_response(self, response: dict[str, Any]) -> None:
         remote = response.get('state', response)

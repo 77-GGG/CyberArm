@@ -196,7 +196,10 @@ async def ticker():
 async def hardware_heartbeat():
     global calibration_owner
     while True:
-        await asyncio.sleep(.4)
+        # The calibration lease already sends a request every 300 ms. Keep a
+        # slower independent heartbeat so an expired lease is still observed,
+        # without making both loops contend for USB CDC at nearly the same rate.
+        await asyncio.sleep(1.0 if calibration_owner else .4)
         before=hardware.snapshot()
         if not before.get('connected'):continue
         try:

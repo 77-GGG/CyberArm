@@ -56,7 +56,10 @@ int main(){
   assert(!command("\"command\":\"arm\",\"q_deg\":[0,0,0,0,0,0]")["ok"].as<bool>());
   assert(!command("\"command\":\"test_target\",\"test_session\":8,\"pulse_us\":1520")["ok"].as<bool>());
   assert(command("\"command\":\"test_target\",\"test_session\":7,\"pulse_us\":1520")["ok"].as<bool>());
-  fakeNow=800;command("\"command\":\"heartbeat\"");protocol.tick(fakeNow);
+  fakeNow=800;reply=command("\"command\":\"heartbeat\"");
+  assert(reply["ok"].as<bool>()&&reply["state"]["test"]["active"].as<bool>());
+  assert(reply["state"]["mappings"].isNull()&&serial.output.size()<512);
+  protocol.tick(fakeNow);
   fakeNow=1200;protocol.tick(fakeNow);assert(!reboot.outputsEnabled());
   assert(!command("\"command\":\"test_renew\",\"test_session\":7")["ok"].as<bool>());
   assert(command("\"command\":\"arm\",\"q_deg\":[3,0,0,0,0,0]")["ok"].as<bool>());
@@ -79,6 +82,16 @@ int main(){
   assert(!reboot.saveLimits(0,narrow)); // active outputs
   command("\"command\":\"disarm\"");
   assert(!command("\"command\":\"arm\",\"q_deg\":[85,0,0,0,0,0]")["ok"].as<bool>());
+  // save_mapping is the only command with a nested array. Exercise it through
+  // the protocol so the JSON path stays covered, not just saveMapping() itself.
+  auto mappingCommand=[&](int expected){return command(std::string("\"command\":\"save_mapping\",\"axis\":1,\"low_deg\":-10,\"high_deg\":10,\"confirmed\":true,\"expected_revision\":")+std::to_string(expected)+",\"model_id\":\"revc-sim-1\",\"wiring_hash\":\""+cyberarm::wiring::kHash+"\",\"points\":[{\"deg\":-10,\"us\":1400},{\"deg\":0,\"us\":1500},{\"deg\":10,\"us\":1620}]");};
+  const int mappingRevision=command("\"command\":\"hello\"")["state"]["mappings"][1]["revision"].as<int>();
+  reply=mappingCommand(mappingRevision);
+  assert(reply["ok"].as<bool>());
+  assert(reply["state"]["mappings"][1]["revision"].as<int>()==mappingRevision+1);
+  assert(reply["state"]["mappings"][1]["confirmed"].as<bool>());
+  assert(reply["state"]["mappings"][1]["points"].size()==3);
+  assert(!mappingCommand(mappingRevision)["ok"].as<bool>()); // stale revision
   ServoSubsystem limitsReboot;assert(limitsReboot.begin());
   assert(limitsReboot.limits(0).low==-75&&limitsReboot.limits(0).high==80&&limitsReboot.limits(0).revision==1);
   assert(limitsReboot.anglePulse(0,60,pulse)&&!limitsReboot.anglePulse(0,85,pulse));

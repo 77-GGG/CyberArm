@@ -1,0 +1,17 @@
+# Test-only dependencies, on top of requirements-build.txt.
+#
+#   uv venv simulator/.venv --python 3.12
+#   uv pip install --python simulator/.venv/bin/python -r desktop/requirements-build.txt
+#   uv pip install --python simulator/.venv/bin/python -r desktop/requirements-dev.txt
+#   PYTHONPATH=simulator/backend simulator/.venv/bin/python -m pytest simulator/tests -q
+#
+# PYTHONPATH is required: the tests import the `cyberarm` package, which lives in
+# simulator/backend and is not installed into the venv.
+#
+# httpx is used directly by simulator/sdk and simulator/tests/test_commands.py.
+# httpx2 is what starlette 1.6 testclient imports first; without it the client
+# falls back to httpx and emits a StarletteDeprecationWarning. Both are listed in
+# starlette's "full" extra, so keep httpx below 0.29.
+pytest==9.1.1
+httpx==0.28.1
+httpx2==2.13.0

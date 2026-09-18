@@ -1,4 +1,5 @@
 .pio
+.DS_Store
 .vscode/
 .codex
 __pycache__/
