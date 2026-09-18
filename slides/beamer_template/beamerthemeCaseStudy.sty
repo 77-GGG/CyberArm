@@ -27,7 +27,9 @@
   {\setsansfont{Latin Modern Sans}\setmainfont{Latin Modern Sans}}
 \IfFontExistsTF{Noto Sans CJK SC}
   {\setCJKsansfont{Noto Sans CJK SC}\setCJKmainfont{Noto Sans CJK SC}}
-  {\setCJKsansfont{FandolHei-Regular}\setCJKmainfont{FandolHei-Regular}}
+  {\IfFontExistsTF{PingFang SC}
+    {\setCJKsansfont{PingFang SC}\setCJKmainfont{PingFang SC}}
+    {\setCJKsansfont{FandolHei-Regular}\setCJKmainfont{FandolHei-Regular}}}
 \renewcommand{\familydefault}{\sfdefault}
 
 % -----------------------------------------------------------------------------
@@ -213,4 +215,3 @@
   \CaseImage{0.55cm}{4.15cm}{4.55cm}{#2}%
   \CaseImage{5.85cm}{4.15cm}{7.20cm}{#3}%
 }
-

@@ -1,0 +1,372 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage{../beamer_template/beamerthemeCaseStudy}
+\usepackage{amsmath,bm,array}
+\usetikzlibrary{positioning,arrows.meta}
+
+\graphicspath{{../renders/}{../pics/}{../../desktop/test-results/}}
+
+\newcommand{\Lead}[1]{%
+  {\fontsize{8.8}{11.0}\selectfont\color{CaseText}#1}%
+}
+\newcommand{\Body}[1]{%
+  {\fontsize{7.1}{9.3}\selectfont\color{CaseText}#1}%
+}
+\newcommand{\Small}[1]{%
+  {\fontsize{5.8}{7.4}\selectfont\color{CaseText}#1}%
+}
+\newcommand{\TinyGray}[1]{%
+  {\fontsize{5.0}{6.4}\selectfont\color{CaseGray}#1}%
+}
+\newcommand{\RedLabel}[1]{%
+  {\fontsize{6.0}{7.2}\selectfont\bfseries\color{CaseRed}#1}%
+}
+\newcommand{\Metric}[2]{%
+  {\fontsize{10.5}{12.0}\selectfont\color{CaseGray}#1}\hspace{0.12cm}%
+  {\fontsize{10.5}{12.0}\selectfont\color{CaseRed}\bfseries #2}%
+}
+\newcommand{\Num}[1]{%
+  \tikz[baseline=-0.55ex]\node[circle,fill=CaseRed,text=white,inner sep=1.7pt,
+    font=\fontsize{5.5}{6.0}\selectfont\bfseries]{#1};%
+}
+
+\begin{document}
+
+% -----------------------------------------------------------------------------
+% 01 COVER
+% -----------------------------------------------------------------------------
+\begin{frame}[plain]
+  \CasePlace{0.82cm}{0.70cm}{%
+    \begin{minipage}{5.2cm}
+      {\fontsize{23}{25}\selectfont\color{CaseRed}CyberArm\par}
+      \vspace{0.18cm}
+      {\fontsize{11.0}{13.5}\selectfont\color{CaseText}
+       桌面机械臂的建模、规划与实机控制\par}
+    \end{minipage}}
+  \CaseImage{6.25cm}{1.05cm}{9.35cm}{CyberArm_RevL_front.png}
+  \CasePlace{0.86cm}{6.75cm}{%
+    \begin{minipage}{4.7cm}
+      {\fontsize{7.0}{8.8}\selectfont
+       清华大学电子系第 29 届硬件设计大赛\par
+       \vspace{0.15cm}
+       马 +7 队\par
+       祁果 \quad 许宇旋\par
+       \vspace{0.12cm}
+       2026.09}
+    \end{minipage}}
+  \CaseNote{11.55cm}{8.16cm}{3.9cm}{RevL final mechanical CAD}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% 02 GOAL AND PROTOTYPE
+% -----------------------------------------------------------------------------
+\begin{caseframe}{项目目标与当前样机}{CyberArm}{ Hardware Prototype}
+  \CasePlace{0.55cm}{1.22cm}{%
+    \begin{minipage}{4.55cm}
+      \Lead{在接通实物之前验证动作，接通实物之后完成安全标定与同步控制。}
+      \vspace{0.48cm}
+
+      \RedLabel{机械本体}\par
+      \vspace{0.08cm}
+      \Body{五个运动关节与一路夹爪\par
+      3 × MG996R，3 × MG90S\par
+      RevL 3D 打印结构}
+
+      \vspace{0.42cm}
+      \RedLabel{控制系统}\par
+      \vspace{0.08cm}
+      \Body{ESP32-S3 管理状态与轨迹执行\par
+      PCA9685 统一输出六路 PWM\par
+      CyberArm Studio 负责模型与规划}
+    \end{minipage}}
+  \CaseImage{5.62cm}{1.28cm}{9.80cm}{0b8ecd9638317f569a953c7d0b11c092.jpg}
+  \CaseKeyword{0.55cm}{7.55cm}{SIMULATION / CALIBRATION / CONTROL}
+  \CaseNote{5.62cm}{8.68cm}{9.2cm}{实体样机、控制板与上位机联调现场}
+\end{caseframe}
+
+% -----------------------------------------------------------------------------
+% 03 MECHANICAL EVOLUTION
+% -----------------------------------------------------------------------------
+\begin{caseframe}{机械结构与方案演化}{RevL}{ Five-axis + Gripper}
+  \CasePlace{0.55cm}{1.28cm}{%
+    \begin{minipage}{4.65cm}
+      \Lead{承载、装配与调试需求推动机械臂演化到 RevL。}
+      \vspace{0.40cm}
+
+      \begin{tabular}{@{}>{\color{CaseGray}}p{1.62cm}p{2.80cm}@{}}
+      \Small{开题阶段} & \Small{当前 RevL} \\[0.10cm]
+      \Small{四关节 + 夹爪} & \Body{五关节 + 夹爪} \\[0.12cm]
+      \Small{五路 MG90S} & \Body{3 × MG996R + 3 × MG90S} \\[0.12cm]
+      \Small{简化夹爪} & \Body{两片式夹爪与连杆机构} \\[0.12cm]
+      \Small{功能优先} & \Body{运动、标定与安全链路优先} \\
+      \end{tabular}
+
+      \vspace{0.42cm}
+      \RedLabel{关节定义}\par
+      \vspace{0.08cm}
+      \Small{J1 底座回转\quad J2 肩俯仰\par
+      J3 肘俯仰\quad J4 腕旋转\par
+      J5 腕俯仰\quad G 夹爪开合}
+    \end{minipage}}
+  \CaseImage{5.72cm}{1.18cm}{9.70cm}{CyberArm_RevL_rear.png}
+  \CaseNote{11.55cm}{8.35cm}{3.65cm}{RevL 后侧结构视角}
+\end{caseframe}
+
+% -----------------------------------------------------------------------------
+% 04 HARDWARE
+% -----------------------------------------------------------------------------
+\begin{caseframe}{硬件与电气连接}{ESP32-S3}{ + PCA9685}
+  \CasePlace{0.58cm}{1.24cm}{%
+    \begin{minipage}{4.55cm}
+      \Lead{逻辑电源与舵机电源分离，六路 PWM 由同一控制链产生。}
+      \vspace{0.48cm}
+      \RedLabel{供电原则}\par
+      \vspace{0.08cm}
+      \Body{PCA9685 VCC 接 3.3 V\par
+      舵机 V+ 使用独立约 5 V 电源\par
+      ESP32-S3、驱动板与舵机电源共地}
+
+      \vspace{0.40cm}
+      \RedLabel{配置入口}\par
+      \vspace{0.08cm}
+      \Body{J1 至 G 对应 PWM0 至 PWM5\par
+      \texttt{config/wiring.json} 统一记录接线\par
+      编译前检查重复通道与非法配置}
+    \end{minipage}}
+
+  \CasePlace{5.65cm}{1.34cm}{%
+    \begin{tikzpicture}[x=1cm,y=1cm]
+      \draw[CaseLightGray,line width=0.45pt] (0,0) -- (9.45,0);
+      \node[anchor=west] at (0,5.65) {\fontsize{8.5}{10}\selectfont\bfseries CyberArm Studio};
+      \node[anchor=east,text=CaseGray] at (9.4,5.65) {\fontsize{5.8}{7}\selectfont PC};
+      \draw[CaseRed,line width=1.1pt] (0,5.24) -- (9.45,5.24);
+      \node[anchor=west,text=CaseRed] at (0,4.88) {\fontsize{6.2}{7}\selectfont USB CDC / JSONL};
+
+      \node[anchor=west] at (0,4.12) {\fontsize{8.5}{10}\selectfont\bfseries ESP32-S3 DevKitC-1};
+      \node[anchor=east,text=CaseGray] at (9.4,4.12) {\fontsize{5.8}{7}\selectfont 状态、轨迹、看门狗};
+      \draw[CaseLightGray,line width=0.45pt] (0,3.72) -- (9.45,3.72);
+      \node[anchor=west,text=CaseRed] at (0,3.34) {\fontsize{6.2}{7}\selectfont I\textsuperscript{2}C · GPIO8 / GPIO9 · 400 kHz};
+
+      \node[anchor=west] at (0,2.58) {\fontsize{8.5}{10}\selectfont\bfseries PCA9685};
+      \node[anchor=east,text=CaseGray] at (9.4,2.58) {\fontsize{5.8}{7}\selectfont 0x40 · 50 Hz};
+      \draw[CaseLightGray,line width=0.45pt] (0,2.16) -- (9.45,2.16);
+
+      \foreach \x/\name in {0/J1,1.65/J2,3.30/J3,4.95/J4,6.60/J5,8.25/G}{
+        \draw[CaseRed,line width=0.65pt] (\x+0.43,1.80) -- (\x+0.43,1.34);
+        \node[anchor=north] at (\x+0.43,1.24) {\fontsize{7.2}{8}\selectfont\bfseries \name};
+      }
+      \node[anchor=west,text=CaseGray] at (0,0.52) {\fontsize{5.6}{7}\selectfont MG996R × 3};
+      \node[anchor=east,text=CaseGray] at (9.4,0.52) {\fontsize{5.6}{7}\selectfont MG90S × 3};
+    \end{tikzpicture}}
+\end{caseframe}
+
+% -----------------------------------------------------------------------------
+% 05 SOFTWARE
+% -----------------------------------------------------------------------------
+\begin{caseframe}{软件与固件结构}{CyberArm Studio}{ Control Stack}
+  \CasePlace{0.58cm}{1.28cm}{%
+    \begin{minipage}{5.15cm}
+      \Lead{上位机负责求解与检查，固件负责确定性的轨迹执行。}
+      \vspace{0.48cm}
+
+      \RedLabel{React + Three.js}\par
+      \Body{三维显示、手动控制、自动运行、标定界面}
+      \vspace{0.28cm}
+
+      \RedLabel{Python 本机服务}\par
+      \Body{运动学、路径规划、碰撞检查、串口桥接}
+      \vspace{0.28cm}
+
+      \RedLabel{USB CDC JSONL}\par
+      \Body{命令、状态、心跳与标定数据}
+      \vspace{0.28cm}
+
+      \RedLabel{ESP32-S3 固件}\par
+      \Body{协议解析、轨迹执行、舵机输出}
+    \end{minipage}}
+
+  \CasePlace{6.25cm}{1.42cm}{%
+    \begin{tikzpicture}[x=1cm,y=1cm]
+      \draw[CaseLightGray,line width=0.7pt] (0.62,0.55) -- (0.62,5.95);
+      \foreach \y/\n/\title/\desc in {
+        5.85/1/交互/关节滑块与末端目标,
+        4.52/2/规划/IK、限位与整段碰撞检查,
+        3.19/3/传输/计划版本、目标角与分段时间,
+        1.86/4/执行/20 ms 控制周期与五次插补,
+        0.53/5/输出/角度映射为六路 PWM}{
+        \node[anchor=center,circle,fill=CaseRed,text=white,inner sep=2.0pt,
+          font=\fontsize{5.8}{6}\selectfont\bfseries] at (0.62,\y) {\n};
+        \node[anchor=west] at (1.10,\y+0.13) {\fontsize{7.6}{8.5}\selectfont\bfseries \title};
+        \node[anchor=west,text=CaseGray] at (1.10,\y-0.22) {\fontsize{5.8}{7}\selectfont \desc};
+      }
+    \end{tikzpicture}}
+  \CaseKeyword{6.25cm}{7.73cm}{ONE CONTROL PATH}
+  \CaseNote{9.15cm}{7.70cm}{5.3cm}{前端不能绕过规划层直接写 PWM}
+\end{caseframe}
+
+% -----------------------------------------------------------------------------
+% 06 KINEMATICS
+% -----------------------------------------------------------------------------
+\begin{caseframe}{运动学求解与性能优化}{FK / IK}{ Analytic Jacobian}
+  \CasePlace{0.52cm}{1.17cm}{%
+    \begin{minipage}{7.55cm}
+      \RedLabel{正运动学}\par
+      \vspace{0.06cm}
+      \Small{每个关节绕自身局部 $z$ 轴旋转。固定局部变换 $A_i$ 来自机械模型。}
+      \vspace{0.10cm}
+      {\fontsize{7.6}{9.4}\selectfont
+      \[
+      T_{0E}(\bm q)=\left(\prod_{i=1}^{5}A_iR_z(q_i)\right)
+      A_{\mathrm{palm}}A_{\mathrm{TCP}}
+      \]}
+      \vspace{-0.14cm}
+      {\fontsize{6.8}{8.6}\selectfont
+      \[
+      \bm p(\bm q)=T_{0E}[0\!:\!3,3],\qquad
+      \bm d(\bm q)=R_{0E}\bm e_z
+      \]}
+
+      \vspace{0.12cm}
+      \RedLabel{解析雅可比}\par
+      \vspace{0.06cm}
+      \Small{关节轴与原点记为 $\bm a_i,\bm o_i$，目标为 $\bm p^*,\bm d^*$。}
+      \vspace{0.04cm}
+      {\fontsize{6.7}{8.5}\selectfont
+      \[
+      \bm r=\begin{bmatrix}1000(\bm p-\bm p^*)\\ \bm d-\bm d^*\end{bmatrix},
+      \quad
+      J_{p,i}=1000\,\bm a_i\!\times\!(\bm p-\bm o_i),
+      \quad
+      J_{d,i}=\bm a_i\!\times\!\bm d
+      \]}
+
+      \vspace{0.08cm}
+      \RedLabel{热启动阻尼高斯-牛顿}\par
+      \vspace{0.02cm}
+      {\fontsize{6.6}{8.4}\selectfont
+      \[
+      (J^TJ+\lambda sI)\Delta\bm q=J^T\bm r,
+      \qquad
+      \bm q_{k+1}=\operatorname{clip}(\bm q_k-\eta\Delta\bm q)
+      \]}
+      \vspace{-0.12cm}
+      \TinyGray{从当前姿态热启动；失败时再进入多种子信任域最小二乘。}
+    \end{minipage}}
+
+  \CasePlace{8.56cm}{1.20cm}{%
+    \begin{minipage}{6.72cm}
+      \Lead{求解从“通用迭代为主”变为“近点快速修正为主”。}
+      \vspace{0.38cm}
+
+      \Num{1}\hspace{0.12cm}\Body{雅可比轴从错误的局部 $x$ 轴改为真实的局部 $z$ 轴}\par
+      \vspace{0.25cm}
+      \Num{2}\hspace{0.12cm}\Body{五个关节一次计算叉乘，并复用同一次 FK}\par
+      \vspace{0.25cm}
+      \Num{3}\hspace{0.12cm}\Body{当前姿态热启动，冷种子才调用通用信任域}\par
+      \vspace{0.25cm}
+      \Num{4}\hspace{0.12cm}\Body{整条路径批量计算正运动学}\par
+
+      \vspace{0.46cm}
+      \RedLabel{实测耗时}\par
+      \vspace{0.16cm}
+      \Metric{79 ms}{1 ms}\quad\Small{近点 IK 10 mm}\par
+      \vspace{0.18cm}
+      \Metric{8 ms}{< 1 ms}\quad\Small{末端上移 30 mm}\par
+      \vspace{0.18cm}
+      \Metric{3.599 s}{0.178 s}\quad\Small{关节 30° 完整预览}
+    \end{minipage}}
+\end{caseframe}
+
+% -----------------------------------------------------------------------------
+% 07 CALIBRATION AND LINKAGE
+% -----------------------------------------------------------------------------
+\begin{caseframe}{上位机联动与关节标定}{CyberArm Studio}{ Commanded vs Measured}
+  \CasePlace{0.55cm}{1.20cm}{%
+    \begin{minipage}{5.05cm}
+      \Lead{仿真关节角经实测映射转换为舵机脉宽。}
+      \vspace{0.34cm}
+
+      \Num{1}\hspace{0.11cm}\Body{支撑连杆，只接入一个待测关节}\par
+      \vspace{0.22cm}
+      \Num{2}\hspace{0.11cm}\Body{从 1400--1600 $\mu$s 窄窗口开始点动}\par
+      \vspace{0.22cm}
+      \Num{3}\hspace{0.11cm}\Body{对照 CAD 零位，用外部量具读取真实角度}\par
+      \vspace{0.22cm}
+      \Num{4}\hspace{0.11cm}\Body{正负方向记录 3--7 组角度与脉宽}\par
+      \vspace{0.22cm}
+      \Num{5}\hspace{0.11cm}\Body{保存至 ESP32 NVS，并读回验证}\par
+
+      \vspace{0.38cm}
+      \RedLabel{分段线性映射}\par
+      \vspace{-0.05cm}
+      {\fontsize{6.3}{8.0}\selectfont
+      \[
+      u(q)=u_k+\frac{q-q_k}{q_{k+1}-q_k}(u_{k+1}-u_k)
+      \]}
+      \vspace{-0.18cm}
+      \TinyGray{上位机显示指令角。三线 PWM 舵机没有位置回读，标定不会形成闭环。}
+    \end{minipage}}
+
+  \CaseImage{6.05cm}{1.24cm}{9.36cm}{calibration-zero-reference.png}
+  \CaseNote{6.05cm}{7.42cm}{9.15cm}{零位参考只做运动学计算，不改变仿真姿态，也不发送舵机指令。}
+  \CaseKeyword{6.05cm}{7.88cm}{TARGET ANGLE / MAPPING / PWM}
+\end{caseframe}
+
+% -----------------------------------------------------------------------------
+% 08 DEMO
+% -----------------------------------------------------------------------------
+\begin{caseframe}{现场演示}{CyberArm}{ Live Control}
+  \CasePlace{0.55cm}{1.20cm}{%
+    \begin{minipage}{4.75cm}
+      \Lead{先验证软件状态，再连接实机并使用小角度动作。}
+      \vspace{0.46cm}
+
+      \Num{1}\hspace{0.12cm}\Body{启动上位机，检查模型与当前姿态}\par
+      \vspace{0.34cm}
+      \Num{2}\hspace{0.12cm}\Body{拖动末端，展示实时 IK 与边界反馈}\par
+      \vspace{0.34cm}
+      \Num{3}\hspace{0.12cm}\Body{连接 ESP32-S3，驱动已标定关节}\par
+      \vspace{0.34cm}
+      \Num{4}\hspace{0.12cm}\Body{触发停止，确认旧动作失效}\par
+
+      \vspace{0.54cm}
+      \RedLabel{备用展示}\par
+      \vspace{0.08cm}
+      \Small{不可达目标与碰撞拒绝\par
+      自动模式的预览、暂停与继续\par
+      提前录制的实机联动视频}
+    \end{minipage}}
+
+  \CaseImage{5.72cm}{1.18cm}{9.72cm}{calibration-workbench.png}
+  \CaseNote{5.72cm}{8.46cm}{9.4cm}{演示中不临时扩大模型限位或舵机脉宽范围。}
+\end{caseframe}
+
+% -----------------------------------------------------------------------------
+% 09 LIMITATIONS
+% -----------------------------------------------------------------------------
+\begin{caseframe}{机械臂的当前局限}{RevL}{ Open-loop Prototype}
+  \CaseImage{0.38cm}{1.22cm}{9.42cm}{CyberArm_RevL_side.png}
+  \CasePlace{10.18cm}{1.22cm}{%
+    \begin{minipage}{5.15cm}
+      \Lead{结构刚度、舵机性能和角度反馈共同限制实际精度。}
+      \vspace{0.38cm}
+
+      \RedLabel{3D 打印结构}\par
+      \Small{PLA 强度与刚度有限；打印误差、孔轴间隙和负载变形会改变理论关节中心。}
+      \vspace{0.30cm}
+
+      \RedLabel{舵机性能}\par
+      \Small{MG996R 与 MG90S 存在齿隙、死区和批次差异；小角度低速动作容易抖动。}
+      \vspace{0.30cm}
+
+      \RedLabel{角度感知}\par
+      \Small{三线 PWM 舵机没有位置回读。系统知道发送了什么指令，无法精确得知负载下的真实角度。}
+      \vspace{0.30cm}
+
+      \RedLabel{模型与实物}\par
+      \Small{碰撞模型不包含线缆摆动、打印件变形与未知障碍；数学可达不等于实物能够稳定到达。}
+
+    \end{minipage}}
+  \CaseNote{0.55cm}{8.22cm}{8.8cm}{RevL 舵机侧视角：远端质量、关节间隙与开环执行误差会沿运动链累积。}
+\end{caseframe}
+
+\end{document}
